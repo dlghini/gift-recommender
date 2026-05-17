@@ -105,12 +105,12 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
         });
-        if (!res.ok) throw new Error("API error");
-        const data = (await res.json()) as GiftResult[];
-        setGifts(data);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error ?? "API error");
+        setGifts(data as GiftResult[]);
         setStep("results");
-      } catch {
-        setApiError("Something went wrong. Please try again.");
+      } catch (e) {
+        setApiError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
         setStep(4);
       }
     } else if (typeof step === "number") {
@@ -215,6 +215,13 @@ export default function Home() {
                       </div>
                       <Button
                         className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm"
+                        onClick={() =>
+                          window.open(
+                            `https://www.amazon.com/s?k=${encodeURIComponent(gift.name)}`,
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
                       >
                         <ExternalLink className="w-3.5 h-3.5 mr-1" />
                         Buy now

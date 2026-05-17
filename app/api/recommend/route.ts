@@ -70,14 +70,12 @@ export async function POST(request: Request) {
           cache_control: { type: "ephemeral" },
         },
       ],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       output_config: {
         format: {
           type: "json_schema",
-          name: "gift_recommendations",
           schema: GIFT_SCHEMA,
         },
-      } as never,
+      },
       messages: [
         {
           role: "user",
@@ -101,7 +99,8 @@ export async function POST(request: Request) {
 
     return Response.json(data.gifts);
   } catch (error) {
-    console.error("[/api/recommend]", error);
-    return Response.json({ error: "Failed to get recommendations" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[/api/recommend]", msg);
+    return Response.json({ error: msg }, { status: 500 });
   }
 }
