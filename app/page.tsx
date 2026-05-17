@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle } from "lucide-react";
+import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Step = 1 | 2 | 3 | 4 | "loading" | "results";
@@ -95,24 +95,29 @@ export default function Home() {
             ? form.budget !== ""
             : false;
 
+  const fetchRecommendations = async () => {
+    setApiError(null);
+    setSaved(new Set());
+    setStep("loading");
+    try {
+      const res = await fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "API error");
+      setGifts(data as GiftResult[]);
+      setStep("results");
+    } catch (e) {
+      setApiError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      setStep(4);
+    }
+  };
+
   const next = async () => {
     if (step === 4) {
-      setApiError(null);
-      setStep("loading");
-      try {
-        const res = await fetch("/api/recommend", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error ?? "API error");
-        setGifts(data as GiftResult[]);
-        setStep("results");
-      } catch (e) {
-        setApiError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
-        setStep(4);
-      }
+      fetchRecommendations();
     } else if (typeof step === "number") {
       setStep((step + 1) as Step);
     }
@@ -154,12 +159,20 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-amber-50">
         <div className="max-w-2xl mx-auto px-4 py-10">
-          <button
-            onClick={back}
-            className="flex items-center gap-1 text-stone-400 hover:text-stone-700 text-sm mb-8 transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" /> Start over
-          </button>
+          <div className="flex items-center justify-between mb-8">
+            <button
+              onClick={back}
+              className="flex items-center gap-1 text-stone-400 hover:text-stone-700 text-sm transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" /> Start over
+            </button>
+            <button
+              onClick={fetchRecommendations}
+              className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Try different gifts
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-amber-500" />
