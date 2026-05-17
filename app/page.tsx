@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift } from "lucide-react";
+import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Step = 1 | 2 | 3 | 4 | "loading" | "results";
@@ -16,6 +16,14 @@ interface FormState {
   interests: string[];
   freetext: string;
   budget: string;
+}
+
+interface GiftResult {
+  name: string;
+  price: string;
+  rationale: string;
+  tags: string[];
+  affiliateUrl: string;
 }
 
 const RELATIONSHIPS = ["Partner", "Friend", "Parent", "Sibling", "Child", "Colleague"];
@@ -37,32 +45,20 @@ const BUDGETS = [
   { label: "$250+", value: "250+" },
 ];
 
-const MOCK_GIFTS = [
-  {
-    name: "Instant Pot Pro Plus",
-    price: "$99",
-    rationale:
-      "With their love for cooking, this programmable pressure cooker opens up a world of fast, flavorful meals — perfect for busy weeknight dinners or weekend experiments.",
-    tags: ["Cooking", "Kitchen", "Practical"],
-    emoji: "🍳",
-  },
-  {
-    name: "Moleskine Hardcover Journal Set",
-    price: "$45",
-    rationale:
-      "For the reader and thinker, a beautiful journal set invites creativity, reflection, and daily writing rituals that make any day feel more intentional.",
-    tags: ["Reading", "Creative", "Mindfulness"],
-    emoji: "📓",
-  },
-  {
-    name: "JBL Flip 6 Bluetooth Speaker",
-    price: "$79",
-    rationale:
-      "A waterproof, portable speaker delivering rich, punchy sound for music lovers who enjoy life both indoors and out.",
-    tags: ["Music", "Outdoors", "Tech"],
-    emoji: "🎵",
-  },
-];
+const TAG_EMOJI: Record<string, string> = {
+  Cooking: "🍳", Travel: "✈️", Fitness: "💪", Gaming: "🎮",
+  Reading: "📚", Music: "🎵", Art: "🎨", Outdoors: "🏕️",
+  Tech: "💻", Fashion: "👗", Kitchen: "🍳", Creative: "✏️",
+  Mindfulness: "🧘", Practical: "⚙️", Food: "🍽️", Coffee: "☕",
+};
+
+function pickEmoji(tags: string[]): string {
+  for (const tag of tags) {
+    const match = TAG_EMOJI[tag];
+    if (match) return match;
+  }
+  return "🎁";
+}
 
 const pillClass = (selected: boolean) =>
   cn(
@@ -75,6 +71,8 @@ const pillClass = (selected: boolean) =>
 export default function Home() {
   const [step, setStep] = useState<Step>(1);
   const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [gifts, setGifts] = useState<GiftResult[]>([]);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>({
     relationship: "",
     ageRange: "",
@@ -97,10 +95,24 @@ export default function Home() {
             ? form.budget !== ""
             : false;
 
-  const next = () => {
+  const next = async () => {
     if (step === 4) {
+      setApiError(null);
       setStep("loading");
-      setTimeout(() => setStep("results"), 2200);
+      try {
+        const res = await fetch("/api/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        if (!res.ok) throw new Error("API error");
+        const data = (await res.json()) as GiftResult[];
+        setGifts(data);
+        setStep("results");
+      } catch {
+        setApiError("Something went wrong. Please try again.");
+        setStep(4);
+      }
     } else if (typeof step === "number") {
       setStep((step + 1) as Step);
     }
@@ -133,7 +145,7 @@ export default function Home() {
       <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center gap-4">
         <div className="text-5xl animate-bounce">🎁</div>
         <p className="font-heading text-2xl text-stone-800">Finding your perfect gifts…</p>
-        <p className="text-stone-400 text-sm">Matching across thousands of ideas</p>
+        <p className="text-stone-400 text-sm">Our AI is thinking through thousands of ideas</p>
       </div>
     );
   }
@@ -162,11 +174,11 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col gap-4">
-            {MOCK_GIFTS.map((gift, idx) => (
+            {gifts.map((gift, idx) => (
               <Card key={idx} className="bg-white border-0 shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="text-4xl shrink-0">{gift.emoji}</div>
+                    <div className="text-4xl shrink-0">{pickEmoji(gift.tags)}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
@@ -242,6 +254,13 @@ export default function Home() {
                 style={{ width: `${progress}%` }}
               />
             </div>
+
+            {apiError && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3 mb-6">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {apiError}
+              </div>
+            )}
 
             {step === 1 && (
               <div>

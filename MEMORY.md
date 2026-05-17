@@ -50,8 +50,15 @@
 - Progress bar: custom div (not shadcn Progress) for easier amber color control
 - Added Lora font to `app/layout.tsx`, `--font-heading` updated in `app/globals.css`
 
-### Phase 3: AI Backend (NEXT)
-- Create `app/api/recommend/route.ts` POST endpoint
-- Accept `{ relationship, age, occasion, interests, budget }`, call Anthropic API
-- Return `[{ name, price, rationale, tags, affiliateUrl }]` (3 items)
-- Wire results into the existing results dashboard UI
+### Phase 3: AI Backend — COMPLETE
+- **`app/api/recommend/route.ts`** — POST handler using `@anthropic-ai/sdk` v0.96.0
+- Model: `claude-opus-4-7` with structured JSON output via `output_config.format` (raw JSON schema, no Zod)
+- Prompt caching: system prompt cached with `cache_control: { type: "ephemeral" }` in system array
+- Returns `[{ name, price, rationale, tags, affiliateUrl }]` (3 items)
+- **`app/page.tsx`** — replaced hardcoded mock data with live `/api/recommend` fetch
+- `TAG_EMOJI` map + `pickEmoji()` for dynamic gift card emoji based on AI-returned tags
+- Error banner (AlertCircle) on API failure, returns user to step 4 for retry
+- `output_config` typed as `never` cast to work around SDK type gap
+
+### Phase 4: (NEXT)
+- TBD
