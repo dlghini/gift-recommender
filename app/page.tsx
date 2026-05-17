@@ -71,6 +71,7 @@ const pillClass = (selected: boolean) =>
 export default function Home() {
   const [step, setStep] = useState<Step>(1);
   const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [attempt, setAttempt] = useState(0);
   const [gifts, setGifts] = useState<GiftResult[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>({
@@ -96,6 +97,8 @@ export default function Home() {
             : false;
 
   const fetchRecommendations = async () => {
+    const nextAttempt = attempt + 1;
+    setAttempt(nextAttempt);
     setApiError(null);
     setSaved(new Set());
     setStep("loading");
@@ -103,7 +106,7 @@ export default function Home() {
       const res = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, attempt: nextAttempt }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "API error");
@@ -124,7 +127,7 @@ export default function Home() {
   };
 
   const back = () => {
-    if (step === "results") setStep(4);
+    if (step === "results") { setStep(4); setAttempt(0); }
     else if (typeof step === "number" && step > 1) setStep((step - 1) as Step);
   };
 
