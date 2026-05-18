@@ -50,7 +50,7 @@ const BUDGET_LABELS: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    const { relationship, ageRange, occasion, interests, freetext, budget, attempt } =
+    const { relationship, ageRange, occasion, interests, freetext, budget, attempt, exclude } =
       (await request.json()) as {
         relationship: string;
         ageRange: string;
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
         freetext: string;
         budget: string;
         attempt: number;
+        exclude: string[];
       };
 
     const budgetLabel = BUDGET_LABELS[budget] ?? budget;
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 - Recipient: ${relationship}, age range ${ageRange}
 - Occasion: ${occasion}
 - Interests: ${interestList}
-- Budget: ${budgetLabel}${freetext ? `\n- Additional context: ${freetext}` : ""}${attempt > 1 ? `\n\nThis is regeneration #${attempt - 1}. You must suggest completely different gifts from any previous recommendations — avoid your most predictable or obvious picks for this profile and explore more creative, unexpected options.` : ""}`,
+- Budget: ${budgetLabel}${freetext ? `\n- Additional context: ${freetext}` : ""}${exclude.length > 0 ? `\n\nDo NOT suggest any of the following gifts — they have already been shown to the user:\n${exclude.map((n) => `- ${n}`).join("\n")}\n\nExplore more creative, unexpected options instead.` : ""}`,
         },
       ],
     });

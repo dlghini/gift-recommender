@@ -73,6 +73,7 @@ export default function Home() {
   const [step, setStep] = useState<Step>(1);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [attempt, setAttempt] = useState(0);
+  const [seenGifts, setSeenGifts] = useState<string[]>([]);
   const [gifts, setGifts] = useState<GiftResult[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>({
@@ -99,6 +100,7 @@ export default function Home() {
 
   const fetchRecommendations = async () => {
     const nextAttempt = attempt + 1;
+    const exclude = [...seenGifts, ...gifts.map((g) => g.name)];
     setAttempt(nextAttempt);
     setApiError(null);
     setSaved(new Set());
@@ -107,11 +109,13 @@ export default function Home() {
       const res = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, attempt: nextAttempt }),
+        body: JSON.stringify({ ...form, attempt: nextAttempt, exclude }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "API error");
-      setGifts(data as GiftResult[]);
+      const results = data as GiftResult[];
+      setSeenGifts((prev) => [...prev, ...results.map((g) => g.name)]);
+      setGifts(results);
       setStep("results");
     } catch (e) {
       setApiError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
@@ -128,7 +132,7 @@ export default function Home() {
   };
 
   const back = () => {
-    if (step === "results") { setStep(4); setAttempt(0); }
+    if (step === "results") { setStep(4); setAttempt(0); setSeenGifts([]); }
     else if (typeof step === "number" && step > 1) setStep((step - 1) as Step);
   };
 
