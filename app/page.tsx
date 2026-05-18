@@ -24,6 +24,7 @@ interface GiftResult {
   rationale: string;
   tags: string[];
   affiliateUrl: string;
+  searchQuery: string;
 }
 
 const RELATIONSHIPS = ["Partner", "Friend", "Parent", "Sibling", "Child", "Colleague"];
@@ -233,7 +234,7 @@ export default function Home() {
                         className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm"
                         onClick={() =>
                           window.open(
-                            `https://www.amazon.com/s?k=${encodeURIComponent(gift.name)}`,
+                            `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}`,
                             "_blank",
                             "noopener,noreferrer"
                           )

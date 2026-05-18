@@ -4,12 +4,15 @@ const client = new Anthropic();
 
 const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend exactly 3 gifts that are genuinely well-suited to them.
 
+Only suggest real products that actually exist and are widely available for purchase. Stick to well-known brands and products you are certain are real — do not invent product names or combine brand names with model numbers you are not sure about.
+
 For each gift provide:
-- A specific, real product name (not generic — e.g. "Kindle Paperwhite" not "e-reader")
-- A realistic price matching the stated budget, formatted as "$X" or "$X–$Y"
-- A warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person
-- 2–4 short interest or theme tags
-- affiliateUrl set to "#"
+- name: a specific, real product name (e.g. "Kindle Paperwhite" not "e-reader"). Must be a product that genuinely exists.
+- price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y"
+- rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person
+- tags: 2–4 short interest or theme tags
+- affiliateUrl: set to "#"
+- searchQuery: a concise 2–5 word Amazon search query that will reliably surface this product or very close alternatives (e.g. "Kindle Paperwhite e-reader" or "Yeti Rambler tumbler"). Keep it broad enough that slight naming variations still return good results.
 
 Make the gifts feel personal and considered. Vary the types across physical items, experiences, and subscriptions where appropriate.`;
 
@@ -26,8 +29,9 @@ const GIFT_SCHEMA = {
           rationale: { type: "string" },
           tags: { type: "array", items: { type: "string" } },
           affiliateUrl: { type: "string" },
+          searchQuery: { type: "string" },
         },
-        required: ["name", "price", "rationale", "tags", "affiliateUrl"],
+        required: ["name", "price", "rationale", "tags", "affiliateUrl", "searchQuery"],
         additionalProperties: false,
       },
     },
@@ -95,7 +99,7 @@ export async function POST(request: Request) {
     }
 
     const data = JSON.parse(textBlock.text) as {
-      gifts: { name: string; price: string; rationale: string; tags: string[]; affiliateUrl: string }[];
+      gifts: { name: string; price: string; rationale: string; tags: string[]; affiliateUrl: string; searchQuery: string }[];
     };
 
     return Response.json(data.gifts);
