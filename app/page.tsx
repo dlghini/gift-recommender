@@ -323,7 +323,7 @@ export default function Home() {
         <div className="flex items-center gap-2 mb-8 justify-center">
           <Gift className="w-5 h-5 text-amber-500" />
           <span className="font-heading text-xl font-bold text-stone-900 tracking-tight">
-            giftspark
+            The Gift Whisperer
           </span>
         </div>
 

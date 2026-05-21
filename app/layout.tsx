@@ -19,7 +19,7 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "GiftSpark — Find the perfect gift",
+  title: "The Gift Whisperer — Find the perfect gift",
   description: "AI-powered gift recommendations tailored to the person you love.",
 };
 
