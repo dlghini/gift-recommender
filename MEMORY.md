@@ -60,5 +60,9 @@
 - Error banner (AlertCircle) on API failure, returns user to step 4 for retry
 - `output_config` typed as `never` cast to work around SDK type gap
 
-### Phase 4: (NEXT)
-- TBD
+### Phase 4: Persistent Saved Gifts — COMPLETE
+- `savedGifts: GiftResult[]` state initialized from `localStorage("giftspark_saved")` on mount
+- `savedNames: Set<string>` derived from savedGifts for O(1) heart-state lookup (keyed by gift name, not index)
+- `toggleSaved(gift)` saves/removes full gift objects to localStorage; persists across page refreshes and sessions
+- Saved gifts section rendered below recommendations on results page — compact card with emoji, name, price, remove heart, and Buy button
+- Saves survive "Try different gifts" regeneration (no longer cleared on new fetch)

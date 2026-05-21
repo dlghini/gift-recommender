@@ -71,7 +71,16 @@ const pillClass = (selected: boolean) =>
 
 export default function Home() {
   const [step, setStep] = useState<Step>(1);
-  const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [savedGifts, setSavedGifts] = useState<GiftResult[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem("giftspark_saved");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+  const savedNames = new Set(savedGifts.map((g) => g.name));
   const [attempt, setAttempt] = useState(0);
   const [seenGifts, setSeenGifts] = useState<string[]>([]);
   const [gifts, setGifts] = useState<GiftResult[]>([]);
@@ -103,7 +112,6 @@ export default function Home() {
     const exclude = [...seenGifts, ...gifts.map((g) => g.name)];
     setAttempt(nextAttempt);
     setApiError(null);
-    setSaved(new Set());
     setStep("loading");
     try {
       const res = await fetch("/api/recommend", {
@@ -145,10 +153,13 @@ export default function Home() {
     }));
   };
 
-  const toggleSaved = (idx: number) => {
-    setSaved((s) => {
-      const next = new Set(s);
-      next.has(idx) ? next.delete(idx) : next.add(idx);
+  const toggleSaved = (gift: GiftResult) => {
+    setSavedGifts((prev) => {
+      const isAlreadySaved = prev.some((g) => g.name === gift.name);
+      const next = isAlreadySaved
+        ? prev.filter((g) => g.name !== gift.name)
+        : [...prev, gift];
+      localStorage.setItem("giftspark_saved", JSON.stringify(next));
       return next;
     });
   };
@@ -209,14 +220,14 @@ export default function Home() {
                           <p className="text-amber-600 font-semibold text-sm mt-0.5">{gift.price}</p>
                         </div>
                         <button
-                          onClick={() => toggleSaved(idx)}
+                          onClick={() => toggleSaved(gift)}
                           className="shrink-0 p-1.5 rounded-full hover:bg-rose-50 transition-colors cursor-pointer"
-                          aria-label={saved.has(idx) ? "Remove from wishlist" : "Save to wishlist"}
+                          aria-label={savedNames.has(gift.name) ? "Remove from wishlist" : "Save to wishlist"}
                         >
                           <Heart
                             className={cn(
                               "w-5 h-5 transition-colors",
-                              saved.has(idx)
+                              savedNames.has(gift.name)
                                 ? "fill-rose-500 text-rose-500"
                                 : "text-stone-300"
                             )}
@@ -253,6 +264,54 @@ export default function Home() {
               </Card>
             ))}
           </div>
+
+          {savedGifts.length > 0 && (
+            <div className="mt-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
+                <span className="text-stone-700 text-sm font-semibold">
+                  Saved gifts ({savedGifts.length})
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {savedGifts.map((gift, idx) => (
+                  <Card key={idx} className="bg-white border-0 shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl shrink-0">{pickEmoji(gift.tags)}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
+                          <p className="text-amber-600 text-xs font-semibold">{gift.price}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() => toggleSaved(gift)}
+                            className="p-1.5 rounded-full hover:bg-rose-50 transition-colors cursor-pointer"
+                            aria-label="Remove from saved"
+                          >
+                            <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
+                          </button>
+                          <Button
+                            size="sm"
+                            className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-8 px-3"
+                            onClick={() =>
+                              window.open(
+                                `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}`,
+                                "_blank",
+                                "noopener,noreferrer"
+                              )
+                            }
+                          >
+                            Buy
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
