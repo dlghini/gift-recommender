@@ -28,7 +28,7 @@ interface GiftResult {
 }
 
 const RELATIONSHIPS = ["Partner", "Friend", "Parent", "Sibling", "Child", "Colleague"];
-const AGE_RANGES = ["Under 18", "18–25", "26–35", "36–50", "51–65", "65+"];
+const AGE_RANGES = ["Under 10", "10–17", "18–30", "31–60", "60+"];
 const OCCASIONS = [
   { label: "Birthday", emoji: "🎂" },
   { label: "Holiday", emoji: "🎁" },
