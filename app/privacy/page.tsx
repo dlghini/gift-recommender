@@ -130,10 +130,10 @@ export default function PrivacyPage() {
             <p>
               If you have questions or concerns about this privacy policy, please email us at{" "}
               <a
-                href="mailto:hello@thegiftwhisperer.gifts"
+                href="mailto:dan.maghini@gmail.com"
                 className="text-amber-600 hover:text-amber-700 underline underline-offset-2"
               >
-                hello@thegiftwhisperer.gifts
+                dan.maghini@gmail.com
               </a>
               .
             </p>

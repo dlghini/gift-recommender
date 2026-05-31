@@ -32,10 +32,10 @@ export default function ContactPage() {
           <div>
             <p className="text-stone-500 text-sm mb-2">Drop us a line at</p>
             <a
-              href="mailto:hello@thegiftwhisperer.gifts"
+              href="mailto:dan.maghini@gmail.com"
               className="font-heading text-xl text-stone-900 hover:text-amber-600 transition-colors"
             >
-              hello@thegiftwhisperer.gifts
+              dan.maghini@gmail.com
             </a>
           </div>
           <p className="text-stone-400 text-xs max-w-xs">
