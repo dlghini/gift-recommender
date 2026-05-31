@@ -42,51 +42,29 @@ export default function PrivacyPage() {
           <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">2. How we use your information</h2>
             <p>
-              We use the information you provide to generate personalized gift recommendations
-              via Claude AI (by Anthropic). We also store anonymized session data — including
-              your wizard inputs and the gifts we recommended — to analyze usage patterns and
-              improve our service. We do not sell your data to third parties.
+              We use the information you provide to generate personalized gift recommendations.
+              We also store anonymized session data — including your wizard inputs and the gifts
+              we recommended — to analyze usage patterns and improve our service. We do not sell
+              your data to third parties.
             </p>
           </section>
 
           <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">3. Local storage</h2>
             <p>
-              Your saved gifts are stored in your browser&apos;s local storage under the key{" "}
-              <code className="bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded text-xs font-mono">
-                giftspark_saved
-              </code>
-              . This data never leaves your device and is not transmitted to our servers.
-              You can clear it at any time by clearing your browser&apos;s local storage or
-              site data.
+              Your saved gifts are stored in your browser&apos;s local storage and never leave
+              your device. You can clear them at any time by clearing your browser&apos;s local
+              storage or site data.
             </p>
           </section>
 
           <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">4. Third-party services</h2>
-            <p>We rely on the following third-party services, each with their own privacy policies:</p>
-            <ul className="mt-3 space-y-2 list-disc list-inside marker:text-amber-400">
-              <li>
-                <strong className="text-stone-700">Anthropic (Claude AI)</strong> — Your wizard
-                inputs are sent to Anthropic&apos;s API to generate gift recommendations.
-                Anthropic&apos;s privacy practices govern how this data is handled.
-              </li>
-              <li>
-                <strong className="text-stone-700">Amazon Associates</strong> — We participate in
-                the Amazon Services LLC Associates Program. When you click a "Buy now" link,
-                Amazon may set tracking cookies on your device. Amazon&apos;s privacy policy governs
-                their data practices.
-              </li>
-              <li>
-                <strong className="text-stone-700">Vercel</strong> — Our website is hosted on
-                Vercel, which may log standard server access information such as IP addresses and
-                request timestamps.
-              </li>
-              <li>
-                <strong className="text-stone-700">Neon</strong> — We use Neon (a Postgres
-                cloud database) to store anonymized session data.
-              </li>
-            </ul>
+            <p>
+              We participate in the Amazon Services LLC Associates Program. When you click a
+              &quot;Buy now&quot; link, Amazon may set tracking cookies on your device.
+              Amazon&apos;s privacy policy governs their data practices.
+            </p>
           </section>
 
           <section>
@@ -100,6 +78,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">6. Data retention</h2>
+
             <p>
               We retain anonymized session data indefinitely for analytics purposes. Because
               we do not collect personally identifiable information, we are unable to
