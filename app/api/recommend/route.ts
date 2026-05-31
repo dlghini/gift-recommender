@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import sql from "@/lib/db";
 
 const client = new Anthropic();
 
@@ -103,7 +104,28 @@ export async function POST(request: Request) {
       gifts: { name: string; price: string; rationale: string; tags: string[]; affiliateUrl: string; searchQuery: string }[];
     };
 
-    return Response.json(data.gifts);
+    const gifts = data.gifts;
+
+    // Log session to database — errors here don't affect the user response
+    try {
+      await sql`
+        INSERT INTO sessions (relationship, age_range, occasion, interests, freetext, budget, gifts, attempt)
+        VALUES (
+          ${relationship},
+          ${ageRange},
+          ${occasion},
+          ${JSON.stringify(interests)},
+          ${freetext ?? ""},
+          ${budget},
+          ${JSON.stringify(gifts)},
+          ${attempt}
+        )
+      `;
+    } catch (dbError) {
+      console.error("[session logging]", dbError);
+    }
+
+    return Response.json(gifts);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[/api/recommend]", msg);
