@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import sql from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 export async function GET() {
+  const sql = getDb();
   await sql`
     CREATE TABLE IF NOT EXISTS sessions (
       id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import sql from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 const client = new Anthropic();
 
@@ -108,6 +108,7 @@ export async function POST(request: Request) {
 
     // Log session to database — errors here don't affect the user response
     try {
+      const sql = getDb();
       await sql`
         INSERT INTO sessions (relationship, age_range, occasion, interests, freetext, budget, gifts, attempt)
         VALUES (
