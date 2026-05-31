@@ -256,7 +256,7 @@ export default function Home() {
                         className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm"
                         onClick={() =>
                           window.open(
-                            `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}`,
+                            `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}&tag=giftwhisper0e-20`,
                             "_blank",
                             "noopener,noreferrer"
                           )
@@ -303,7 +303,7 @@ export default function Home() {
                             className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-8 px-3"
                             onClick={() =>
                               window.open(
-                                `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}`,
+                                `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}&tag=giftwhisper0e-20`,
                                 "_blank",
                                 "noopener,noreferrer"
                               )
