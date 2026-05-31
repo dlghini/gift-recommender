@@ -205,6 +205,13 @@ export default function Home() {
             {form.occasion || "any occasion"}
           </p>
 
+          <p className="text-xs text-stone-400 mb-4">
+            As an Amazon Associate we earn from qualifying purchases.{" "}
+            <a href="/disclosure" className="underline underline-offset-2 hover:text-stone-600">
+              Learn more
+            </a>
+          </p>
+
           <div className="flex flex-col gap-4">
             {gifts.map((gift, idx) => (
               <Card key={idx} className="bg-white border-0 shadow-sm">
