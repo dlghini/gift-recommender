@@ -30,8 +30,8 @@ export default function AboutPage() {
           </h1>
           <p className="text-stone-500 text-lg leading-relaxed">
             Finding a meaningful gift is hard. Not because there aren&apos;t enough options —
-            because there are too many. The Gift Whisperer cuts through the noise with AI
-            that actually understands who you&apos;re buying for.
+            because there are too many. The Gift Whisperer cuts through the noise with
+            recommendations tailored to the person you&apos;re buying for.
           </p>
         </div>
 
@@ -40,11 +40,10 @@ export default function AboutPage() {
             <CardContent className="p-6 flex gap-4">
               <div className="text-3xl shrink-0">🧠</div>
               <div>
-                <h2 className="font-heading text-lg text-stone-900 mb-1">Powered by Claude AI</h2>
+                <h2 className="font-heading text-lg text-stone-900 mb-1">Smarter than a bestseller list</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
-                  Our recommendations come from Claude, Anthropic&apos;s AI assistant. We give it
-                  the full picture — the recipient&apos;s relationship to you, their age, the
-                  occasion, their interests, and your budget — and it thinks through thousands
+                  We look at the full picture — the recipient&apos;s relationship to you, their age,
+                  the occasion, their interests, and your budget — and think through thousands
                   of possibilities to surface three gifts that genuinely fit.
                 </p>
               </div>
