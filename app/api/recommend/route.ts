@@ -1,5 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "1 h"),
+  prefix: "giftwhisperer:ratelimit",
+});
 
 const client = new Anthropic();
 
@@ -51,6 +59,19 @@ const BUDGET_LABELS: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      request.headers.get("x-real-ip") ??
+      "anonymous";
+
+    const { success, remaining } = await ratelimit.limit(ip);
+    if (!success) {
+      return Response.json(
+        { error: "Too many requests. Please try again in an hour." },
+        { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+      );
+    }
+
     const { relationship, ageRange, occasion, interests, freetext, budget, attempt, exclude } =
       (await request.json()) as {
         relationship: string;
