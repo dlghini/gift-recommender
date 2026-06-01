@@ -1,11 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw } from "lucide-react";
+import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
+  return btoa(encodeURIComponent(JSON.stringify({ form, gifts })));
+}
+
+function decodeSharePayload(encoded: string): { form: FormState; gifts: GiftResult[] } | null {
+  try {
+    return JSON.parse(decodeURIComponent(atob(encoded)));
+  } catch {
+    return null;
+  }
+}
 
 type Step = 1 | 2 | 3 | 4 | "loading" | "results";
 
@@ -93,6 +105,36 @@ export default function Home() {
     freetext: "",
     budget: "",
   });
+
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const r = params.get("r");
+    if (r) {
+      const decoded = decodeSharePayload(r);
+      if (decoded) {
+        setForm(decoded.form);
+        setGifts(decoded.gifts);
+        setStep("results");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (step === "results" && gifts.length > 0) {
+      const encoded = encodeSharePayload(form, gifts);
+      window.history.replaceState(null, "", `?r=${encoded}`);
+    } else if (step !== "results" && step !== "loading") {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, [step, gifts, form]);
+
+  const handleShare = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const progress = typeof step === "number" ? (step / 4) * 100 : 100;
 
@@ -185,12 +227,21 @@ export default function Home() {
             >
               <ArrowLeft className="w-4 h-4" /> Start over
             </button>
-            <button
-              onClick={fetchRecommendations}
-              className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors cursor-pointer"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Try different gifts
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-1.5 text-sm font-medium text-stone-400 hover:text-stone-700 transition-colors cursor-pointer"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Share2 className="w-3.5 h-3.5" />}
+                {copied ? "Copied!" : "Share"}
+              </button>
+              <button
+                onClick={fetchRecommendations}
+                className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Try different gifts
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 mb-2">
