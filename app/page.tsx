@@ -250,18 +250,7 @@ export default function Home() {
               Your picks
             </span>
           </div>
-          <h1 className="font-heading text-3xl text-stone-900 mb-1">3 gifts they&apos;ll love</h1>
-          <p className="text-stone-400 text-sm mb-8">
-            Curated for {form.relationship.toLowerCase() || "them"} •{" "}
-            {form.occasion || "any occasion"}
-          </p>
-
-          <p className="text-xs text-stone-400 mb-4">
-            As an Amazon Associate we earn from qualifying purchases.{" "}
-            <a href="/disclosure" className="underline underline-offset-2 hover:text-stone-600">
-              Learn more
-            </a>
-          </p>
+          <h1 className="font-heading text-3xl text-stone-900 mb-8">3 gifts they&apos;ll love</h1>
 
           <div className="flex flex-col gap-4">
             {gifts.map((gift, idx) => (
@@ -322,6 +311,13 @@ export default function Home() {
               </Card>
             ))}
           </div>
+
+          <p className="text-xs text-stone-400 mt-4">
+            As an Amazon Associate we earn from qualifying purchases.{" "}
+            <a href="/disclosure" className="underline underline-offset-2 hover:text-stone-600">
+              Learn more
+            </a>
+          </p>
 
           {savedGifts.length > 0 && (
             <div className="mt-10">
