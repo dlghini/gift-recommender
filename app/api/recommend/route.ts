@@ -3,11 +3,14 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(25, "1 h"),
-  prefix: "giftwhisperer:ratelimit",
-});
+const ratelimit =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(25, "1 h"),
+        prefix: "giftwhisperer:ratelimit",
+      })
+    : null;
 
 const client = new Anthropic();
 
@@ -64,12 +67,14 @@ export async function POST(request: Request) {
       request.headers.get("x-real-ip") ??
       "anonymous";
 
-    const { success, remaining } = await ratelimit.limit(ip);
-    if (!success) {
-      return Response.json(
-        { error: "Too many requests. Please try again in an hour." },
-        { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
-      );
+    if (ratelimit) {
+      const { success, remaining } = await ratelimit.limit(ip);
+      if (!success) {
+        return Response.json(
+          { error: "Too many requests. Please try again in an hour." },
+          { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+        );
+      }
     }
 
     const { relationship, ageRange, occasion, interests, freetext, budget, attempt, exclude } =
