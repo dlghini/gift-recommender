@@ -24,9 +24,10 @@ For each gift provide:
 - rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person
 - tags: 2–4 short interest or theme tags
 - affiliateUrl: set to "#"
-- searchQuery: a concise 2–5 word Amazon search query that will reliably surface this product or very close alternatives (e.g. "Kindle Paperwhite e-reader" or "Yeti Rambler tumbler"). Keep it broad enough that slight naming variations still return good results.
+- store: either "etsy" or "amazon". Use "etsy" for gifts that are handmade, personalized, custom, artisan, vintage, or unique in nature — the kind of thing you'd find on Etsy. Use "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced.
+- searchQuery: a concise 2–5 word search query that will reliably surface this product. For "amazon" gifts, optimize for Amazon search. For "etsy" gifts, optimize for Etsy search (e.g. "personalized leather wallet" or "custom star map print").
 
-Make the gifts feel personal and considered. Vary the types across physical items, experiences, and subscriptions where appropriate.`;
+Make the gifts feel personal and considered. Vary the types across physical items, experiences, and subscriptions where appropriate. Aim to include at least one Etsy-type gift per set where it fits naturally.`;
 
 const GIFT_SCHEMA = {
   type: "object",
@@ -41,9 +42,10 @@ const GIFT_SCHEMA = {
           rationale: { type: "string" },
           tags: { type: "array", items: { type: "string" } },
           affiliateUrl: { type: "string" },
+          store: { type: "string", enum: ["amazon", "etsy"] },
           searchQuery: { type: "string" },
         },
-        required: ["name", "price", "rationale", "tags", "affiliateUrl", "searchQuery"],
+        required: ["name", "price", "rationale", "tags", "affiliateUrl", "store", "searchQuery"],
         additionalProperties: false,
       },
     },

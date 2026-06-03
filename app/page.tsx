@@ -36,7 +36,19 @@ interface GiftResult {
   rationale: string;
   tags: string[];
   affiliateUrl: string;
+  store: "amazon" | "etsy";
   searchQuery: string;
+}
+
+const RAKUTEN_ID = "4710093";
+const ETSY_MID = "54027";
+
+function buildBuyUrl(gift: GiftResult): string {
+  if (gift.store === "etsy") {
+    const etsyUrl = `https://www.etsy.com/search?q=${encodeURIComponent(gift.searchQuery || gift.name)}`;
+    return `https://click.linksynergy.com/deeplink?id=${RAKUTEN_ID}&mid=${ETSY_MID}&murl=${encodeURIComponent(etsyUrl)}`;
+  }
+  return `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}&tag=giftwhisper0e-20`;
 }
 
 const RELATIONSHIPS = ["Partner", "Friend", "Parent", "Sibling", "Child", "Colleague"];
@@ -295,15 +307,11 @@ export default function Home() {
                       <Button
                         className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm"
                         onClick={() =>
-                          window.open(
-                            `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}&tag=giftwhisper0e-20`,
-                            "_blank",
-                            "noopener,noreferrer"
-                          )
+                          window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer")
                         }
                       >
                         <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                        Buy now
+                        {gift.store === "etsy" ? "Shop on Etsy" : "Buy on Amazon"}
                       </Button>
                     </div>
                   </div>
@@ -349,11 +357,7 @@ export default function Home() {
                             size="sm"
                             className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-8 px-3"
                             onClick={() =>
-                              window.open(
-                                `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery || gift.name)}&tag=giftwhisper0e-20`,
-                                "_blank",
-                                "noopener,noreferrer"
-                              )
+                              window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer")
                             }
                           >
                             Buy
