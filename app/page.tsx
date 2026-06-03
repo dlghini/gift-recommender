@@ -311,7 +311,7 @@ export default function Home() {
                         }
                       >
                         <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                        {gift.store === "etsy" ? "Shop on Etsy" : "Buy on Amazon"}
+                        Buy now
                       </Button>
                     </div>
                   </div>
@@ -321,7 +321,7 @@ export default function Home() {
           </div>
 
           <p className="text-xs text-stone-400 mt-4">
-            As an Amazon Associate we earn from qualifying purchases.{" "}
+            We earn from qualifying purchases via affiliate partnerships.{" "}
             <a href="/disclosure" className="underline underline-offset-2 hover:text-stone-600">
               Learn more
             </a>
