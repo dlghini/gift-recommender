@@ -40,7 +40,7 @@ interface GiftResult {
   searchQuery: string;
 }
 
-const RAKUTEN_ID = "4710093";
+const RAKUTEN_ID = "wa9JRgUhXO8";
 const ETSY_MID = "54027";
 
 function buildBuyUrl(gift: GiftResult): string {
