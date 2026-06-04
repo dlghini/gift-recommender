@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePostHog } from "posthog-js/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -94,6 +95,7 @@ const pillClass = (selected: boolean) =>
   );
 
 export default function Home() {
+  const posthog = usePostHog();
   const [step, setStep] = useState<Step>(1);
   const [savedGifts, setSavedGifts] = useState<GiftResult[]>(() => {
     if (typeof window === "undefined") return [];
@@ -145,6 +147,7 @@ export default function Home() {
   const handleShare = async () => {
     await navigator.clipboard.writeText(window.location.href);
     setCopied(true);
+    posthog?.capture("results_shared");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -161,12 +164,17 @@ export default function Home() {
             ? form.budget !== ""
             : false;
 
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = async (isRegenerate = false) => {
     const nextAttempt = attempt + 1;
     const exclude = [...seenGifts, ...gifts.map((g) => g.name)];
     setAttempt(nextAttempt);
     setApiError(null);
     setStep("loading");
+    if (isRegenerate) {
+      posthog?.capture("regenerate_clicked", { attempt: nextAttempt, ...form });
+    } else {
+      posthog?.capture("wizard_completed", form);
+    }
     try {
       const res = await fetch("/api/recommend", {
         method: "POST",
@@ -179,16 +187,20 @@ export default function Home() {
       setSeenGifts((prev) => [...prev, ...results.map((g) => g.name)]);
       setGifts(results);
       setStep("results");
+      posthog?.capture("recommendations_shown", { attempt: nextAttempt, gifts: results.map((g) => g.name) });
     } catch (e) {
-      setApiError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      const msg = e instanceof Error ? e.message : "Something went wrong. Please try again.";
+      setApiError(msg);
       setStep(4);
+      posthog?.capture("recommendations_error", { error: msg, ...form });
     }
   };
 
   const next = async () => {
     if (step === 4) {
-      fetchRecommendations();
+      fetchRecommendations(false);
     } else if (typeof step === "number") {
+      posthog?.capture("wizard_step_completed", { step, ...form });
       setStep((step + 1) as Step);
     }
   };
@@ -214,8 +226,14 @@ export default function Home() {
         ? prev.filter((g) => g.name !== gift.name)
         : [...prev, gift];
       localStorage.setItem("giftspark_saved", JSON.stringify(next));
+      posthog?.capture(isAlreadySaved ? "gift_unsaved" : "gift_saved", { gift: gift.name, store: gift.store });
       return next;
     });
+  };
+
+  const handleBuyClick = (gift: GiftResult) => {
+    posthog?.capture("buy_clicked", { gift: gift.name, store: gift.store, price: gift.price, ...form });
+    handleBuyClick(gift);
   };
 
   if (step === "loading") {
@@ -248,7 +266,7 @@ export default function Home() {
                 {copied ? "Copied!" : "Share"}
               </button>
               <button
-                onClick={fetchRecommendations}
+                onClick={() => fetchRecommendations(true)}
                 className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Try different gifts
@@ -307,7 +325,7 @@ export default function Home() {
                       <Button
                         className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm"
                         onClick={() =>
-                          window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer")
+                          handleBuyClick(gift)
                         }
                       >
                         <ExternalLink className="w-3.5 h-3.5 mr-1" />
@@ -357,7 +375,7 @@ export default function Home() {
                             size="sm"
                             className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-8 px-3"
                             onClick={() =>
-                              window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer")
+                              handleBuyClick(gift)
                             }
                           >
                             Buy
