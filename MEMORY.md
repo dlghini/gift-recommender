@@ -122,6 +122,17 @@
 - How-it-works copy is store-agnostic (no explicit Amazon/Etsy mention)
 - Amazon Associates re-suspension fix: static affiliate links now visible in landing page HTML for the bot to find
 
+### Phase 13: Email Capture ("Send to my inbox") — COMPLETE
+- Resend domain verification finished (DKIM/SPF/MX on `send.thegiftwhisperer.gifts` all resolved) — confirmed **Verified** in Resend dashboard.
+- `resend` npm package installed (memory previously said this was already done — it wasn't; corrected).
+- Created a Resend API key scoped to sending-only access, restricted to `thegiftwhisperer.gifts` domain — added to `.env.local` and needs to be added to Vercel Production env vars as `RESEND_API_KEY` before this works live.
+- `app/api/setup/route.ts` now also creates a `subscribers` table (`id`, `created_at`, `email`, `gifts` JSONB) — same lazy-migration pattern as `sessions`. Re-run `/api/setup` in production once deployed.
+- New `app/api/send-results/route.ts`: validates email format, rate-limits by IP (10/hour via Upstash, separate prefix from `/api/recommend`), logs the subscriber (best-effort, non-blocking), and sends a branded HTML email via Resend from `hello@thegiftwhisperer.gifts` with the 3 gift cards + real affiliate buy/book links (escapes all interpolated text to prevent HTML injection into the email body).
+- `app/wizard/page.tsx`: new "Send these to your inbox" card on the results screen (email input + Send button, success/error states), tracked via PostHog (`results_emailed` / `results_email_error`).
+- Tested end-to-end via direct API calls: subscriber row confirmed in Neon, email confirmed **Delivered** in Resend's dashboard, rendered preview looks correct (amber/indigo styling matching product vs experience cards).
+- Resend flagged two non-blocking insights on the test send: "Ensure link URLs match sending domain" (expected — these are affiliate emails, external links are the point) and "Use a subdomain" (optional deliverability best practice, e.g. `hello@send.thegiftwhisperer.gifts` instead of the root domain — not applied, current setup delivers fine as-is).
+- Not yet done: add `RESEND_API_KEY` to Vercel, push to `origin/main`, redeploy, re-run `/api/setup` against production DB.
+
 ### Phase 12b: Static Etsy/Viator Example Links — COMPLETE
 - Same crawlability fix that resolved the Amazon Associates suspension, extended to the other two affiliate programs: added 1 Etsy example card and 1 Viator experience example card to the landing page (`app/page.tsx`), alongside the existing 3 Amazon cards (kept untouched since the Amazon reapplication is still pending — didn't want to reduce Amazon's link count mid-appeal).
 - Rationale: neither Etsy nor Viator had any crawlable affiliate link anywhere in static HTML before this — same failure mode that got Amazon's bot to flag the site, just not yet triggered for these two.
@@ -149,7 +160,7 @@
 11. ~~Rate limiting~~ ✅ DONE — 25 req/hour/IP via Upstash Redis
 12. ~~PostHog analytics~~ ✅ DONE
 13. ~~Landing page split from wizard~~ ✅ DONE
-14. Fix Resend DNS + build email capture ("Send to my inbox" on results screen, `/api/send-results`, Neon `subscribers` table)
+14. ~~Fix Resend DNS + build email capture~~ ✅ DONE (see Phase 13) — code complete, tested end-to-end locally; still needs `RESEND_API_KEY` in Vercel + deploy + prod `/api/setup` run
 15. Reapply to Amazon Associates
 16. Unsplash API for Etsy gift images (Etsy Open API denied, final)
 17. Experience recommendations (Viator + Groupon, `type: "product" | "experience"` on schema) — IN PROGRESS, Viator side built (see Phase 12), Groupon blocked on affiliate approval

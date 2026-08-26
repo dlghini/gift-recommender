@@ -17,5 +17,13 @@ export async function GET() {
       attempt     INTEGER DEFAULT 1
     )
   `;
-  return NextResponse.json({ ok: true, message: "Table ready" });
+  await sql`
+    CREATE TABLE IF NOT EXISTS subscribers (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      email       TEXT NOT NULL,
+      gifts       JSONB
+    )
+  `;
+  return NextResponse.json({ ok: true, message: "Tables ready" });
 }

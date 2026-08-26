@@ -5,7 +5,7 @@ import { usePostHog } from "posthog-js/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket } from "lucide-react";
+import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
@@ -134,6 +134,9 @@ export default function WizardPage() {
     giftPreference: "both",
   });
   const [copied, setCopied] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -244,6 +247,28 @@ export default function WizardPage() {
     });
   };
 
+  const handleSendEmail = async () => {
+    if (!emailValue || emailStatus === "sending") return;
+    setEmailStatus("sending");
+    setEmailError(null);
+    try {
+      const res = await fetch("/api/send-results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailValue, gifts }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "Something went wrong. Please try again.");
+      setEmailStatus("sent");
+      posthog?.capture("results_emailed", { gifts: gifts.map((g) => g.name) });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Something went wrong. Please try again.";
+      setEmailError(msg);
+      setEmailStatus("error");
+      posthog?.capture("results_email_error", { error: msg });
+    }
+  };
+
   const handleBuyClick = (gift: GiftResult) => {
     posthog?.capture("buy_clicked", { gift: gift.name, store: gift.store, price: gift.price, ...form });
     window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer");
@@ -351,6 +376,43 @@ export default function WizardPage() {
             We earn from qualifying purchases via affiliate partnerships.{" "}
             <a href="/disclosure" className="underline underline-offset-2 hover:text-stone-600">Learn more</a>
           </p>
+
+          <Card className="bg-white border-0 shadow-sm mt-6">
+            <CardContent className="p-5">
+              {emailStatus === "sent" ? (
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <Check className="w-4 h-4" />
+                  Sent! Check your inbox for these picks.
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Mail className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-semibold text-stone-700">Send these to your inbox</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={emailValue}
+                      onChange={(e) => setEmailValue(e.target.value)}
+                      className="border-stone-200 focus:border-amber-400"
+                    />
+                    <Button
+                      onClick={handleSendEmail}
+                      disabled={!emailValue || emailStatus === "sending"}
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-semibold shrink-0"
+                    >
+                      {emailStatus === "sending" ? "Sending…" : "Send"}
+                    </Button>
+                  </div>
+                  {emailStatus === "error" && (
+                    <p className="text-xs text-red-600 mt-2">{emailError}</p>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
 
           {savedGifts.length > 0 && (
             <div className="mt-10">
