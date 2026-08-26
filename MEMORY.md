@@ -60,10 +60,12 @@
 - After deploying, visit `thegiftwhisperer.gifts/api/setup` once to create the sessions table in production
 - `.env.local` is gitignored — secrets must be added manually in the Vercel dashboard
 - Resend sending domain `hello@thegiftwhisperer.gifts` — DKIM verified, MX and SPF still failing to resolve via Namecheap Custom MX; blocks email capture feature
+- A weekly scheduled cloud routine (`trig_01TkauHiFAyPU2EUhPnBTo1J`, Mondays 9am America/Chicago) POSTs a test request to production `/api/recommend` and reports PASS/FAIL, as an early-warning check for the Upstash rate-limiter gotcha above (see Phase 13b). Limitation: since the endpoint fails open, a PASS does NOT prove the Upstash database is still alive — only manually checking console.upstash.com can confirm that.
 
 ## Affiliate Setup
 
-- **Amazon Associates** — tag `giftwhisper0e-20`. Account was suspended because Amazon's bot couldn't find the tag on the page (recommendations were client-side dynamic). Fixed by adding static example gift cards with real affiliate links to the landing page HTML; reapplication pending confirmation.
+- **Amazon Associates** — tag `giftwhisper0e-20`. Account was suspended because Amazon's bot couldn't find the tag on the page (recommendations were client-side dynamic). Fixed by adding static example gift cards with real affiliate links to the landing page HTML. **Reinstated 2026-08-26** (case #21744947221) — active again in all previously-configured countries. Pre-suspension earnings weren't voided: $6.23 total commission from early June, with $5.51 already paid out (initiated Aug 18) despite the suspension.
+- **Amazon OneLink** — flagged in the reinstatement email as a way to monetize international traffic via a single store ID with automatic geo-redirect to local Amazon marketplaces. Evaluated 2026-08-26, deliberately **deferred**: per-marketplace commission rates aren't uniform, geo-IP misdetection can send US buyers into a foreign checkout, it's another third-party script with its own failure mode, EU marketplaces add GDPR/compliance surface our privacy/disclosure pages don't cover, and international traffic volume is unconfirmed (PostHog shows ~33% non-US over 180 days but on only 46 total visitors with no bot filtering — not reliable). Revisit once the account has clean post-reinstatement history and PostHog goal tracking confirms real international volume.
 - **Etsy via Rakuten** — publisher SID `4710093`, MID `54027`, link token `wa9JRgUhXO8`. Approved and live. Deeplink format: `https://click.linksynergy.com/deeplink?id=wa9JRgUhXO8&mid=54027&murl=ENCODED_ETSY_URL`
 - **Etsy Open API** — denied, no reconsideration possible. Plan is to use Unsplash's free API for contextual images on Etsy cards instead.
 - **Viator** — approved (~8% commission), partner ID not yet retrieved.
@@ -122,6 +124,13 @@
 - How-it-works copy is store-agnostic (no explicit Amazon/Etsy mention)
 - Amazon Associates re-suspension fix: static affiliate links now visible in landing page HTML for the bot to find
 
+### Phase 14: Gift Card Images (Viator real photos + Unsplash fallback) — CODE COMPLETE, needs Unsplash key
+- Discovered Viator's `/search/freetext` response (already being called for every `store: "viator"` gift) includes an `images` array per result with multiple resolution `variants` — this data was being fetched all along but discarded. Added `pickViatorImageUrl()` in [route.ts](app/api/recommend/route.ts) to pick the variant closest to 200px wide.
+- Added `fetchUnsplashImage(query)` as a generic fallback for any gift without a real product photo: Amazon and Etsy gifts always use it (neither has a real per-product image source yet); Viator gifts use it only if Viator's own image lookup comes back empty. Gracefully no-ops (returns `undefined`) if `UNSPLASH_ACCESS_KEY` isn't set, same pattern as the other optional integrations.
+- Frontend: added `imageUrl?: string` to `GiftResult`, and a new `GiftThumb` component in [wizard/page.tsx](app/wizard/page.tsx) that renders the real photo when present (with `onError` fallback to the emoji if the image URL 404s/fails to load) and falls back to the existing `pickEmoji()` treatment otherwise. Used in both the main results cards and the saved-gifts list.
+- **Still needs a real `UNSPLASH_ACCESS_KEY`** to actually activate the Amazon/Etsy fallback path (and the Viator-image-missing fallback) — requires a free Unsplash developer account + registered app, which needs to be done by the user (Claude does not create third-party accounts). Once obtained, add to `.env.local` and Vercel Production as `UNSPLASH_ACCESS_KEY`.
+- Verified end-to-end in dev: build passes with no type errors, full wizard flow tested in browser, `imageUrl` resolves to `undefined` and is cleanly omitted from the API response when no keys are configured (current state — Viator sandbox key is still the old invalid one from Phase 12, Unsplash key not yet obtained), falling back to emoji with no console errors or regressions.
+
 ### Phase 13b: Production Outage — Upstash Rate Limiter Deleted — RESOLVED
 - **What happened**: the free-tier Upstash Redis database backing rate limiting (`noted-labrador...upstash.io`) was silently auto-deleted by Upstash after 14 days of inactivity. This broke `/api/recommend` (the core feature) and the new `/api/send-results` in production with a generic `{"error":"fetch failed"}` — both were unusable for real users until this was found and fixed.
 - **Root cause in code**: `ratelimit.limit(ip)` was only guarded by `if (ratelimit)` (checking env vars are *set*), not wrapped in try/catch — so an unreachable host threw instead of failing gracefully like the "env vars unset" case already did.
@@ -168,14 +177,21 @@
 12. ~~PostHog analytics~~ ✅ DONE
 13. ~~Landing page split from wizard~~ ✅ DONE
 14. ~~Fix Resend DNS + build email capture~~ ✅ DONE (see Phase 13) — code complete, tested end-to-end locally; still needs `RESEND_API_KEY` in Vercel + deploy + prod `/api/setup` run
-15. Reapply to Amazon Associates
-16. Unsplash API for Etsy gift images (Etsy Open API denied, final)
+15. ~~Reapply to Amazon Associates~~ ✅ DONE — reinstated 2026-08-26, see Affiliate Setup above
+16. ~~Real/contextual gift images~~ ✅ DONE 2026-08-26 (see Phase 14) — now covers all 3 stores, not just Etsy as originally scoped
 17. Experience recommendations (Viator + Groupon, `type: "product" | "experience"` on schema) — IN PROGRESS, Viator side built (see Phase 12), Groupon blocked on affiliate approval
 18. Smarter Claude search queries (tighter `searchQuery` values)
-19. Amazon Product Advertising API (needs 10 qualifying sales)
+19. ~~Amazon Product Advertising API~~ ✅ APPLIED 2026-08-26 — access now provisioned via Amazon's newer "Creators API" program, not the old webservices.amazon.com flow. Created application `thegiftwhisperer` (App ID `giftwhisper0e-20.thegiftwhisperer`), generated credentials, saved to `.env.local` as `AMAZON_PAAPI_CREDENTIAL_ID` / `AMAZON_PAAPI_SECRET` — **still needs to be added to Vercel Production** before any deployed code can use it. Real eligibility gate is 10 qualifying sales in the trailing 30 days (not 10 sales ever, as previously noted here — that was stale); review takes up to 48h and may show `AssociateNotEligible` until met. Unconfirmed whether sales credited during the recent Amazon suspension count toward that window.
 20. Uncommon Goods affiliate (via CJ Affiliate, product feed)
 21. User profiles + auth (Clerk, optional login, loved-one profiles, birthday reminders)
 22. Metabase — connect to Neon for no-code dashboards
 23. Etsy geo-targeted affiliate routing (US → Rakuten, UK/EU → Awin)
 24. Interest-tag matched affiliate partners (REI for Outdoors, Best Buy for Tech, etc.)
 25. ML recommendation model
+26. Amazon OneLink (international traffic monetization) — deliberately deferred, see Affiliate Setup above for reasoning
+
+## Traffic Snapshot (PostHog, pulled 2026-08-26, last 180 days)
+
+46 unique visitors, 61 pageviews, 49 sessions, 71% bounce rate, 3m22s avg session. ~All traffic is "Direct" source (45/46) — no real acquisition channel yet. Traffic peaked launch week (Jun 7–13, 12 visitors), mostly quiet since. Geography: US 31, Germany 4, France 3, Poland 3, India 2, UK/Mexico/Netherlands 1 each (treat with caution — small sample, no bot filtering applied). No conversion goals configured in PostHog yet.
+
+**Gotcha for future sessions:** the landing/wizard route split (commit `cf55e60`, 2026-08-25 5:08pm) means `/wizard` didn't exist before that — `app/page.tsx` *was* the entire wizard flow on one route for the ~3 months prior. Don't compare historical `/` traffic against `/wizard` traffic as a conversion funnel; they measure different eras of the app. (A first pass at this analysis made exactly this mistake.)

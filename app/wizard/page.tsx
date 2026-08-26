@@ -41,6 +41,7 @@ interface GiftResult {
   type: "product" | "experience";
   store: "amazon" | "etsy" | "viator";
   searchQuery: string;
+  imageUrl?: string;
 }
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
@@ -97,6 +98,26 @@ function pickEmoji(tags: string[], type?: "product" | "experience"): string {
     if (match) return match;
   }
   return type === "experience" ? "🎟️" : "🎁";
+}
+
+// Renders the gift's real photo when we have one; falls back to an emoji if there's no image
+// (no key set up, lookup miss, or the image URL failed to load).
+function GiftThumb({ gift, size = "lg" }: { gift: GiftResult; size?: "lg" | "sm" }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const boxClass = size === "lg" ? "w-14 h-14" : "w-10 h-10";
+  const textClass = size === "lg" ? "text-4xl" : "text-2xl";
+
+  if (gift.imageUrl && !imgFailed) {
+    return (
+      <img
+        src={gift.imageUrl}
+        alt={gift.name}
+        className={cn(boxClass, "shrink-0 rounded-lg object-cover bg-stone-100")}
+        onError={() => setImgFailed(true)}
+      />
+    );
+  }
+  return <div className={cn(textClass, "shrink-0")}>{pickEmoji(gift.tags, gift.type)}</div>;
 }
 
 const pillClass = (selected: boolean) =>
@@ -329,7 +350,7 @@ export default function WizardPage() {
               >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="text-4xl shrink-0">{pickEmoji(gift.tags, gift.type)}</div>
+                    <GiftThumb gift={gift} size="lg" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
@@ -425,7 +446,7 @@ export default function WizardPage() {
                   <Card key={idx} className="bg-white border-0 shadow-sm">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="text-2xl shrink-0">{pickEmoji(gift.tags, gift.type)}</div>
+                        <GiftThumb gift={gift} size="sm" />
                         <div className="flex-1 min-w-0">
                           <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
                           <p className="text-amber-600 text-xs font-semibold">{gift.price}</p>

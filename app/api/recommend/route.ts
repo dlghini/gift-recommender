@@ -71,9 +71,23 @@ interface ViatorProductResult {
   productUrl: string;
   pricing?: { summary?: { fromPrice?: number } };
   duration?: { fixedDurationInMinutes?: number };
+  images?: { variants?: { width?: number; height?: number; url?: string }[] }[];
 }
 
-async function fetchViatorListing(searchQuery: string): Promise<{ price: string; affiliateUrl: string } | null> {
+// Viator returns several resolutions per image — pick the one closest to our card thumbnail size.
+function pickViatorImageUrl(images?: ViatorProductResult["images"]): string | undefined {
+  const variants = images?.[0]?.variants;
+  if (!variants?.length) return undefined;
+  const target = 200;
+  const best = variants.reduce((closest, v) =>
+    Math.abs((v.width ?? 0) - target) < Math.abs((closest.width ?? 0) - target) ? v : closest
+  );
+  return best.url;
+}
+
+async function fetchViatorListing(
+  searchQuery: string
+): Promise<{ price: string; affiliateUrl: string; imageUrl?: string } | null> {
   const apiKey = process.env.VIATOR_API_KEY;
   if (!apiKey) return null;
   try {
@@ -99,10 +113,29 @@ async function fetchViatorListing(searchQuery: string): Promise<{ price: string;
     return {
       price: fromPrice ? `From $${Math.round(fromPrice)} per person` : "See price on Viator",
       affiliateUrl: top.productUrl,
+      imageUrl: pickViatorImageUrl(top.images),
     };
   } catch (err) {
     console.error("[viator search]", err);
     return null;
+  }
+}
+
+// Generic fallback for any gift without a real product photo (Amazon/Etsy always, Viator if its own image is missing).
+async function fetchUnsplashImage(query: string): Promise<string | undefined> {
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
+  if (!accessKey) return undefined;
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=squarish`,
+      { headers: { Authorization: `Client-ID ${accessKey}` } }
+    );
+    if (!res.ok) return undefined;
+    const data = (await res.json()) as { results?: { urls?: { thumb?: string } }[] };
+    return data.results?.[0]?.urls?.thumb;
+  } catch (err) {
+    console.error("[unsplash search]", err);
+    return undefined;
   }
 }
 
@@ -203,10 +236,17 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
 
     const gifts = await Promise.all(
       data.gifts.map(async (gift) => {
-        if (gift.store !== "viator") return gift;
-        const listing = await fetchViatorListing(gift.searchQuery || gift.name);
+        const query = gift.searchQuery || gift.name;
+
+        if (gift.store !== "viator") {
+          const imageUrl = await fetchUnsplashImage(query);
+          return { ...gift, imageUrl };
+        }
+
+        const listing = await fetchViatorListing(query);
         if (!listing) return gift;
-        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl };
+        const imageUrl = listing.imageUrl ?? (await fetchUnsplashImage(query));
+        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl };
       })
     );
 
