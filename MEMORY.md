@@ -122,6 +122,13 @@
 - How-it-works copy is store-agnostic (no explicit Amazon/Etsy mention)
 - Amazon Associates re-suspension fix: static affiliate links now visible in landing page HTML for the bot to find
 
+### Phase 13b: Production Outage — Upstash Rate Limiter Deleted — RESOLVED
+- **What happened**: the free-tier Upstash Redis database backing rate limiting (`noted-labrador...upstash.io`) was silently auto-deleted by Upstash after 14 days of inactivity. This broke `/api/recommend` (the core feature) and the new `/api/send-results` in production with a generic `{"error":"fetch failed"}` — both were unusable for real users until this was found and fixed.
+- **Root cause in code**: `ratelimit.limit(ip)` was only guarded by `if (ratelimit)` (checking env vars are *set*), not wrapped in try/catch — so an unreachable host threw instead of failing gracefully like the "env vars unset" case already did.
+- **Fix**: created a new Upstash Redis database (`gift-whisperer-ratelimit`, free tier, us-east-1, hostname `closing-boar-165545.upstash.io`) and updated `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` in Vercel Production. Also wrapped the rate-limit check in both `app/api/recommend/route.ts` and `app/api/send-results/route.ts` in try/catch so it now **fails open** (logs and continues) if the rate limiter is ever unreachable again — this is a real risk to watch since the free tier will delete this new database too after another 14 days of low traffic.
+- Old dead database (`gift-whisperer` / `noted-labrador`) still shows as "Deleted" in Upstash console with a restore option available for a while, but a fresh one was simpler than restoring — not restored, left as-is (harmless, no cost).
+- **Worth reconsidering later**: if traffic stays low, this exact outage will recur every ~14 days on the free tier. The fail-open fix means it won't take down the app next time, but rate limiting itself will silently stop working until someone notices and recreates the database again. Upgrading to Upstash's Pay-as-You-Go plan (~$0.2/100K commands) would eliminate the auto-deletion risk entirely for very little cost, but wasn't done — would need explicit user approval since it requires adding a payment method.
+
 ### Phase 13: Email Capture ("Send to my inbox") — COMPLETE
 - Resend domain verification finished (DKIM/SPF/MX on `send.thegiftwhisperer.gifts` all resolved) — confirmed **Verified** in Resend dashboard.
 - `resend` npm package installed (memory previously said this was already done — it wasn't; corrected).
@@ -131,7 +138,7 @@
 - `app/wizard/page.tsx`: new "Send these to your inbox" card on the results screen (email input + Send button, success/error states), tracked via PostHog (`results_emailed` / `results_email_error`).
 - Tested end-to-end via direct API calls: subscriber row confirmed in Neon, email confirmed **Delivered** in Resend's dashboard, rendered preview looks correct (amber/indigo styling matching product vs experience cards).
 - Resend flagged two non-blocking insights on the test send: "Ensure link URLs match sending domain" (expected — these are affiliate emails, external links are the point) and "Use a subdomain" (optional deliverability best practice, e.g. `hello@send.thegiftwhisperer.gifts` instead of the root domain — not applied, current setup delivers fine as-is).
-- Not yet done: add `RESEND_API_KEY` to Vercel, push to `origin/main`, redeploy, re-run `/api/setup` against production DB.
+- `RESEND_API_KEY` added to Vercel Production, deployed, `/api/setup` re-run against production — confirmed working end-to-end live (see Phase 13b for the rate-limiter outage that briefly blocked this, now resolved).
 
 ### Phase 12b: Static Etsy/Viator Example Links — COMPLETE
 - Same crawlability fix that resolved the Amazon Associates suspension, extended to the other two affiliate programs: added 1 Etsy example card and 1 Viator experience example card to the landing page (`app/page.tsx`), alongside the existing 3 Amazon cards (kept untouched since the Amazon reapplication is still pending — didn't want to reduce Amazon's link count mid-appeal).
