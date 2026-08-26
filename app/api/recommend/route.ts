@@ -128,7 +128,7 @@ async function fetchUnsplashImage(query: string): Promise<string | undefined> {
   try {
     const res = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=squarish`,
-      { headers: { Authorization: `Client-ID ${accessKey}` } }
+      { headers: { Authorization: `Client-ID ${accessKey}` }, cache: "no-store" }
     );
     if (!res.ok) return undefined;
     const data = (await res.json()) as { results?: { urls?: { thumb?: string } }[] };
@@ -244,8 +244,8 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
         }
 
         const listing = await fetchViatorListing(query);
-        if (!listing) return gift;
-        const imageUrl = listing.imageUrl ?? (await fetchUnsplashImage(query));
+        const imageUrl = listing?.imageUrl ?? (await fetchUnsplashImage(query));
+        if (!listing) return { ...gift, imageUrl };
         return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl };
       })
     );
