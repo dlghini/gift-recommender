@@ -12,15 +12,6 @@ const VIATOR_PID = "P00304135";
 
 const EXAMPLE_GIFTS = [
   {
-    name: "Leather-Bound Travel Journal with Vintage World Map",
-    price: "$35–$50",
-    rationale: "For the friend who romanticizes every trip they take — this isn't just a notebook, it's a place to collect stamps, ticket stubs, and memories. The kind of gift that gets better-looking the more it's used.",
-    tags: ["Travel", "Writing", "Personalized"],
-    searchQuery: "leather bound travel journal vintage world map",
-    store: "amazon" as const,
-    imageUrl: "https://images.unsplash.com/photo-1709988795057-a13a7a612046?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
-  },
-  {
     name: "Japanese Cast Iron Tetsubin Tea Kettle Set",
     price: "$55–$80",
     rationale: "A ritual disguised as a kitchen item. For the person who takes their morning routine seriously — this cast iron kettle turns making tea into something meditative. Functional art that lasts decades.",
@@ -28,6 +19,15 @@ const EXAMPLE_GIFTS = [
     searchQuery: "japanese cast iron tetsubin tea kettle set",
     store: "amazon" as const,
     imageUrl: "https://images.unsplash.com/photo-1578920181445-0a0b285b9757?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
+  },
+  {
+    name: "Private Sunset Sailing Cruise",
+    price: "From $85 per person",
+    rationale: "A bookable experience instead of another object — a couple of hours on the water as the sky turns gold. Perfect for someone who'd rather collect memories than more stuff.",
+    tags: ["Travel", "Romance", "Outdoors"],
+    searchQuery: "private sunset sailing cruise",
+    store: "viator" as const,
+    imageUrl: "https://images.unsplash.com/photo-1647391410347-2eb84bb9cbbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
   {
     name: "Stargazing Night Sky Constellation Projector",
@@ -39,6 +39,15 @@ const EXAMPLE_GIFTS = [
     imageUrl: "https://images.unsplash.com/photo-1560380416-f65464ef84b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
   {
+    name: "Leather-Bound Travel Journal with Vintage World Map",
+    price: "$35–$50",
+    rationale: "For the friend who romanticizes every trip they take — this isn't just a notebook, it's a place to collect stamps, ticket stubs, and memories. The kind of gift that gets better-looking the more it's used.",
+    tags: ["Travel", "Writing", "Personalized"],
+    searchQuery: "leather bound travel journal vintage world map",
+    store: "amazon" as const,
+    imageUrl: "https://images.unsplash.com/photo-1709988795057-a13a7a612046?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
+  },
+  {
     name: "Custom Constellation Star Map Print of Your First Date",
     price: "$25–$45",
     rationale: "A personalized print of exactly how the sky looked the night you met, engraved with the date and place. Handmade, sentimental, and the kind of thing they'll actually hang on the wall.",
@@ -46,15 +55,6 @@ const EXAMPLE_GIFTS = [
     searchQuery: "custom star map print first date",
     store: "etsy" as const,
     imageUrl: "https://images.unsplash.com/photo-1765207663362-bad07a16fbb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
-  },
-  {
-    name: "Private Sunset Sailing Cruise",
-    price: "From $85 per person",
-    rationale: "A bookable experience instead of another object — a couple of hours on the water as the sky turns gold. Perfect for someone who'd rather collect memories than more stuff.",
-    tags: ["Travel", "Romance", "Outdoors"],
-    searchQuery: "private sunset sailing cruise",
-    store: "viator" as const,
-    imageUrl: "https://images.unsplash.com/photo-1647391410347-2eb84bb9cbbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
 ];
 
