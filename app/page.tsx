@@ -207,7 +207,7 @@ export default function Home() {
         </div>
         <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
         <p className="text-stone-500 text-base mb-10 max-w-xl mx-auto">
-          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or giving the same candle twice.
+          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or scrambling last minute.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
           {[
