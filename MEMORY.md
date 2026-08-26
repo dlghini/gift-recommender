@@ -122,6 +122,13 @@
 - How-it-works copy is store-agnostic (no explicit Amazon/Etsy mention)
 - Amazon Associates re-suspension fix: static affiliate links now visible in landing page HTML for the bot to find
 
+### Phase 12: Experience Recommendations (Viator) — IN PROGRESS
+- `app/api/recommend/route.ts`: Claude response schema now includes `type: "product" | "experience"`, and `store` extended to `"amazon" | "etsy" | "viator"`. A `giftPreference` field (`"experiences" | "gifts" | "both"`) is sent from the wizard and used to instruct Claude on the experience/product mix per request (all-experience, all-product, or capped at 1-of-3 experience for "both").
+- `fetchViatorListing()` calls Viator's `/search/freetext` API (sandbox: `api.sandbox.viator.com/partner`) server-side for any `store: "viator"` gift, using `VIATOR_API_KEY` (header `exp-api-key`). Returns real `fromPrice` and a pre-attributed `productUrl` when available; falls back gracefully to Claude's estimated price and `"#"` if the API call fails (e.g. key not yet active, no results).
+- `app/wizard/page.tsx`: new "Do they prefer experiences or physical gifts?" question added to step 3 (interests), not a new wizard step. `GiftResult` type extended with `type` field. `buildBuyUrl()` uses the real Viator `affiliateUrl` when present, otherwise falls back to a basic `viator.com` search link with `pid=P00304135`.
+- Card UI: experience-type gifts get an "Experience" badge, indigo accent border/price/button, and "Book now" instead of "Buy now".
+- Status as of 2026-08-25: code built, tested end-to-end in dev — wizard question, Claude type/mix logic, and card UI all confirmed working. Viator API enrichment confirmed to gracefully fall back (verified via direct curl: sandbox key returns 401 "Invalid API Key" since it was just created — Viator warns this can take up to 24h to activate). Re-test the live pricing path once the key activates. Groupon integration still blocked on CJ Affiliate approval (see [[project_overview]]).
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE
@@ -140,7 +147,7 @@
 14. Fix Resend DNS + build email capture ("Send to my inbox" on results screen, `/api/send-results`, Neon `subscribers` table)
 15. Reapply to Amazon Associates
 16. Unsplash API for Etsy gift images (Etsy Open API denied, final)
-17. Experience recommendations (Viator + Groupon, `type: "product" | "experience"` on schema)
+17. Experience recommendations (Viator + Groupon, `type: "product" | "experience"` on schema) — IN PROGRESS, Viator side built (see Phase 12), Groupon blocked on affiliate approval
 18. Smarter Claude search queries (tighter `searchQuery` values)
 19. Amazon Product Advertising API (needs 10 qualifying sales)
 20. Uncommon Goods affiliate (via CJ Affiliate, product feed)

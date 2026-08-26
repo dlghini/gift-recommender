@@ -14,20 +14,23 @@ const ratelimit =
 
 const client = new Anthropic();
 
+const VIATOR_API_BASE = "https://api.sandbox.viator.com/partner";
+
 const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend exactly 3 gifts that are genuinely well-suited to them.
 
-Only suggest real products that actually exist and are widely available for purchase. Stick to well-known brands and products you are certain are real — do not invent product names or combine brand names with model numbers you are not sure about.
+Only suggest real products or experiences that actually exist and are widely available for purchase/booking. Stick to well-known brands and real, bookable experience types — do not invent product names or combine brand names with model numbers you are not sure about.
 
 For each gift provide:
-- name: a specific, real product name (e.g. "Kindle Paperwhite" not "e-reader"). Must be a product that genuinely exists.
-- price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y"
+- name: a specific, real product name (e.g. "Kindle Paperwhite" not "e-reader") or a specific experience type (e.g. "Sunset Sailing Cruise" not "boat activity")
+- price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y". For experiences, this is a placeholder — real pricing is fetched separately.
 - rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person
 - tags: 2–4 short interest or theme tags
 - affiliateUrl: set to "#"
-- store: either "etsy" or "amazon". Use "etsy" for gifts that are handmade, personalized, custom, artisan, vintage, or unique in nature — the kind of thing you'd find on Etsy. Use "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced.
-- searchQuery: a concise 2–5 word search query that will reliably surface this product. For "amazon" gifts, optimize for Amazon search. For "etsy" gifts, optimize for Etsy search (e.g. "personalized leather wallet" or "custom star map print").
+- type: either "product" or "experience". Use "experience" for tours, classes, activities, tastings, or bookable local/online experiences. Use "product" for physical items.
+- store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift — tours, classes, activities, workshops, tastings, both local in-person experiences AND digital/online experiences (virtual classes, online tastings) are equally valid choices here.
+- searchQuery: a concise 2–5 word search query that will reliably surface this product/experience. For "amazon"/"etsy" gifts, optimize for that store's search. For "viator" gifts, optimize for Viator's search (e.g. "sunset sailing cruise" or "pottery making class").
 
-Make the gifts feel personal and considered. Vary the types across physical items, experiences, and subscriptions where appropriate. Aim to include at least one Etsy-type gift per set where it fits naturally.`;
+Make the gifts feel personal and considered. Since the recipient's location is unknown, do not assume any specific city or region is available for local experiences — a digital/online experience is just as valid a choice as an in-person one when it fits the person well.`;
 
 const GIFT_SCHEMA = {
   type: "object",
@@ -42,10 +45,11 @@ const GIFT_SCHEMA = {
           rationale: { type: "string" },
           tags: { type: "array", items: { type: "string" } },
           affiliateUrl: { type: "string" },
-          store: { type: "string", enum: ["amazon", "etsy"] },
+          type: { type: "string", enum: ["product", "experience"] },
+          store: { type: "string", enum: ["amazon", "etsy", "viator"] },
           searchQuery: { type: "string" },
         },
-        required: ["name", "price", "rationale", "tags", "affiliateUrl", "store", "searchQuery"],
+        required: ["name", "price", "rationale", "tags", "affiliateUrl", "type", "store", "searchQuery"],
         additionalProperties: false,
       },
     },
@@ -53,6 +57,52 @@ const GIFT_SCHEMA = {
   required: ["gifts"],
   additionalProperties: false,
 };
+
+const GIFT_PREFERENCE_INSTRUCTIONS: Record<string, string> = {
+  experiences: "The user said they're shopping for someone who prefers experiences over physical gifts. All 3 recommendations must be type \"experience\".",
+  gifts: "The user said they're shopping for someone who prefers physical gifts over experiences. All 3 recommendations must be type \"product\".",
+  both: "The user said this person likes both experiences and physical gifts. At most 1 of the 3 recommendations should be type \"experience\" — the rest should be type \"product\".",
+};
+
+interface ViatorProductResult {
+  title: string;
+  productUrl: string;
+  pricing?: { summary?: { fromPrice?: number } };
+  duration?: { fixedDurationInMinutes?: number };
+}
+
+async function fetchViatorListing(searchQuery: string): Promise<{ price: string; affiliateUrl: string } | null> {
+  const apiKey = process.env.VIATOR_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const res = await fetch(`${VIATOR_API_BASE}/search/freetext`, {
+      method: "POST",
+      headers: {
+        "exp-api-key": apiKey,
+        "Accept-Language": "en-US",
+        Accept: "application/json;version=2.0",
+        "Content-Type": "application/json;version=2.0",
+      },
+      body: JSON.stringify({
+        searchTerm: searchQuery,
+        searchTypes: [{ searchType: "PRODUCTS", pagination: { start: 1, count: 1 } }],
+        currency: "USD",
+      }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { products?: { results?: ViatorProductResult[] } };
+    const top = data.products?.results?.[0];
+    if (!top?.productUrl) return null;
+    const fromPrice = top.pricing?.summary?.fromPrice;
+    return {
+      price: fromPrice ? `From $${Math.round(fromPrice)} per person` : "See price on Viator",
+      affiliateUrl: top.productUrl,
+    };
+  } catch (err) {
+    console.error("[viator search]", err);
+    return null;
+  }
+}
 
 const BUDGET_LABELS: Record<string, string> = {
   "under-25": "under $25",
@@ -79,7 +129,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const { relationship, ageRange, occasion, interests, freetext, budget, attempt, exclude } =
+    const { relationship, ageRange, occasion, interests, freetext, budget, giftPreference, attempt, exclude } =
       (await request.json()) as {
         relationship: string;
         ageRange: string;
@@ -87,6 +137,7 @@ export async function POST(request: Request) {
         interests: string[];
         freetext: string;
         budget: string;
+        giftPreference: "experiences" | "gifts" | "both";
         attempt: number;
         exclude: string[];
       };
@@ -118,7 +169,9 @@ export async function POST(request: Request) {
 - Recipient: ${relationship}, age range ${ageRange}
 - Occasion: ${occasion}
 - Interests: ${interestList}
-- Budget: ${budgetLabel}${freetext ? `\n- Additional context: ${freetext}` : ""}${exclude.length > 0 ? `\n\nDo NOT suggest any of the following gifts — they have already been shown to the user:\n${exclude.map((n) => `- ${n}`).join("\n")}\n\nExplore more creative, unexpected options instead.` : ""}`,
+- Budget: ${budgetLabel}${freetext ? `\n- Additional context: ${freetext}` : ""}
+
+${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.both}${exclude.length > 0 ? `\n\nDo NOT suggest any of the following gifts — they have already been shown to the user:\n${exclude.map((n) => `- ${n}`).join("\n")}\n\nExplore more creative, unexpected options instead.` : ""}`,
         },
       ],
     });
@@ -129,10 +182,26 @@ export async function POST(request: Request) {
     }
 
     const data = JSON.parse(textBlock.text) as {
-      gifts: { name: string; price: string; rationale: string; tags: string[]; affiliateUrl: string; searchQuery: string }[];
+      gifts: {
+        name: string;
+        price: string;
+        rationale: string;
+        tags: string[];
+        affiliateUrl: string;
+        type: "product" | "experience";
+        store: "amazon" | "etsy" | "viator";
+        searchQuery: string;
+      }[];
     };
 
-    const gifts = data.gifts;
+    const gifts = await Promise.all(
+      data.gifts.map(async (gift) => {
+        if (gift.store !== "viator") return gift;
+        const listing = await fetchViatorListing(gift.searchQuery || gift.name);
+        if (!listing) return gift;
+        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl };
+      })
+    );
 
     // Log session to database — errors here don't affect the user response
     try {

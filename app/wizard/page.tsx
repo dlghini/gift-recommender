@@ -5,7 +5,7 @@ import { usePostHog } from "posthog-js/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check } from "lucide-react";
+import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
@@ -29,6 +29,7 @@ interface FormState {
   interests: string[];
   freetext: string;
   budget: string;
+  giftPreference: "experiences" | "gifts" | "both";
 }
 
 interface GiftResult {
@@ -37,14 +38,21 @@ interface GiftResult {
   rationale: string;
   tags: string[];
   affiliateUrl: string;
-  store: "amazon" | "etsy";
+  type: "product" | "experience";
+  store: "amazon" | "etsy" | "viator";
   searchQuery: string;
 }
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
 const ETSY_MID = "54027";
+const VIATOR_PID = "P00304135";
 
 function buildBuyUrl(gift: GiftResult): string {
+  if (gift.store === "viator") {
+    // affiliateUrl is a real, pre-attributed Viator productUrl when available; fall back to a basic search link
+    if (gift.affiliateUrl && gift.affiliateUrl !== "#") return gift.affiliateUrl;
+    return `https://www.viator.com/searchResults/all?text=${encodeURIComponent(gift.searchQuery || gift.name)}&pid=${VIATOR_PID}`;
+  }
   if (gift.store === "etsy") {
     const etsyUrl = `https://www.etsy.com/search?q=${encodeURIComponent(gift.searchQuery || gift.name)}`;
     return `https://click.linksynergy.com/deeplink?id=${RAKUTEN_ID}&mid=${ETSY_MID}&murl=${encodeURIComponent(etsyUrl)}`;
@@ -63,6 +71,11 @@ const OCCASIONS = [
   { label: "Just Because", emoji: "💝" },
 ];
 const INTERESTS = ["Cooking", "Travel", "Fitness", "Gaming", "Reading", "Music", "Art", "Outdoors", "Tech", "Fashion"];
+const GIFT_PREFERENCES: { label: string; value: FormState["giftPreference"] }[] = [
+  { label: "Physical gifts", value: "gifts" },
+  { label: "Experiences", value: "experiences" },
+  { label: "Both", value: "both" },
+];
 const BUDGETS = [
   { label: "Under $25", value: "under-25" },
   { label: "$25 – $50", value: "25-50" },
@@ -78,12 +91,12 @@ const TAG_EMOJI: Record<string, string> = {
   Mindfulness: "🧘", Practical: "⚙️", Food: "🍽️", Coffee: "☕",
 };
 
-function pickEmoji(tags: string[]): string {
+function pickEmoji(tags: string[], type?: "product" | "experience"): string {
   for (const tag of tags) {
     const match = TAG_EMOJI[tag];
     if (match) return match;
   }
-  return "🎁";
+  return type === "experience" ? "🎟️" : "🎁";
 }
 
 const pillClass = (selected: boolean) =>
@@ -118,6 +131,7 @@ export default function WizardPage() {
     interests: [],
     freetext: "",
     budget: "",
+    giftPreference: "both",
   });
   const [copied, setCopied] = useState(false);
 
@@ -281,15 +295,26 @@ export default function WizardPage() {
 
           <div className="flex flex-col gap-4">
             {gifts.map((gift, idx) => (
-              <Card key={idx} className="bg-white border-0 shadow-sm">
+              <Card
+                key={idx}
+                className={cn(
+                  "bg-white shadow-sm",
+                  gift.type === "experience" ? "border-2 border-indigo-200" : "border-0"
+                )}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="text-4xl shrink-0">{pickEmoji(gift.tags)}</div>
+                    <div className="text-4xl shrink-0">{pickEmoji(gift.tags, gift.type)}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
+                          {gift.type === "experience" && (
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100 mb-1.5">
+                              <Ticket className="w-3 h-3" /> Experience
+                            </span>
+                          )}
                           <h2 className="font-heading text-lg text-stone-900 leading-tight">{gift.name}</h2>
-                          <p className="text-amber-600 font-semibold text-sm mt-0.5">{gift.price}</p>
+                          <p className={cn("font-semibold text-sm mt-0.5", gift.type === "experience" ? "text-indigo-600" : "text-amber-600")}>{gift.price}</p>
                         </div>
                         <button
                           onClick={() => toggleSaved(gift)}
@@ -306,11 +331,14 @@ export default function WizardPage() {
                         ))}
                       </div>
                       <Button
-                        className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm"
+                        className={cn(
+                          "mt-4 w-full text-white font-semibold h-9 text-sm",
+                          gift.type === "experience" ? "bg-indigo-500 hover:bg-indigo-600" : "bg-amber-500 hover:bg-amber-600"
+                        )}
                         onClick={() => handleBuyClick(gift)}
                       >
                         <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                        Buy now
+                        {gift.type === "experience" ? "Book now" : "Buy now"}
                       </Button>
                     </div>
                   </div>
@@ -335,7 +363,7 @@ export default function WizardPage() {
                   <Card key={idx} className="bg-white border-0 shadow-sm">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="text-2xl shrink-0">{pickEmoji(gift.tags)}</div>
+                        <div className="text-2xl shrink-0">{pickEmoji(gift.tags, gift.type)}</div>
                         <div className="flex-1 min-w-0">
                           <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
                           <p className="text-amber-600 text-xs font-semibold">{gift.price}</p>
@@ -449,8 +477,14 @@ export default function WizardPage() {
                   placeholder="Anything else we should know? (optional)"
                   value={form.freetext}
                   onChange={(e) => setForm((f) => ({ ...f, freetext: e.target.value }))}
-                  className="border-stone-200 focus:border-amber-400"
+                  className="border-stone-200 focus:border-amber-400 mb-6"
                 />
+                <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Do they prefer experiences or physical gifts?</p>
+                <div className="flex flex-wrap gap-2">
+                  {GIFT_PREFERENCES.map((p) => (
+                    <button key={p.value} onClick={() => setForm((f) => ({ ...f, giftPreference: p.value }))} className={pillClass(form.giftPreference === p.value)}>{p.label}</button>
+                  ))}
+                </div>
               </div>
             )}
 
