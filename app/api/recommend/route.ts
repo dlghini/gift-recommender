@@ -14,7 +14,9 @@ const ratelimit =
 
 const client = new Anthropic();
 
-const VIATOR_API_BASE = "https://api.sandbox.viator.com/partner";
+// Sandbox and production keys only authenticate against their matching host.
+const VIATOR_API_BASE =
+  process.env.NODE_ENV === "production" ? "https://api.viator.com/partner" : "https://api.sandbox.viator.com/partner";
 
 const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend exactly 3 gifts that are genuinely well-suited to them.
 
