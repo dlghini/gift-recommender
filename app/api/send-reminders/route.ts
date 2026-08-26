@@ -29,10 +29,16 @@ function renderReminderEmail(label: string, lovedOneId: string): string {
     </div>`;
 }
 
-export async function POST(request: Request) {
+// Always run fresh — this reads "today" and hits the DB/email provider, never cacheable.
+export const dynamic = "force-dynamic";
+
+async function handleReminderRun(request: Request): Promise<Response> {
   try {
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.REMINDER_CRON_SECRET}`) {
+    // Vercel Cron auto-injects `Authorization: Bearer $CRON_SECRET`; accept either
+    // env var name so a manual curl using REMINDER_CRON_SECRET still works too.
+    const validSecrets = [process.env.CRON_SECRET, process.env.REMINDER_CRON_SECRET].filter(Boolean);
+    if (!validSecrets.some((secret) => authHeader === `Bearer ${secret}`)) {
       return Response.json({ error: "Unauthorized." }, { status: 401 });
     }
 
@@ -96,3 +102,7 @@ export async function POST(request: Request) {
     return Response.json({ error: msg }, { status: 500 });
   }
 }
+
+// GET is what Vercel Cron actually calls; POST is kept for manual/external triggering.
+export const GET = handleReminderRun;
+export const POST = handleReminderRun;
