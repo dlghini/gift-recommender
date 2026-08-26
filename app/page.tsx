@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink, Sparkles, Gift } from "lucide-react";
@@ -17,6 +18,7 @@ const EXAMPLE_GIFTS = [
     tags: ["Travel", "Writing", "Personalized"],
     searchQuery: "leather bound travel journal vintage world map",
     store: "amazon" as const,
+    imageUrl: "https://images.unsplash.com/photo-1709988795057-a13a7a612046?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
   {
     name: "Japanese Cast Iron Tetsubin Tea Kettle Set",
@@ -25,6 +27,7 @@ const EXAMPLE_GIFTS = [
     tags: ["Cooking", "Mindfulness", "Home"],
     searchQuery: "japanese cast iron tetsubin tea kettle set",
     store: "amazon" as const,
+    imageUrl: "https://images.unsplash.com/photo-1578920181445-0a0b285b9757?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
   {
     name: "Stargazing Night Sky Constellation Projector",
@@ -33,6 +36,7 @@ const EXAMPLE_GIFTS = [
     tags: ["Tech", "Outdoors", "Ambiance"],
     searchQuery: "stargazing night sky constellation projector room",
     store: "amazon" as const,
+    imageUrl: "https://images.unsplash.com/photo-1560380416-f65464ef84b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
   {
     name: "Custom Constellation Star Map Print of Your First Date",
@@ -41,6 +45,7 @@ const EXAMPLE_GIFTS = [
     tags: ["Personalized", "Art", "Sentimental"],
     searchQuery: "custom star map print first date",
     store: "etsy" as const,
+    imageUrl: "https://images.unsplash.com/photo-1765207663362-bad07a16fbb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
   {
     name: "Private Sunset Sailing Cruise",
@@ -49,6 +54,7 @@ const EXAMPLE_GIFTS = [
     tags: ["Travel", "Romance", "Outdoors"],
     searchQuery: "private sunset sailing cruise",
     store: "viator" as const,
+    imageUrl: "https://images.unsplash.com/photo-1647391410347-2eb84bb9cbbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200",
   },
 ];
 
@@ -75,6 +81,21 @@ function pickEmoji(tags: string[]): string {
     if (TAG_EMOJI[tag]) return TAG_EMOJI[tag];
   }
   return "🎁";
+}
+
+function ExampleThumb({ gift }: { gift: (typeof EXAMPLE_GIFTS)[number] }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  if (!imgFailed) {
+    return (
+      <img
+        src={gift.imageUrl}
+        alt={gift.name}
+        className="w-14 h-14 shrink-0 rounded-lg object-cover bg-stone-100"
+        onError={() => setImgFailed(true)}
+      />
+    );
+  }
+  return <div className="text-4xl shrink-0">{pickEmoji(gift.tags)}</div>;
 }
 
 export default function Home() {
@@ -114,7 +135,7 @@ export default function Home() {
             <Card key={idx} className="bg-white border-0 shadow-sm opacity-90">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="text-4xl shrink-0">{pickEmoji(gift.tags)}</div>
+                  <ExampleThumb gift={gift} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs bg-stone-100 text-stone-400 px-2 py-0.5 rounded-full font-medium">Example</span>
