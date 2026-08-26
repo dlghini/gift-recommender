@@ -121,7 +121,8 @@ export async function POST(request: Request) {
     return Response.json({ ok: true });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.error("[/api/send-results]", msg);
-    return Response.json({ error: msg }, { status: 500 });
+    const cause = error instanceof Error && error.cause ? String(error.cause) : undefined;
+    console.error("[/api/send-results]", msg, cause ? `cause: ${cause}` : "");
+    return Response.json({ error: msg, cause }, { status: 500 });
   }
 }
