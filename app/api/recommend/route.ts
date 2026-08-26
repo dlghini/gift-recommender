@@ -28,11 +28,11 @@ For each gift provide:
 - rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person
 - tags: 2–4 short interest or theme tags
 - affiliateUrl: set to "#"
-- type: either "product" or "experience". Use "experience" for tours, classes, activities, tastings, or bookable local/online experiences. Use "product" for physical items.
-- store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift — tours, classes, activities, workshops, tastings, both local in-person experiences AND digital/online experiences (virtual classes, online tastings) are equally valid choices here.
+- type: either "product" or "experience". Use "experience" for real, in-person bookable tours, classes, activities, workshops, or tastings. Use "product" for physical items.
+- store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift. Viator's catalog is in-person only — do not suggest purely virtual/online-only experiences (e.g. a "virtual cooking class" or "online workshop") for this store, since there's no real inventory for those and the resulting link will be irrelevant.
 - searchQuery: a concise 2–5 word search query that will reliably surface this product/experience. For "amazon"/"etsy" gifts, optimize for that store's search. For "viator" gifts, optimize for Viator's search (e.g. "sunset sailing cruise" or "pottery making class").
 
-Make the gifts feel personal and considered. Since the recipient's location is unknown, do not assume any specific city or region is available for local experiences — a digital/online experience is just as valid a choice as an in-person one when it fits the person well.`;
+Make the gifts feel personal and considered. Since the recipient's location is unknown, favor experience types that are common and widely available in most cities (e.g. a sunset sailing cruise, a cooking class, a wine tasting) rather than something hyper-specific to one place — Viator surfaces options near the person once they click through.`;
 
 const GIFT_SCHEMA = {
   type: "object",
