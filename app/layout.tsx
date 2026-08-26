@@ -24,6 +24,9 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: "The Gift Whisperer — Find the perfect gift",
   description: "AI-powered gift recommendations tailored to the person you love.",
+  other: {
+    "impact-site-verification": "62509d58-8ed2-4dfa-b534-6c9ef7074147",
+  },
 };
 
 export default function RootLayout({
