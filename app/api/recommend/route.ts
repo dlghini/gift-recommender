@@ -122,12 +122,17 @@ export async function POST(request: Request) {
       "anonymous";
 
     if (ratelimit) {
-      const { success, remaining } = await ratelimit.limit(ip);
-      if (!success) {
-        return Response.json(
-          { error: "Too many requests. Please try again in an hour." },
-          { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
-        );
+      try {
+        const { success, remaining } = await ratelimit.limit(ip);
+        if (!success) {
+          return Response.json(
+            { error: "Too many requests. Please try again in an hour." },
+            { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+          );
+        }
+      } catch (rateLimitError) {
+        // Fail open: an unreachable rate limiter shouldn't take down the whole feature.
+        console.error("[rate limit]", rateLimitError);
       }
     }
 
