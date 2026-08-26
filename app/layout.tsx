@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/footer";
+import { Nav } from "@/components/nav";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
+import { ClerkProvider } from "@clerk/nextjs";
+import { CLERK_ENABLED } from "@/lib/clerk-enabled";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,13 +37,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+  const body = (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <PostHogProvider>
+          <Nav />
           {children}
           <Footer />
         </PostHogProvider>
@@ -48,4 +52,6 @@ export default function RootLayout({
       </body>
     </html>
   );
+
+  return CLERK_ENABLED ? <ClerkProvider>{body}</ClerkProvider> : body;
 }

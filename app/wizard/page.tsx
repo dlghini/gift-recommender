@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { usePostHog } from "posthog-js/react";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AssignGiftDialog } from "@/components/assign-gift-dialog";
+import { CLERK_ENABLED } from "@/lib/clerk-enabled";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
   return btoa(encodeURIComponent(JSON.stringify({ form, gifts })));
@@ -33,6 +36,7 @@ interface FormState {
 }
 
 interface GiftResult {
+  id: string;
   name: string;
   price: string;
   rationale: string;
@@ -128,9 +132,34 @@ const pillClass = (selected: boolean) =>
       : "bg-white text-stone-700 border-stone-200 hover:border-amber-300 hover:text-amber-700"
   );
 
+function ageRangeFromBirthYear(year: number | null | undefined): string {
+  if (!year) return "";
+  const age = new Date().getFullYear() - year;
+  if (age < 10) return "Under 10";
+  if (age <= 17) return "10–17";
+  if (age <= 30) return "18–30";
+  if (age <= 60) return "31–60";
+  return "60+";
+}
+
+// useUser() throws unless a <ClerkProvider> is actually mounted above it, and
+// that only happens when Clerk keys are configured (see lib/clerk-enabled.ts).
+// Isolating the hook call in its own component — only ever rendered when
+// Clerk is enabled — keeps this file safe to load either way, without
+// conditionally calling a hook inside WizardPageContent itself.
+function ClerkAwareWizardPage() {
+  const { isSignedIn } = useUser();
+  return <WizardPageContent isSignedIn={!!isSignedIn} />;
+}
+
 export default function WizardPage() {
+  return CLERK_ENABLED ? <ClerkAwareWizardPage /> : <WizardPageContent isSignedIn={false} />;
+}
+
+function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const posthog = usePostHog();
   const [step, setStep] = useState<Step>(1);
+  const [assigningGift, setAssigningGift] = useState<GiftResult | null>(null);
   const [savedGifts, setSavedGifts] = useState<GiftResult[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -140,7 +169,7 @@ export default function WizardPage() {
       return [];
     }
   });
-  const savedNames = new Set(savedGifts.map((g) => g.name));
+  const savedIds = new Set(savedGifts.map((g) => g.id));
   const [attempt, setAttempt] = useState(0);
   const [seenGifts, setSeenGifts] = useState<string[]>([]);
   const [gifts, setGifts] = useState<GiftResult[]>([]);
@@ -169,6 +198,23 @@ export default function WizardPage() {
         setGifts(decoded.gifts);
         setStep("results");
       }
+      return;
+    }
+    const lovedOneId = params.get("lovedOneId");
+    if (lovedOneId) {
+      fetch(`/api/loved-ones/${lovedOneId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const lovedOne = data.lovedOne;
+          if (!lovedOne) return;
+          setForm((f) => ({
+            ...f,
+            relationship: lovedOne.relationship,
+            ageRange: ageRangeFromBirthYear(lovedOne.birthday_year) || f.ageRange,
+            freetext: lovedOne.interests_notes || f.freetext,
+          }));
+        })
+        .catch(() => {});
     }
   }, []);
 
@@ -220,7 +266,7 @@ export default function WizardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "API error");
-      const results = data as GiftResult[];
+      const results = (data as Omit<GiftResult, "id">[]).map((g) => ({ ...g, id: crypto.randomUUID() }));
       setSeenGifts((prev) => [...prev, ...results.map((g) => g.name)]);
       setGifts(results);
       setStep("results");
@@ -256,14 +302,31 @@ export default function WizardPage() {
     }));
   };
 
-  const toggleSaved = (gift: GiftResult) => {
+  // Signed-out users keep the original local-only save. Signed-in users get
+  // the "assign to a loved one" dialog instead of a flat local list.
+  const handleHeartClick = (gift: GiftResult) => {
+    if (isSignedIn) {
+      setAssigningGift(gift);
+      return;
+    }
     setSavedGifts((prev) => {
-      const isAlreadySaved = prev.some((g) => g.name === gift.name);
+      const isAlreadySaved = prev.some((g) => g.id === gift.id);
       const next = isAlreadySaved
-        ? prev.filter((g) => g.name !== gift.name)
+        ? prev.filter((g) => g.id !== gift.id)
         : [...prev, gift];
       localStorage.setItem("giftspark_saved", JSON.stringify(next));
       posthog?.capture(isAlreadySaved ? "gift_unsaved" : "gift_saved", { gift: gift.name, store: gift.store });
+      return next;
+    });
+  };
+
+  // Only used by the local "Saved gifts" section, which only exists for
+  // signed-out users (or leftover local saves not yet migrated).
+  const removeSavedLocally = (gift: GiftResult) => {
+    setSavedGifts((prev) => {
+      const next = prev.filter((g) => g.id !== gift.id);
+      localStorage.setItem("giftspark_saved", JSON.stringify(next));
+      posthog?.capture("gift_unsaved", { gift: gift.name, store: gift.store });
       return next;
     });
   };
@@ -363,11 +426,11 @@ export default function WizardPage() {
                           <p className={cn("font-semibold text-sm mt-0.5", gift.type === "experience" ? "text-indigo-600" : "text-amber-600")}>{gift.price}</p>
                         </div>
                         <button
-                          onClick={() => toggleSaved(gift)}
+                          onClick={() => handleHeartClick(gift)}
                           className="shrink-0 p-1.5 rounded-full hover:bg-rose-50 transition-colors cursor-pointer"
-                          aria-label={savedNames.has(gift.name) ? "Remove from wishlist" : "Save to wishlist"}
+                          aria-label={!isSignedIn && savedIds.has(gift.id) ? "Remove from wishlist" : "Save to wishlist"}
                         >
-                          <Heart className={cn("w-5 h-5 transition-colors", savedNames.has(gift.name) ? "fill-rose-500 text-rose-500" : "text-stone-300")} />
+                          <Heart className={cn("w-5 h-5 transition-colors", !isSignedIn && savedIds.has(gift.id) ? "fill-rose-500 text-rose-500" : "text-stone-300")} />
                         </button>
                       </div>
                       <p className="text-stone-500 text-sm mt-3 leading-relaxed">{gift.rationale}</p>
@@ -453,7 +516,7 @@ export default function WizardPage() {
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <button
-                            onClick={() => toggleSaved(gift)}
+                            onClick={() => removeSavedLocally(gift)}
                             className="p-1.5 rounded-full hover:bg-rose-50 transition-colors cursor-pointer"
                             aria-label="Remove from saved"
                           >
@@ -475,6 +538,14 @@ export default function WizardPage() {
             </div>
           )}
         </div>
+        <AssignGiftDialog
+          gift={assigningGift}
+          open={assigningGift !== null}
+          onOpenChange={(open) => {
+            if (!open) setAssigningGift(null);
+          }}
+          onAssigned={() => posthog?.capture("gift_saved", { gift: assigningGift?.name, store: assigningGift?.store })}
+        />
       </div>
     );
   }

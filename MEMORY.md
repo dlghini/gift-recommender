@@ -17,6 +17,7 @@
 - **Rate limiting**: Upstash Redis, 25 req/hour/IP on `/api/recommend`
 - **Analytics**: Vercel Analytics + PostHog (funnel/event tracking)
 - **Email**: Resend (transactional email — DNS verification pending, not live yet)
+- **Auth**: Clerk (`@clerk/nextjs` v7, "Core 3") — powers the opt-in Loved Ones feature only; the wizard itself stays fully anonymous. See Phase 17 below for the Core 3 breaking-change gotchas and the `CLERK_ENABLED` graceful-degradation pattern.
 - **Deployment**: Vercel (auto-deploy from main branch)
 - **Domain registrar**: Namecheap
 
@@ -26,6 +27,9 @@
 - `input` — `components/ui/input.tsx`
 - `card` — `components/ui/card.tsx`
 - `progress` — `components/ui/progress.tsx`
+- `dialog` — `components/ui/dialog.tsx`
+- `select` — `components/ui/select.tsx`
+- `tabs` — `components/ui/tabs.tsx`
 
 ## Key Files
 
@@ -40,6 +44,13 @@
 - `components.json` — shadcn/ui config (aliases: `@/components`, `@/lib`, `@/hooks`)
 - `lib/utils.ts` — `cn()` utility (clsx + tailwind-merge)
 - `.env.local` — `ANTHROPIC_API_KEY`, Neon/Postgres credentials, Upstash credentials, `RESEND_API_KEY` (gitignored)
+- `proxy.ts` — Next 16 renamed "middleware" to "proxy"; this is `clerkMiddleware()`, conditionally applied only when `CLERK_ENABLED` (see `lib/clerk-enabled.ts`) so a missing Clerk key can't take down every request site-wide
+- `lib/clerk-enabled.ts` — `CLERK_ENABLED` constant gating all Clerk usage (provider, nav, wizard, loved-ones pages) so the site works before Clerk keys exist
+- `lib/holidays.ts` / `lib/reminders.ts` — Type B holiday date rules (Mother's/Father's Day, Valentine's, Christmas) and the 14-day reminder lead-window logic (`REMINDER_LEAD_DAYS`)
+- `app/loved-ones/page.tsx`, `app/loved-ones/[id]/page.tsx` — Loved Ones list + profile detail pages
+- `app/api/loved-ones/**` — CRUD for profiles, gifts (idea/given), and holiday reminder toggles
+- `app/api/send-reminders/route.ts` — bearer-token-protected endpoint a daily external routine calls to send occasion reminder emails (dedup via `reminder_log` unique constraint)
+- `components/nav.tsx` — first site-wide nav (previously every page inlined its own header)
 
 ## Fonts
 
@@ -61,6 +72,7 @@
 - `.env.local` is gitignored — secrets must be added manually in the Vercel dashboard
 - Resend sending domain `hello@thegiftwhisperer.gifts` — DKIM verified, MX and SPF still failing to resolve via Namecheap Custom MX; blocks email capture feature
 - A weekly scheduled cloud routine (`trig_01TkauHiFAyPU2EUhPnBTo1J`, Mondays 9am America/Chicago) POSTs a test request to production `/api/recommend` and reports PASS/FAIL, as an early-warning check for the Upstash rate-limiter gotcha above (see Phase 13b). Limitation: since the endpoint fails open, a PASS does NOT prove the Upstash database is still alive — only manually checking console.upstash.com can confirm that.
+- **Loved Ones (Phase 17) needs, not yet set up**: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` (from a Clerk account, not yet created) and `REMINDER_CRON_SECRET` (any random string) in both `.env.local` and Vercel Production, plus a daily scheduled routine hitting `POST /api/send-reminders` with that bearer token. Until the Clerk keys exist, the whole feature is inert but harmless — see `lib/clerk-enabled.ts` / Phase 17 for how the rest of the site stays unaffected.
 
 ## Affiliate Setup
 
@@ -180,6 +192,23 @@
 - Card UI: experience-type gifts get an "Experience" badge, indigo accent border/price/button, and "Book now" instead of "Buy now".
 - Status as of 2026-08-25: code built, tested end-to-end in dev — wizard question, Claude type/mix logic, and card UI all confirmed working. Viator API enrichment confirmed to gracefully fall back (verified via direct curl: sandbox key returns 401 "Invalid API Key" since it was just created — Viator warns this can take up to 24h to activate). Re-test the live pricing path once the key activates. Groupon integration still blocked on CJ Affiliate approval (see [[project_overview]]).
 
+### Phase 17: Loved Ones (accounts, per-person profiles, occasion reminders) — CODE COMPLETE 2026-08-26, blocked on Clerk keys
+- Designed via a long collaborative conversation (roadmap item #21), then implemented via a full plan-mode pass: 3 parallel Explore agents on existing conventions, 1 Plan agent on the data model/file structure, then direct implementation phase by phase with `npm run build` after each.
+- **Data model** (added to `app/api/setup/route.ts`, first relational/FK data in this app): `loved_ones` (name, relationship, birthday month/day/optional-year, anniversary month/day, interests/notes, per-date reminder toggles), `loved_one_gifts` (single table with `status: 'idea'|'given'` — "mark as given" is a state transition, not a copy, so tags/rationale/store survive it), `holiday_reminder_prefs` (opt-out-only storage — a missing row means a holiday defaults ON for a matching relationship), `reminder_log` (unique on `loved_one_id, occasion_key, occasion_year`, used as an atomic dedup lock via `INSERT ... ON CONFLICT DO NOTHING RETURNING id`). No `users` table — Clerk is the identity system of record, rows just carry `clerk_user_id`.
+- **Relationship dropdown** (`components/relationship-emoji.ts`): Husband/Wife/Boyfriend/Girlfriend/Partner/Mother/Father/Brother/Sister/Child/Friend/Other — deliberately more granular than the wizard's own `RELATIONSHIPS` const (`Partner/Friend/Parent/Sibling/Child/Colleague`). No mapping table between the two exists or is needed: `/api/recommend` interpolates whatever relationship string it's given straight into the Claude prompt with no enum validation, so a profile's specific value (e.g. "Mother") flows through as-is and typically improves recommendation specificity rather than requiring translation down to the coarser wizard bucket.
+- **Two occasion types**, both in `lib/holidays.ts` / `lib/reminders.ts`: Type A is a literal date on the profile (birthday, and anniversary — anniversary only collected/shown for partner-type relationships). Type B is calendar-derived and relationship-gated (Mother's Day → Mother only, Father's Day → Father only, Valentine's Day → partner-type relationships, Christmas → everyone), computed via a small date-formula rule table (`nthWeekdayOfMonth` helper) rather than stored as dates — verified against real 2025/2026/2027 Mother's/Father's Day dates via a standalone script, all correct. `REMINDER_LEAD_DAYS = 14`, one exported constant.
+- **Wizard integration** (`app/wizard/page.tsx`): `GiftResult` gained an `id` field (`crypto.randomUUID()` at fetch time) since the old name-based localStorage dedup breaks once gifts are person-scoped — save-dedup keys switched from name to id throughout. Heart-click behavior forks on sign-in state: signed-out is byte-for-byte the original localStorage behavior (verified in-browser: same `giftspark_saved` key, same shape plus the new `id` field, no dialog); signed-in opens `components/assign-gift-dialog.tsx` (list existing profiles + inline "create new") instead. `/wizard?lovedOneId=...` prefills relationship + interests-notes (into `freetext`) + an age range guessed from birth year when present, and is the target of a "Get ideas for {name}" button on the profile page.
+- **localStorage migration**: on the Loved Ones list page, any pre-existing `giftspark_saved` items render in an "assign these" banner, reusing the same `AssignGiftDialog` per item; resolved items (assigned or skipped) are removed from the local list until it's empty, then the key is cleared. No separate import feature — same mechanism as the everyday "add idea to a person" flow.
+- **Clerk is Core 3** (`@clerk/nextjs` v7, released 2026-03-03) — training-data Clerk knowledge is stale for this version, confirmed by the package's own runtime errors, which is worth remembering for any future Clerk work here:
+  - `<SignedIn>`/`<SignedOut>`/`<Protect>` were removed; use `<Show when="signed-in">` / `<Show when="signed-out">` / `<Show when={{...}}>` instead (async Server Component).
+  - `auth()` and `clerkClient()` are both async now — `const { userId } = await auth();` and `const clerk = await clerkClient();`.
+  - `<UserButton afterSignOutUrl="/">` no longer exists as a prop — sign-out redirect is Clerk-Dashboard-configured only now.
+  - Next.js 16 itself renamed `middleware.ts` → `proxy.ts` (same `clerkMiddleware()` export, just a file rename + deprecation warning if left as `middleware.ts`).
+- **Graceful degradation without Clerk keys** (`lib/clerk-enabled.ts`, `CLERK_ENABLED = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)`): discovered during verification that `ClerkProvider`/`clerkMiddleware()` throw hard with no fallback UI when unconfigured — and since `proxy.ts` runs on nearly every request, an unconfigured Clerk key would otherwise take down the *entire site*, including the anonymous wizard, not just Loved Ones. Fixed by gating `proxy.ts`, `app/layout.tsx`'s `<ClerkProvider>`, `components/nav.tsx`'s sign-in UI, both `/loved-ones` pages, and the wizard's `useUser()` call (isolated into a small `ClerkAwareWizardPage` wrapper, only ever rendered when `CLERK_ENABLED`, to avoid a conditional hook call) behind this one constant. Verified end-to-end in dev with no Clerk keys present: landing/wizard/about/etc. all render and the full anonymous wizard flow (including heart-save) works exactly as before; `/loved-ones` shows a plain "almost here" message instead of crashing.
+- **Verified in this session**: `npm run build` clean at every phase: all new tables + indexes + FKs + unique constraints confirmed to exist in the real Neon database via a direct query; holiday date-math and the 14-day due-window boundary confirmed correct via a standalone `tsx` script; full anonymous wizard flow clicked through in the browser preview end-to-end (all 4 steps → real Claude recommendations → heart-save → correct localStorage shape). **Not yet verifiable**: anything requiring an actual signed-in session (profile CRUD, gift assignment, holiday toggles, reminder emails actually sending) — blocked on the operational step below.
+- **Blocking operational step, not something Claude can do**: create a Clerk account (dashboard.clerk.com) and add `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` to `.env.local` and Vercel Production, plus a new `REMINDER_CRON_SECRET` (any random string) for both. Clerk's own CLI offers `npx clerk@latest init` as a faster no-signup-needed path to provision keys — deliberately not run automatically here since it still creates an application/account on an external service on the user's behalf.
+- **Still needed after keys exist**: a daily-scheduled external routine (same mechanism as the existing weekly Upstash health-check routine, see Infrastructure Notes) that `POST`s `/api/send-reminders` with `Authorization: Bearer $REMINDER_CRON_SECRET`.
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE
@@ -201,8 +230,8 @@
 17. Experience recommendations (Viator + Groupon, `type: "product" | "experience"` on schema) — IN PROGRESS, Viator side built (see Phase 12), Groupon blocked on affiliate approval
 18. Smarter Claude search queries (tighter `searchQuery` values)
 19. ~~Amazon Product Advertising API~~ ✅ APPLIED 2026-08-26 — access now provisioned via Amazon's newer "Creators API" program, not the old webservices.amazon.com flow. Created application `thegiftwhisperer` (App ID `giftwhisper0e-20.thegiftwhisperer`), generated credentials, saved to `.env.local` as `AMAZON_PAAPI_CREDENTIAL_ID` / `AMAZON_PAAPI_SECRET` — **still needs to be added to Vercel Production** before any deployed code can use it. Real eligibility gate is 10 qualifying sales in the trailing 30 days (not 10 sales ever, as previously noted here — that was stale); review takes up to 48h and may show `AssociateNotEligible` until met. Unconfirmed whether sales credited during the recent Amazon suspension count toward that window.
-20. Uncommon Goods affiliate (via CJ Affiliate, product feed)
-21. User profiles + auth (Clerk, optional login, loved-one profiles, birthday reminders)
+20. **Uncommon Goods affiliate — PARKED (2026-08-26).** Investigated the roadmap note "via CJ Affiliate" and found it was wrong: UncommonGoods has no CJ listing at all (searched CJ's "Find Advertisers" for both "Uncommon Goods" and "UncommonGoods" — zero results). Per [affi.io](https://affi.io/m/uncommongoods), the real networks are **FlexOffers (Closed/inactive)** and **LinkConnector (Opened)** — LinkConnector is the live one, and it's where the "product-oriented links only, must use `lcpid`" requirement actually lives (not CJ). No LinkConnector account exists yet for this project — would need to be created (an account-creation step, so the user needs to do it, not Claude). Product quality check: browsed uncommongoods.com directly, catalog is genuinely quirky/novelty + personalized (e.g. "Emotional Support Desk Pets," customizable birthday books, artisan-made pieces) — distinct niche from both Amazon and Etsy, good fit for the site if pursued later. Deliberately parked for now, not pursuing LinkConnector signup at this time.
+21. ~~User profiles + auth (Clerk, optional login, loved-one profiles, birthday reminders)~~ ✅ CODE COMPLETE 2026-08-26 (see Phase 17) — blocked on the user creating a Clerk account and adding keys to `.env.local`/Vercel before it can go live; a daily reminder-email scheduled routine still needs setting up once keys exist.
 22. Metabase — connect to Neon for no-code dashboards
 23. Etsy geo-targeted affiliate routing (US → Rakuten, UK/EU → Awin)
 24. Interest-tag matched affiliate partners (REI for Outdoors, Best Buy for Tech, etc.)
