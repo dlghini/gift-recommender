@@ -121,10 +121,7 @@ async function fetchViatorListing(
   }
 }
 
-// Generic fallback for any gift without a real product photo (Amazon/Etsy always, Viator if its own image is missing).
-async function fetchUnsplashImage(query: string): Promise<string | undefined> {
-  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
-  if (!accessKey) return undefined;
+async function searchUnsplash(query: string, accessKey: string): Promise<string | undefined> {
   try {
     const res = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=squarish`,
@@ -137,6 +134,19 @@ async function fetchUnsplashImage(query: string): Promise<string | undefined> {
     console.error("[unsplash search]", err);
     return undefined;
   }
+}
+
+// Generic fallback for any gift without a real product photo (Amazon/Etsy always, Viator if its own image is missing).
+// A specific/branded query (e.g. "HexClad hybrid frying pan") often has zero matches on stock photography,
+// so if the first search comes up empty, retry once with the gift's tags — broader, more photogenic terms
+// (e.g. "cooking kitchen home chef") that are far more likely to have real Unsplash coverage.
+async function fetchUnsplashImage(query: string, tags: string[]): Promise<string | undefined> {
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
+  if (!accessKey) return undefined;
+  const primary = await searchUnsplash(query, accessKey);
+  if (primary) return primary;
+  if (tags.length === 0) return undefined;
+  return searchUnsplash(tags.join(" "), accessKey);
 }
 
 const BUDGET_LABELS: Record<string, string> = {
@@ -239,12 +249,12 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
         const query = gift.searchQuery || gift.name;
 
         if (gift.store !== "viator") {
-          const imageUrl = await fetchUnsplashImage(query);
+          const imageUrl = await fetchUnsplashImage(query, gift.tags);
           return { ...gift, imageUrl };
         }
 
         const listing = await fetchViatorListing(query);
-        const imageUrl = listing?.imageUrl ?? (await fetchUnsplashImage(query));
+        const imageUrl = listing?.imageUrl ?? (await fetchUnsplashImage(query, gift.tags));
         if (!listing) return { ...gift, imageUrl };
         return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl };
       })
