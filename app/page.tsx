@@ -3,6 +3,11 @@
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink, Sparkles, Gift } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const RAKUTEN_ID = "wa9JRgUhXO8";
+const ETSY_MID = "54027";
+const VIATOR_PID = "P00304135";
 
 const EXAMPLE_GIFTS = [
   {
@@ -11,6 +16,7 @@ const EXAMPLE_GIFTS = [
     rationale: "For the friend who romanticizes every trip they take — this isn't just a notebook, it's a place to collect stamps, ticket stubs, and memories. The kind of gift that gets better-looking the more it's used.",
     tags: ["Travel", "Writing", "Personalized"],
     searchQuery: "leather bound travel journal vintage world map",
+    store: "amazon" as const,
   },
   {
     name: "Japanese Cast Iron Tetsubin Tea Kettle Set",
@@ -18,6 +24,7 @@ const EXAMPLE_GIFTS = [
     rationale: "A ritual disguised as a kitchen item. For the person who takes their morning routine seriously — this cast iron kettle turns making tea into something meditative. Functional art that lasts decades.",
     tags: ["Cooking", "Mindfulness", "Home"],
     searchQuery: "japanese cast iron tetsubin tea kettle set",
+    store: "amazon" as const,
   },
   {
     name: "Stargazing Night Sky Constellation Projector",
@@ -25,8 +32,36 @@ const EXAMPLE_GIFTS = [
     rationale: "Transforms any bedroom ceiling into a planetarium. Perfect for the dreamer, the curious kid, or the couple who met at a rooftop bar and still talks about the stars. Unexpectedly moving for what it is.",
     tags: ["Tech", "Outdoors", "Ambiance"],
     searchQuery: "stargazing night sky constellation projector room",
+    store: "amazon" as const,
+  },
+  {
+    name: "Custom Constellation Star Map Print of Your First Date",
+    price: "$25–$45",
+    rationale: "A personalized print of exactly how the sky looked the night you met, engraved with the date and place. Handmade, sentimental, and the kind of thing they'll actually hang on the wall.",
+    tags: ["Personalized", "Art", "Sentimental"],
+    searchQuery: "custom star map print first date",
+    store: "etsy" as const,
+  },
+  {
+    name: "Private Sunset Sailing Cruise",
+    price: "From $85 per person",
+    rationale: "A bookable experience instead of another object — a couple of hours on the water as the sky turns gold. Perfect for someone who'd rather collect memories than more stuff.",
+    tags: ["Travel", "Romance", "Outdoors"],
+    searchQuery: "private sunset sailing cruise",
+    store: "viator" as const,
   },
 ];
+
+function buildExampleUrl(gift: (typeof EXAMPLE_GIFTS)[number]): string {
+  if (gift.store === "viator") {
+    return `https://www.viator.com/searchResults/all?text=${encodeURIComponent(gift.searchQuery)}&pid=${VIATOR_PID}`;
+  }
+  if (gift.store === "etsy") {
+    const etsyUrl = `https://www.etsy.com/search?q=${encodeURIComponent(gift.searchQuery)}`;
+    return `https://click.linksynergy.com/deeplink?id=${RAKUTEN_ID}&mid=${ETSY_MID}&murl=${encodeURIComponent(etsyUrl)}`;
+  }
+  return `https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery)}&tag=giftwhisper0e-20`;
+}
 
 const TAG_EMOJI: Record<string, string> = {
   Cooking: "🍳", Travel: "✈️", Fitness: "💪", Gaming: "🎮",
@@ -83,9 +118,12 @@ export default function Home() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs bg-stone-100 text-stone-400 px-2 py-0.5 rounded-full font-medium">Example</span>
+                      {gift.store === "viator" && (
+                        <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">Experience</span>
+                      )}
                     </div>
                     <h3 className="font-heading text-lg text-stone-900 leading-tight">{gift.name}</h3>
-                    <p className="text-amber-600 font-semibold text-sm mt-0.5">{gift.price}</p>
+                    <p className={cn("font-semibold text-sm mt-0.5", gift.store === "viator" ? "text-indigo-600" : "text-amber-600")}>{gift.price}</p>
                     <p className="text-stone-500 text-sm mt-3 leading-relaxed">{gift.rationale}</p>
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {gift.tags.map((tag) => (
@@ -93,14 +131,17 @@ export default function Home() {
                       ))}
                     </div>
                     <a
-                      href={`https://www.amazon.com/s?k=${encodeURIComponent(gift.searchQuery)}&tag=giftwhisper0e-20`}
+                      href={buildExampleUrl(gift)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => posthog?.capture("example_buy_clicked", { gift: gift.name })}
-                      className="mt-4 w-full flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 text-sm rounded-md transition-colors"
+                      onClick={() => posthog?.capture("example_buy_clicked", { gift: gift.name, store: gift.store })}
+                      className={cn(
+                        "mt-4 w-full flex items-center justify-center gap-1.5 text-white font-semibold h-9 text-sm rounded-md transition-colors",
+                        gift.store === "viator" ? "bg-indigo-500 hover:bg-indigo-600" : "bg-amber-500 hover:bg-amber-600"
+                      )}
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      Buy now
+                      {gift.store === "viator" ? "Book now" : "Buy now"}
                     </a>
                   </div>
                 </div>

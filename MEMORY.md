@@ -122,6 +122,11 @@
 - How-it-works copy is store-agnostic (no explicit Amazon/Etsy mention)
 - Amazon Associates re-suspension fix: static affiliate links now visible in landing page HTML for the bot to find
 
+### Phase 12b: Static Etsy/Viator Example Links — COMPLETE
+- Same crawlability fix that resolved the Amazon Associates suspension, extended to the other two affiliate programs: added 1 Etsy example card and 1 Viator experience example card to the landing page (`app/page.tsx`), alongside the existing 3 Amazon cards (kept untouched since the Amazon reapplication is still pending — didn't want to reduce Amazon's link count mid-appeal).
+- Rationale: neither Etsy nor Viator had any crawlable affiliate link anywhere in static HTML before this — same failure mode that got Amazon's bot to flag the site, just not yet triggered for these two.
+- Verified via direct `curl` of the built page that real, tagged links for all three stores appear in the raw HTML (not just after JS hydration).
+
 ### Phase 12: Experience Recommendations (Viator) — IN PROGRESS
 - `app/api/recommend/route.ts`: Claude response schema now includes `type: "product" | "experience"`, and `store` extended to `"amazon" | "etsy" | "viator"`. A `giftPreference` field (`"experiences" | "gifts" | "both"`) is sent from the wizard and used to instruct Claude on the experience/product mix per request (all-experience, all-product, or capped at 1-of-3 experience for "both").
 - `fetchViatorListing()` calls Viator's `/search/freetext` API (sandbox: `api.sandbox.viator.com/partner`) server-side for any `store: "viator"` gift, using `VIATOR_API_KEY` (header `exp-api-key`). Returns real `fromPrice` and a pre-attributed `productUrl` when available; falls back gracefully to Claude's estimated price and `"#"` if the API call fails (e.g. key not yet active, no results).
