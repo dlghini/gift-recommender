@@ -16,7 +16,7 @@ export default function LovedOnesPage() {
                 <p className="font-heading text-2xl text-stone-900 mb-2">Keep track of the people you love</p>
                 <p className="text-stone-500 text-sm mb-6 max-w-sm mx-auto">
                   Sign in to save gift ideas by person, log what you&apos;ve already given them, and get a
-                  reminder before their birthday.
+                  reminder before their birthday and other special occasions.
                 </p>
                 <SignInButton mode="modal">
                   <button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2.5 rounded-lg cursor-pointer">
