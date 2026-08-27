@@ -18,7 +18,7 @@ export default function LovedOnesPage() {
                   Sign in to save gift ideas by person, log what you&apos;ve already given them, and get a
                   reminder before their birthday and other special occasions.
                 </p>
-                <SignInButton mode="modal">
+                <SignInButton mode="modal" forceRedirectUrl="/loved-ones">
                   <button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2.5 rounded-lg cursor-pointer">
                     Sign in
                   </button>
