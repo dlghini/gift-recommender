@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Cake, Heart, Sparkles, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Cake, Check, Heart, Sparkles, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,7 +99,7 @@ export function LovedOneDetail({ id }: { id: string }) {
   const [holidayPrefs, setHolidayPrefs] = useState<HolidayPref[]>([]);
   const [gifts, setGifts] = useState<GiftRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [logName, setLogName] = useState("");
   const [logOccasion, setLogOccasion] = useState("");
 
@@ -142,24 +142,29 @@ export function LovedOneDetail({ id }: { id: string }) {
     if (!lovedOne) return;
     const next = { ...lovedOne, ...patch };
     setLovedOne(next);
-    setSaving(true);
-    await fetch(`/api/loved-ones/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: next.name,
-        relationship: next.relationship,
-        birthdayMonth: next.birthday_month,
-        birthdayDay: next.birthday_day,
-        birthdayYear: next.birthday_year,
-        anniversaryMonth: next.anniversary_month,
-        anniversaryDay: next.anniversary_day,
-        interestsNotes: next.interests_notes,
-        birthdayReminderEnabled: next.birthday_reminder_enabled,
-        anniversaryReminderEnabled: next.anniversary_reminder_enabled,
-      }),
-    });
-    setSaving(false);
+    setSaveStatus("saving");
+    try {
+      const res = await fetch(`/api/loved-ones/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: next.name,
+          relationship: next.relationship,
+          birthdayMonth: next.birthday_month,
+          birthdayDay: next.birthday_day,
+          birthdayYear: next.birthday_year,
+          anniversaryMonth: next.anniversary_month,
+          anniversaryDay: next.anniversary_day,
+          interestsNotes: next.interests_notes,
+          birthdayReminderEnabled: next.birthday_reminder_enabled,
+          anniversaryReminderEnabled: next.anniversary_reminder_enabled,
+        }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      setSaveStatus("saved");
+    } catch {
+      setSaveStatus("error");
+    }
   };
 
   const markGiven = async (giftId: string) => {
@@ -232,6 +237,19 @@ export function LovedOneDetail({ id }: { id: string }) {
 
         <Card className="bg-white border-0 shadow-sm mb-6">
           <CardContent className="p-6 flex flex-col gap-5">
+            <div className="flex items-center justify-end -mb-2 h-4">
+              {saveStatus === "saving" && <p className="text-xs text-stone-400">Saving…</p>}
+              {saveStatus === "saved" && (
+                <p className="text-xs text-green-600 flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Saved
+                </p>
+              )}
+              {saveStatus === "error" && (
+                <p className="text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> Couldn&apos;t save — try again
+                </p>
+              )}
+            </div>
             <div>
               <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Name</p>
               <Input
@@ -356,8 +374,6 @@ export function LovedOneDetail({ id }: { id: string }) {
                 </div>
               </div>
             )}
-
-            {saving && <p className="text-xs text-stone-300">Saving…</p>}
           </CardContent>
         </Card>
 
