@@ -26,7 +26,17 @@ export function Footer() {
               Contact
             </Link>
           </nav>
-          <p className="text-xs text-stone-300">© {new Date().getFullYear()} The Gift Whisperer</p>
+          <p className="text-xs text-stone-300">
+            © {new Date().getFullYear()} The Gift Whisperer · Some photos via{" "}
+            <a
+              href="https://pixabay.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-500 transition-colors"
+            >
+              Pixabay
+            </a>
+          </p>
         </div>
       </div>
     </footer>

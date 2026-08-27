@@ -1,17 +1,18 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import { after } from "next/server";
 import { getDb } from "@/lib/db";
 
-const ratelimit =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Ratelimit({
-        redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(25, "1 h"),
-        prefix: "giftwhisperer:ratelimit",
-      })
-    : null;
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN ? Redis.fromEnv() : null;
+
+const ratelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(25, "1 h"),
+      prefix: "giftwhisperer:ratelimit",
+    })
+  : null;
 
 const client = new Anthropic();
 
@@ -122,68 +123,61 @@ async function fetchViatorListing(
   }
 }
 
-interface UnsplashImage {
-  url: string;
-  photographerName: string;
-  photographerProfileUrl: string;
-  downloadLocation: string;
-}
+const PIXABAY_CACHE_TTL_SECONDS = 60 * 60 * 24; // Pixabay's API terms require caching responses for 24h
 
-async function searchUnsplash(query: string, accessKey: string): Promise<UnsplashImage | undefined> {
+// Pixabay's free-tier terms require every response to be cached for 24h. This doubles as a real
+// capacity win: popular gift searches (common products recur across different users' sessions) get
+// served from cache instead of burning a fresh API call against the 100req/60s limit. A miss (no
+// real match) is cached too, as "", so a dead query doesn't keep re-hitting Pixabay all day.
+// image_type=photo excludes illustrations/vectors from results — Pixabay's default search mixes
+// those in with real photos, which we don't want for a "real gift photo" card.
+async function searchPixabay(query: string, apiKey: string): Promise<string | undefined> {
+  const cacheKey = `giftwhisperer:pixabay:${query.toLowerCase()}`;
+  if (redis) {
+    try {
+      const cached = await redis.get<string>(cacheKey);
+      if (cached !== null && cached !== undefined) return cached || undefined;
+    } catch (err) {
+      console.error("[pixabay cache read]", err);
+    }
+  }
+
+  let url: string | undefined;
   try {
     const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=squarish`,
-      { headers: { Authorization: `Client-ID ${accessKey}` }, cache: "no-store" }
+      `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&safesearch=true&per_page=3`,
+      { cache: "no-store" }
     );
-    if (!res.ok) return undefined;
-    const data = (await res.json()) as {
-      results?: {
-        urls?: { thumb?: string };
-        user?: { name?: string; links?: { html?: string } };
-        links?: { download_location?: string };
-      }[];
-    };
-    const photo = data.results?.[0];
-    const url = photo?.urls?.thumb;
-    const photographerName = photo?.user?.name;
-    const photographerProfileUrl = photo?.user?.links?.html;
-    const downloadLocation = photo?.links?.download_location;
-    if (!url || !photographerName || !photographerProfileUrl || !downloadLocation) return undefined;
-    return { url, photographerName, photographerProfileUrl, downloadLocation };
+    if (res.ok) {
+      const data = (await res.json()) as { hits?: { webformatURL?: string }[] };
+      url = data.hits?.[0]?.webformatURL;
+    }
   } catch (err) {
-    console.error("[unsplash search]", err);
-    return undefined;
+    console.error("[pixabay search]", err);
   }
+
+  if (redis) {
+    redis.set(cacheKey, url ?? "", { ex: PIXABAY_CACHE_TTL_SECONDS }).catch((err) =>
+      console.error("[pixabay cache write]", err)
+    );
+  }
+  return url;
 }
 
 // Generic fallback for any gift without a real product photo (Amazon/Etsy always, Viator if its own image is missing).
 // A specific/branded query (e.g. "HexClad hybrid frying pan") often has zero matches on stock photography,
 // so if the first search comes up empty, retry with the gift's tags — broader, more photogenic terms
-// that are far more likely to have real Unsplash coverage. Tags are tried one at a time (not joined) so an
+// that are far more likely to have real coverage. Tags are tried one at a time (not joined) so an
 // unrelated tag pairing (e.g. "travel" + "outdoors") can't dominate the result and pull in an off-topic photo.
-async function fetchUnsplashImage(query: string, tags: string[]): Promise<UnsplashImage | undefined> {
-  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
-  if (!accessKey) return undefined;
-  let image = await searchUnsplash(query, accessKey);
+async function fetchPixabayImage(query: string, tags: string[]): Promise<string | undefined> {
+  const apiKey = process.env.PIXABAY_API_KEY;
+  if (!apiKey) return undefined;
+  let url = await searchPixabay(query, apiKey);
   for (const tag of tags) {
-    if (image) break;
-    image = await searchUnsplash(tag, accessKey);
+    if (url) break;
+    url = await searchPixabay(tag, apiKey);
   }
-  // Unsplash's API guidelines require pinging this endpoint whenever a photo is actually
-  // shown to a user — required for Production tier, not just a courtesy for Demo.
-  if (image) {
-    const downloadLocation = image.downloadLocation;
-    after(() =>
-      fetch(downloadLocation, { headers: { Authorization: `Client-ID ${accessKey}` } }).catch((err) =>
-        console.error("[unsplash download trigger]", err)
-      )
-    );
-  }
-  return image;
-}
-
-function toAttribution(image: UnsplashImage | undefined) {
-  return image ? { name: image.photographerName, profileUrl: image.photographerProfileUrl } : undefined;
+  return url;
 }
 
 const BUDGET_LABELS: Record<string, string> = {
@@ -286,20 +280,14 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
         const query = gift.searchQuery || gift.name;
 
         if (gift.store !== "viator") {
-          const image = await fetchUnsplashImage(query, gift.tags);
-          return { ...gift, imageUrl: image?.url, imageAttribution: toAttribution(image) };
+          const imageUrl = await fetchPixabayImage(query, gift.tags);
+          return { ...gift, imageUrl };
         }
 
         const listing = await fetchViatorListing(query);
-        let imageUrl = listing?.imageUrl;
-        let imageAttribution: { name: string; profileUrl: string } | undefined;
-        if (!imageUrl) {
-          const image = await fetchUnsplashImage(query, gift.tags);
-          imageUrl = image?.url;
-          imageAttribution = toAttribution(image);
-        }
-        if (!listing) return { ...gift, imageUrl, imageAttribution };
-        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl, imageAttribution };
+        const imageUrl = listing?.imageUrl ?? (await fetchPixabayImage(query, gift.tags));
+        if (!listing) return { ...gift, imageUrl };
+        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl };
       })
     );
 

@@ -46,10 +46,7 @@ interface GiftResult {
   store: "amazon" | "etsy" | "viator";
   searchQuery: string;
   imageUrl?: string;
-  imageAttribution?: { name: string; profileUrl: string };
 }
-
-const UNSPLASH_UTM = "?utm_source=thegiftwhisperer&utm_medium=referral";
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
 const ETSY_MID = "54027";
@@ -116,35 +113,12 @@ function GiftThumb({ gift, size = "lg" }: { gift: GiftResult; size?: "lg" | "sm"
 
   if (gift.imageUrl && !imgFailed) {
     return (
-      <div className="shrink-0 flex flex-col items-center gap-0.5">
-        <img
-          src={gift.imageUrl}
-          alt={gift.name}
-          className={cn(boxClass, "rounded-lg object-cover bg-stone-100")}
-          onError={() => setImgFailed(true)}
-        />
-        {size === "lg" && gift.imageAttribution && (
-          <div className="text-[8px] leading-tight text-stone-400 text-center w-14">
-            <a
-              href={`${gift.imageAttribution.profileUrl}${UNSPLASH_UTM}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-stone-600 underline underline-offset-1"
-            >
-              {gift.imageAttribution.name}
-            </a>{" "}
-            /{" "}
-            <a
-              href={`https://unsplash.com/${UNSPLASH_UTM}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-stone-600 underline underline-offset-1"
-            >
-              Unsplash
-            </a>
-          </div>
-        )}
-      </div>
+      <img
+        src={gift.imageUrl}
+        alt={gift.name}
+        className={cn(boxClass, "shrink-0 rounded-lg object-cover bg-stone-100")}
+        onError={() => setImgFailed(true)}
+      />
     );
   }
   return <div className={cn(textClass, "shrink-0")}>{pickEmoji(gift.tags, gift.type)}</div>;
