@@ -65,6 +65,7 @@ export const metadata: Metadata = {
   },
   other: {
     "impact-site-verification": "62509d58-8ed2-4dfa-b534-6c9ef7074147",
+    "p:domain_verify": "76475a487dfa715c99122cad2510ebdd",
   },
 };
 
