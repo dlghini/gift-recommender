@@ -5,7 +5,7 @@ import { routeMeta } from "@/lib/site";
 export const metadata = routeMeta(
   "/how-we-choose",
   "How We Choose Gifts",
-  "The method behind The Gift Whisperer's recommendations: what goes into each pick, the rules the model follows, and how we stay independent."
+  "The method behind The Gift Whisperer's recommendations: what goes into each pick, the rules the engine works inside, and how we stay independent."
 );
 
 export default function HowWeChoosePage() {
@@ -29,10 +29,11 @@ export default function HowWeChoosePage() {
 
         <div className="space-y-8 text-stone-600 text-sm leading-relaxed">
           <p className="text-stone-500 text-base">
-            The Gift Whisperer isn&apos;t a bestseller list with a search box on top. Your answers
-            from the wizard go to an AI model &mdash; the same kind of large language model that
-            powers chat assistants &mdash; working inside a set of rules we wrote and keep tuning.
-            Here&apos;s what it uses, what it won&apos;t do, and who&apos;s responsible for it.
+            The Gift Whisperer isn&apos;t a bestseller list with a search box on top. Behind the
+            wizard is a recommendation engine we built and maintain by hand &mdash; one that uses AI
+            and machine learning to work through your answers, inside a set of rules we wrote and
+            keep tuning. This page covers what goes into a pick, what the engine won&apos;t do, and
+            who&apos;s accountable when it&apos;s wrong.
           </p>
 
           <section>
@@ -53,7 +54,7 @@ export default function HowWeChoosePage() {
           </section>
 
           <section>
-            <h2 className="font-heading text-xl text-stone-800 mb-3">The rules the model works inside</h2>
+            <h2 className="font-heading text-xl text-stone-800 mb-3">The rules the engine works inside</h2>
             <ul className="space-y-1.5 list-disc pl-5">
               <li>
                 Real, specific, and easy to find. Every suggestion has to be an actual product or a
@@ -102,11 +103,11 @@ export default function HowWeChoosePage() {
           <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">Who&apos;s responsible</h2>
             <p>
-              The model doesn&apos;t run unsupervised. Daniel M., who runs The Gift Whisperer,
+              The engine doesn&apos;t run unsupervised. Daniel M., who runs The Gift Whisperer,
               wrote the rules it works inside, watches what it produces, and tightens things when it
               gets one wrong &mdash; an off-topic pick, a price that&apos;s way off, a store that
-              doesn&apos;t fit. A generated suggestion is a starting point, not a verdict. You know
-              the person; the site is just here to take the time and guesswork out of it.
+              doesn&apos;t fit. Its suggestions are a starting point, not a verdict. You know the
+              person; the site is just here to take the time and guesswork out of it.
             </p>
           </section>
 
