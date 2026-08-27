@@ -10,6 +10,7 @@ import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw,
 import { cn } from "@/lib/utils";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { useResolvedImage } from "@/lib/use-resolved-image";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
   return btoa(encodeURIComponent(JSON.stringify({ form, gifts })));
@@ -105,19 +106,19 @@ function pickEmoji(tags: string[], type?: "product" | "experience"): string {
 }
 
 // Renders the gift's real photo when we have one; falls back to an emoji if there's no image
-// (no key set up, lookup miss, or the image URL failed to load).
+// (no key set up, lookup miss, or the image URL failed to load and a re-resolve also came up empty).
 function GiftThumb({ gift, size = "lg" }: { gift: GiftResult; size?: "lg" | "sm" }) {
-  const [imgFailed, setImgFailed] = useState(false);
+  const { src, failed, handleError } = useResolvedImage(gift.imageUrl, gift.searchQuery || gift.name, gift.tags);
   const boxClass = size === "lg" ? "w-14 h-14" : "w-10 h-10";
   const textClass = size === "lg" ? "text-4xl" : "text-2xl";
 
-  if (gift.imageUrl && !imgFailed) {
+  if (src && !failed) {
     return (
       <img
-        src={gift.imageUrl}
+        src={src}
         alt={gift.name}
         className={cn(boxClass, "shrink-0 rounded-lg object-cover bg-stone-100")}
-        onError={() => setImgFailed(true)}
+        onError={handleError}
       />
     );
   }

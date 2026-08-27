@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, Cake, Check, Heart, Sparkles, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Check, Gift as GiftIcon, Heart, Sparkles, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import {
 } from "@/components/relationship-emoji";
 import { applicableHolidays } from "@/lib/holidays";
 import { cn } from "@/lib/utils";
+import { useResolvedImage } from "@/lib/use-resolved-image";
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -48,6 +49,32 @@ interface GiftRow {
   rationale: string | null;
   occasion_label: string | null;
   given_at: string | null;
+  image_url: string | null;
+  search_query: string | null;
+  tags: string[] | null;
+}
+
+// Same real-photo-or-fallback pattern as the wizard's GiftThumb, with the same retry-before-giving-up
+// behavior — these images can be weeks old by the time someone views a saved idea or gift history, well
+// past Pixabay's ~24h URL validity, so a load failure here is the common case, not the rare one.
+function LovedOneGiftThumb({ gift }: { gift: GiftRow }) {
+  const { src, failed, handleError } = useResolvedImage(gift.image_url, gift.search_query || gift.name, gift.tags ?? []);
+
+  if (src && !failed) {
+    return (
+      <img
+        src={src}
+        alt={gift.name}
+        className="w-10 h-10 shrink-0 rounded-lg object-cover bg-stone-100"
+        onError={handleError}
+      />
+    );
+  }
+  return (
+    <div className="w-10 h-10 shrink-0 rounded-lg bg-amber-50 flex items-center justify-center">
+      <GiftIcon className="w-4 h-4 text-amber-400" />
+    </div>
+  );
 }
 
 interface HolidayPref {
@@ -393,6 +420,7 @@ export function LovedOneDetail({ id }: { id: string }) {
                 {ideas.map((gift) => (
                   <Card key={gift.id} className="bg-white border-0 shadow-sm">
                     <CardContent className="p-4 flex items-center gap-3">
+                      <LovedOneGiftThumb gift={gift} />
                       <div className="flex-1 min-w-0">
                         <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
                         {gift.price && <p className="text-amber-600 text-xs font-semibold">{gift.price}</p>}
@@ -453,7 +481,7 @@ export function LovedOneDetail({ id }: { id: string }) {
                 {given.map((gift) => (
                   <Card key={gift.id} className="bg-white border-0 shadow-sm">
                     <CardContent className="p-4 flex items-center gap-3">
-                      <Cake className="w-4 h-4 text-amber-400 shrink-0" />
+                      <LovedOneGiftThumb gift={gift} />
                       <div className="flex-1 min-w-0">
                         <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
                         <p className="text-xs text-stone-400">

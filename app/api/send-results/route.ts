@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
+import { fetchPixabayImage } from "@/lib/pixabay";
 
 const ratelimit =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
@@ -27,6 +28,7 @@ interface GiftResult {
   type: "product" | "experience";
   store: "amazon" | "etsy" | "viator";
   searchQuery: string;
+  imageUrl?: string;
 }
 
 function buildBuyUrl(gift: GiftResult): string {
@@ -54,12 +56,22 @@ function renderGiftCard(gift: GiftResult): string {
   const isExperience = gift.type === "experience";
   const accent = isExperience ? "#6366f1" : "#f59e0b";
   const buttonLabel = isExperience ? "Book now" : "Buy now";
+  const imageCell = gift.imageUrl
+    ? `<td width="64" valign="top" style="padding-right:14px;">
+         <img src="${escapeHtml(gift.imageUrl)}" width="64" height="64" alt="${escapeHtml(gift.name)}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;display:block;background:#f5f0e6;" />
+       </td>`
+    : "";
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;margin-bottom:16px;border:1px solid #f0e6d2;">
       <tr><td style="padding:20px;">
-        ${isExperience ? `<span style="display:inline-block;font-size:11px;font-weight:600;color:${accent};background:#eef2ff;padding:2px 8px;border-radius:9999px;margin-bottom:8px;">EXPERIENCE</span><br/>` : ""}
-        <span style="font-family:Georgia,serif;font-size:18px;color:#1c1917;">${escapeHtml(gift.name)}</span><br/>
-        <span style="font-size:14px;font-weight:600;color:${accent};">${escapeHtml(gift.price)}</span>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          ${imageCell}
+          <td valign="top">
+            ${isExperience ? `<span style="display:inline-block;font-size:11px;font-weight:600;color:${accent};background:#eef2ff;padding:2px 8px;border-radius:9999px;margin-bottom:8px;">EXPERIENCE</span><br/>` : ""}
+            <span style="font-family:Georgia,serif;font-size:18px;color:#1c1917;">${escapeHtml(gift.name)}</span><br/>
+            <span style="font-size:14px;font-weight:600;color:${accent};">${escapeHtml(gift.price)}</span>
+          </td>
+        </tr></table>
         <p style="font-size:14px;color:#78716c;line-height:1.6;margin:12px 0;">${escapeHtml(gift.rationale)}</p>
         <a href="${buildBuyUrl(gift)}" style="display:inline-block;background:${accent};color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">${buttonLabel} →</a>
       </td></tr>
@@ -104,9 +116,20 @@ export async function POST(request: Request) {
       return Response.json({ error: "No gifts to send." }, { status: 400 });
     }
 
+    // Re-resolve non-Viator images fresh at send time rather than trusting whatever URL the client
+    // had — Pixabay's URLs are only valid ~24h, and an email might sit unopened for longer than that.
+    // Viator's own images are left as-is; they're not ours to re-resolve.
+    const giftsWithImages = await Promise.all(
+      gifts.map(async (gift) => {
+        if (gift.store === "viator") return gift;
+        const imageUrl = await fetchPixabayImage(gift.searchQuery || gift.name, gift.tags);
+        return { ...gift, imageUrl };
+      })
+    );
+
     try {
       const sql = getDb();
-      await sql`INSERT INTO subscribers (email, gifts) VALUES (${email}, ${JSON.stringify(gifts)})`;
+      await sql`INSERT INTO subscribers (email, gifts) VALUES (${email}, ${JSON.stringify(giftsWithImages)})`;
     } catch (dbError) {
       console.error("[subscriber logging]", dbError);
     }
@@ -115,7 +138,7 @@ export async function POST(request: Request) {
       from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
       to: email,
       subject: "Your gift picks from The Gift Whisperer 🎁",
-      html: renderEmail(gifts),
+      html: renderEmail(giftsWithImages),
     });
 
     if (error) {
