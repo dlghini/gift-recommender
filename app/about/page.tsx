@@ -32,7 +32,7 @@ export default function AboutPage() {
             The right gift for anyone, in minutes.
           </h1>
           <p className="text-stone-500 text-lg leading-relaxed">
-            Finding a meaningful gift is hard. Not because there aren&apos;t enough options —
+            Finding a meaningful gift is hard. Not because there aren&apos;t enough options, but
             because there are too many. The Gift Whisperer cuts through the noise with
             recommendations tailored to the person you&apos;re buying for.
           </p>
@@ -45,8 +45,8 @@ export default function AboutPage() {
               <div>
                 <h2 className="font-heading text-lg text-stone-900 mb-1">Smarter than a bestseller list</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
-                  We look at the full picture — the recipient&apos;s relationship to you, their age,
-                  the occasion, their interests, and your budget — and think through thousands
+                  We look at the full picture: the recipient&apos;s relationship to you, their age,
+                  the occasion, their interests, and your budget. Then we think through thousands
                   of possibilities to surface three gifts that genuinely fit.
                 </p>
               </div>
@@ -60,7 +60,7 @@ export default function AboutPage() {
                 <h2 className="font-heading text-lg text-stone-900 mb-1">Thoughtful, not generic</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
                   We don&apos;t serve up a ranked list of bestsellers. Each suggestion comes
-                  with a rationale — a plain-English explanation of why that specific gift
+                  with a rationale: a plain-language explanation of why that specific gift
                   makes sense for that specific person. You decide if it clicks.
                 </p>
               </div>
@@ -74,7 +74,7 @@ export default function AboutPage() {
                 <h2 className="font-heading text-lg text-stone-900 mb-1">Save your favorites</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
                   Heart any recommendation to save it to your wishlist. Saved gifts persist
-                  across sessions so you can come back and compare — or share them with
+                  across sessions so you can come back and compare, or share them with
                   someone who keeps asking what you want.
                 </p>
               </div>
@@ -87,14 +87,15 @@ export default function AboutPage() {
             <span className="text-amber-600 text-xs font-semibold uppercase tracking-widest">Who&apos;s behind this</span>
           </div>
           <p className="text-stone-500 text-sm leading-relaxed">
-            The Gift Whisperer is built and run by <strong className="text-stone-700">Daniel M.</strong> &mdash;
-            solo, no team, no investors, no advertiser deciding what you see.
+            The Gift Whisperer is built and run by <strong className="text-stone-700">Daniel M.</strong>{" "}
+            No team, no investors, no advertiser deciding what you see.
           </p>
           <p className="text-stone-500 text-sm leading-relaxed mt-3">
-            I&apos;ve always loved giving gifts, and I take pride in finding something that actually
-            fits a person &mdash; their quirks, the specific way they are. Plenty of people don&apos;t
-            have the time or patience for that, so gift-giving turns into a chore they dread. I built
-            this to take the time and guesswork out of it, so giving a good gift can feel fun again.
+            I&apos;ve always loved giving gifts, and I take pride in finding something that fits a
+            person, right down to their quirks and the specific way they are. Plenty of people
+            don&apos;t have the time or patience for that, so gift-giving turns into a chore they
+            dread. I built this to take the time and guesswork out of it, so giving a good gift can
+            feel fun again.
           </p>
           <p className="text-stone-500 text-sm leading-relaxed mt-3">
             How the picks get made, and what this site will and won&apos;t do, is on the{" "}
@@ -113,7 +114,7 @@ export default function AboutPage() {
           <div>
             <h3 className="font-heading text-base text-stone-900 mb-1">A note on honesty</h3>
             <p className="text-stone-500 text-sm leading-relaxed">
-              Some links on this site are affiliate links — if you click through and buy
+              Some links on this site are affiliate links. If you click through and buy
               something, we may earn a small commission at no extra cost to you. This never
               influences what we recommend. Our only job is to help you find a gift they&apos;ll love.{" "}
               <Link href="/disclosure" className="text-amber-600 hover:text-amber-700 underline underline-offset-2">
