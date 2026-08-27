@@ -3,8 +3,9 @@ import { Gift, Sparkles, Heart, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata = {
-  title: "About — The Gift Whisperer",
-  description: "Learn how The Gift Whisperer uses AI to find the perfect gift for anyone.",
+  title: "About",
+  description:
+    "How The Gift Whisperer finds a genuinely well-matched gift for anyone on your list.",
 };
 
 export default function AboutPage() {

@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { JsonLd } from "@/components/json-ld";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,12 +26,61 @@ const lora = Lora({
   weight: ["400", "500", "600", "700"],
 });
 
+const TITLE_DEFAULT = `${SITE_NAME} — Find the perfect gift`;
+
 export const metadata: Metadata = {
-  title: "The Gift Whisperer — Find the perfect gift",
-  description: "AI-powered gift recommendations tailored to the person you love.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: TITLE_DEFAULT,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  // No blanket `alternates.canonical` here: a value set on the root layout
+  // propagates to every child route that doesn't override it, which would
+  // canonicalise all pages to "/". Canonicals are set per-route instead.
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: TITLE_DEFAULT,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE_DEFAULT,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   other: {
     "impact-site-verification": "62509d58-8ed2-4dfa-b534-6c9ef7074147",
   },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
 };
 
 export default function RootLayout({
@@ -43,6 +94,8 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <JsonLd data={organizationSchema} />
+        <JsonLd data={websiteSchema} />
         <PostHogProvider>
           <Nav />
           {children}

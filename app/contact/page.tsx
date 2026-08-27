@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Gift, Mail } from "lucide-react";
 
 export const metadata = {
-  title: "Contact — The Gift Whisperer",
+  title: "Contact",
   description: "Get in touch with The Gift Whisperer team.",
 };
 
