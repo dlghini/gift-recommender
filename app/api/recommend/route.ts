@@ -138,15 +138,19 @@ async function searchUnsplash(query: string, accessKey: string): Promise<string 
 
 // Generic fallback for any gift without a real product photo (Amazon/Etsy always, Viator if its own image is missing).
 // A specific/branded query (e.g. "HexClad hybrid frying pan") often has zero matches on stock photography,
-// so if the first search comes up empty, retry once with the gift's tags — broader, more photogenic terms
-// (e.g. "cooking kitchen home chef") that are far more likely to have real Unsplash coverage.
+// so if the first search comes up empty, retry with the gift's tags — broader, more photogenic terms
+// that are far more likely to have real Unsplash coverage. Tags are tried one at a time (not joined) so an
+// unrelated tag pairing (e.g. "travel" + "outdoors") can't dominate the result and pull in an off-topic photo.
 async function fetchUnsplashImage(query: string, tags: string[]): Promise<string | undefined> {
   const accessKey = process.env.UNSPLASH_ACCESS_KEY;
   if (!accessKey) return undefined;
   const primary = await searchUnsplash(query, accessKey);
   if (primary) return primary;
-  if (tags.length === 0) return undefined;
-  return searchUnsplash(tags.join(" "), accessKey);
+  for (const tag of tags) {
+    const result = await searchUnsplash(tag, accessKey);
+    if (result) return result;
+  }
+  return undefined;
 }
 
 const BUDGET_LABELS: Record<string, string> = {
