@@ -87,22 +87,21 @@ export default function AboutPage() {
             <span className="text-amber-600 text-xs font-semibold uppercase tracking-widest">Who&apos;s behind this</span>
           </div>
           <p className="text-stone-500 text-sm leading-relaxed">
-            The Gift Whisperer is built and run by <strong className="text-stone-700">Dan Maghini</strong>,
-            an independent maker working on it solo. There&apos;s no team, no investors, and no
-            advertiser deciding what you see &mdash; just one person maintaining the recommender and
-            the guardrails around it.
+            The Gift Whisperer is built and run by <strong className="text-stone-700">Daniel M.</strong> &mdash;
+            solo, no team, no investors, no advertiser deciding what you see.
           </p>
           <p className="text-stone-500 text-sm leading-relaxed mt-3">
-            It exists because the hard part of gift-giving isn&apos;t caring &mdash; it&apos;s the time it
-            takes to turn what you know about someone into an actual thing to buy. This is an attempt
-            to do that legwork for you, honestly, in about a minute.
+            I&apos;ve always loved giving gifts, and I take pride in finding something that actually
+            fits a person &mdash; their quirks, the specific way they are. Plenty of people don&apos;t
+            have the time or patience for that, so gift-giving turns into a chore they dread. I built
+            this to take the time and guesswork out of it, so giving a good gift can feel fun again.
           </p>
           <p className="text-stone-500 text-sm leading-relaxed mt-3">
-            Want the detail on how picks are made and what we will and won&apos;t do?{" "}
+            How the picks get made, and what this site will and won&apos;t do, is on the{" "}
             <Link href="/how-we-choose" className="text-amber-600 hover:text-amber-700 underline underline-offset-2">
-              Read how we choose gifts.
+              how we choose gifts
             </Link>{" "}
-            Questions or corrections go straight to{" "}
+            page. Questions or corrections:{" "}
             <a href="mailto:dan.maghini@gmail.com" className="text-amber-600 hover:text-amber-700 underline underline-offset-2">
               dan.maghini@gmail.com
             </a>.

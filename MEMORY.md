@@ -279,9 +279,9 @@ Adds the "who's behind this" and "how content is made" signals that were the pos
 - **`app/about/page.tsx`** — new "Who's behind this" card naming **Dan Maghini** as the independent solo maker, why the site exists (framed as the problem it solves, not a fabricated anecdote), links to `/how-we-choose` + contact email.
 - **`app/disclosure/page.tsx`** — added a Viator/experiences section (was Amazon + Etsy only), refreshed the date to 2026-08-27, added "commission rates play no part" + a link to `/how-we-choose`.
 - **`app/layout.tsx`** — Organization JSON-LD now has `founder: {@type: Person, name: "Dan Maghini"}` and `email`.
-- **No-AI-copy rule honored** — the methodology page describes "a recommendation engine we built and maintain by hand" and never says AI/LLM/etc. Flagged to Dan: this is the one page where E-E-A-T transparency and the no-AI rule are in tension — his call whether to be explicit about the mechanism here.
-- Verified via local prod build: `/how-we-choose` 200, one `<h1>`, canonical = og:url, no AI terms on any new/changed page, founder in JSON-LD, footer link present. Build clean, lint unchanged.
-- **Needs Dan's sign-off before merge**: the "why it exists" framing on About and the use of his full name ("Dan Maghini" vs "Dan M."). Everything else is factual.
+- **Dan's revisions applied (2026-08-27):** name is **"Daniel M."** everywhere (About copy + Organization JSON-LD `founder`); the About "why" is now his real first-person motivation ("I've always loved giving gifts… take the time and guesswork out of it, so giving a good gift can feel fun again"); phrase "time and guesswork" used. **No-AI rule waived for `/how-we-choose` only** — that page now says plainly the wizard answers "go to an AI model — the same kind of large language model that powers chat assistants — working inside a set of rules we wrote." The rest of the site keeps the no-AI rule.
+- Also this session: new memory `feedback_avoid_ai_writing_tells` — strip LLM-prose markers from all user-facing copy going forward (Dan's standing request).
+- Verified via local prod build: `/how-we-choose` 200, one `<h1>`, canonical = og:url, AI mechanism named, founder "Daniel M." in JSON-LD, footer link present. Build clean, lint unchanged. PR #5 open.
 
 ## Prioritized Roadmap
 

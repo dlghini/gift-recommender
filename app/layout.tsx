@@ -74,7 +74,7 @@ const organizationSchema = {
   name: SITE_NAME,
   url: SITE_URL,
   description: SITE_DESCRIPTION,
-  founder: { "@type": "Person", name: "Dan Maghini" },
+  founder: { "@type": "Person", name: "Daniel M." },
   email: "dan.maghini@gmail.com",
 };
 
