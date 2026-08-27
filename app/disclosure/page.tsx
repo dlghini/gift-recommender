@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Gift, ShieldCheck } from "lucide-react";
+import { routeMeta } from "@/lib/site";
 
-export const metadata = {
-  title: "Affiliate Disclosure",
-  description: "Affiliate disclosure for The Gift Whisperer.",
-  alternates: { canonical: "/disclosure" },
-};
+export const metadata = routeMeta(
+  "/disclosure",
+  "Affiliate Disclosure",
+  "How The Gift Whisperer earns from affiliate links, which retailers we partner with, and what that means for the recommendations you see."
+);
 
 export default function DisclosurePage() {
   return (

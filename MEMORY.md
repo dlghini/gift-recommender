@@ -261,6 +261,16 @@ Resolves the "homepage can't be indexed" blocker found via GSC URL inspection (G
 - **Not done here / still open**: E-E-A-T pages (methodology, editorial policy, bio) blocked on the public-identity decision; backlink-toxicity + manual-actions check (needs the keyword tool); GSC data populates ~2–3 days post-verification for the real Phase 1 baseline. `.claude/settings.json` still uncommitted (pre-existing, unrelated — left alone).
 - **Verified**: `npm run build` clean (TypeScript passes, `robots.txt` + `sitemap.xml` emit as static routes). Served the production build on a scratch port and confirmed via curl: `robots.txt` and `sitemap.xml` content correct with www URLs; homepage `<head>` emits the new description, robots meta, OG/Twitter tags, and both JSON-LD blocks; `/about` renders `"About · The Gift Whisperer"` (template works) and — after the canonical fix — no stray `rel=canonical` pointing at `/`.
 
+### Phase 18c: Ahrefs Site Audit fixes — branch `seo/audit-fixes` (2026-08-27)
+
+First Ahrefs Site Audit: health 100, **0 errors**, ~31 warnings + notices. Four real issues, fixed on this branch:
+- **`og:url` ≠ `canonical` on 6 pages** — `app/layout.tsx` sets a static `openGraph.url`; PR #2's per-route canonicals didn't match it. Fix: new **`routeMeta(path, title, description)`** helper in `lib/site.ts` returning `{title, description, alternates.canonical, openGraph:{...base, url}, twitter}`, applied to `/wizard`, `/about`, `/contact`, `/disclosure`, `/privacy`, `/loved-ones`. Homepage unchanged (inherits layout OG; canonical already matches). Next **replaces** the whole `openGraph` object when a page sets one, hence the helper re-spreads the shared base (`type/siteName/locale`).
+- **No `og:image` anywhere** — added `app/opengraph-image.tsx` (`next/og` ImageResponse, text-only, brand amber). File convention → applies to every route.
+- **`/loved-ones` had 0 `<h1>`** — signed-out and CLERK-disabled states used `<p class="font-heading">`; changed to `<h1>`.
+- **5 meta descriptions under ~110 chars** — lengthened all to 120–160; `SITE_DESCRIPTION` too.
+- Not fixed (deliberate): "3XX redirect"/"redirect chain" are all proper 308s — the phantom inlink is Ahrefs' own crawl seed (apex); optional cleanup is to set the Ahrefs project URL to the www host. "Redirected JavaScript" (8) is client-component routing; Googlebot renders JS, not worth chasing.
+- Verified via local prod build: og:url matches canonical on every route, og:image present (1200×630), `/loved-ones` has an h1, descriptions 120–160. Build clean, lint unchanged (8/5/3, all pre-existing).
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE

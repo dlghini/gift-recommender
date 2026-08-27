@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Gift } from "lucide-react";
+import { routeMeta } from "@/lib/site";
 
-export const metadata = {
-  title: "Privacy Policy",
-  description: "Privacy policy for The Gift Whisperer.",
-  alternates: { canonical: "/privacy" },
-};
+export const metadata = routeMeta(
+  "/privacy",
+  "Privacy Policy",
+  "What data The Gift Whisperer collects when you use the gift finder, how it's used, and the choices you have over it."
+);
 
 export default function PrivacyPage() {
   return (

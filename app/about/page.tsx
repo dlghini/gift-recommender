@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Gift, Sparkles, Heart, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-export const metadata = {
-  title: "About",
-  description:
-    "How The Gift Whisperer finds a genuinely well-matched gift for anyone on your list.",
-  alternates: { canonical: "/about" },
-};
+import { routeMeta } from "@/lib/site";
+
+export const metadata = routeMeta(
+  "/about",
+  "About",
+  "How The Gift Whisperer works: tell us about the person and the occasion, and we find a genuinely well-matched gift instead of a generic one."
+);
 
 export default function AboutPage() {
   return (
