@@ -1,9 +1,7 @@
-import { Resend } from "resend";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
+import { getResend } from "@/lib/resend";
 import { findDueOccasions, type LovedOneRow } from "@/lib/reminders";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function escapeHtml(text: string): string {
   return text
@@ -83,7 +81,7 @@ async function handleReminderRun(request: Request): Promise<Response> {
           user.emailAddresses[0]?.emailAddress;
         if (!primaryEmail) continue;
 
-        const { error: sendResultError } = await resend.emails.send({
+        const { error: sendResultError } = await getResend().emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: `${occasion.label} is coming up 🎁`,
