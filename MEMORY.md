@@ -283,6 +283,20 @@ Adds the "who's behind this" and "how content is made" signals that were the pos
 - Also this session: new memory `feedback_avoid_ai_writing_tells` — strip LLM-prose markers from all user-facing copy going forward (Dan's standing request).
 - Verified via local prod build: `/how-we-choose` 200, one `<h1>`, canonical = og:url, AI mechanism named, founder "Daniel M." in JSON-LD, footer link present. Build clean, lint unchanged. PR #5 open.
 
+### Phase 18e: Probe gift-guide pages (`/gifts-for/[slug]`) — branch `seo/probe-gift-guides` (2026-08-27)
+
+First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to test whether we can rank for high-volume, low-KD "gifts for X" terms (competitor benchmark showed these SERPs are small blogs + niche collection pages, not media giants — winnable).
+
+- **URL**: `/gifts-for/[slug]` + a `/gifts-for` index. Slugs: `book-lovers` (KD 2, 8.1K), `coffee-lovers` (KD 3, 5.4K), `dog-lovers` (KD 2, 2.3K), `cat-lovers` (KD 2, 2.2K), `wine-lovers` (KD 0, 1.6K), `men-who-have-everything` (~KD 0, 7.9K), `person-who-has-everything` (KD 0, 3.1K).
+- **Data model**: one TS file per guide in `lib/gift-guides/` exporting a `GiftGuide` const (`lib/gift-guides/types.ts`). Each: 3 sections × 5 real named products/experiences, 3-paragraph intro (light Whisperer voice), 4 FAQ, `related` slugs, `updated` ISO date. `lib/gift-guides/index.ts` = registry (`GIFT_GUIDES`, `getGuide`, `allGuideSlugs`).
+- **`lib/affiliate.ts`** (new, shared): `buildAffiliateUrl(store, searchQuery)` — same Rakuten/Etsy (`wa9JRgUhXO8`/`54027`), Viator (`P00304135`), Amazon (`giftwhisper0e-20`) IDs and search-not-listing rule as the wizard. **`lib/gift-emoji.ts`** (new): `TAG_EMOJI` + `pickEmoji(tags)` for the image fallback.
+- **`components/gift-guide/pick-card.tsx`** (client): resolves a photo on mount via `GET /api/resolve-image?q=&tags=` (the existing cached Pixabay endpoint), emoji fallback while loading / on miss. Affiliate link is `target="_blank" rel="sponsored nofollow noopener"`.
+- **`app/gifts-for/[slug]/page.tsx`**: `generateStaticParams` from `allGuideSlugs()`, `dynamicParams = false` (unknown slug → 404, verified), `export const revalidate = 604800` (7-day ISR; literal, not an expression — this Next version requires statically-analyzable). `generateMetadata` → `routeMeta()`. Renders H1, byline ("Curated by Daniel M. · Updated <date>"), intro, wizard CTA, sections, FAQ, related links, affiliate-disclosure footnote. JSON-LD: `BreadcrumbList` + `ItemList` + `FAQPage`.
+- **`app/sitemap.ts`**: now generates `/gifts-for` + the 7 guide URLs from `allGuideSlugs()` (priority 0.8 / 0.7). **`components/footer.tsx`**: added "Gift guides" link.
+- Note: guide pages build as `ƒ (Dynamic)` not `● SSG` — but so does every other page here (`/about` included), a pre-existing site-wide condition (proxy/PostHog/Analytics in the tree), not specific to these. Crawlable HTML + canonicals + schema all render correctly regardless.
+- Verified in dev: all 7 pages + index render, no console errors, canonical + og:url = self, 5 JSON-LD blocks (2 layout + 3 page), affiliate hrefs correct with `rel="sponsored nofollow noopener"`, Pixabay images resolving, unknown slug → 404. `RESEND_API_KEY="" npx next build` clean.
+- **Next**: user merges PR. Then publish the 8 Pinterest pins linked to these URLs (staggered 1–2/day), and request-index the guide URLs in GSC.
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE
