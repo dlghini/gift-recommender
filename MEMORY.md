@@ -270,6 +270,18 @@ First Ahrefs Site Audit: health 100, **0 errors**, ~31 warnings + notices. Four 
 - **5 meta descriptions under ~110 chars** — lengthened all to 120–160; `SITE_DESCRIPTION` too.
 - Not fixed (deliberate): "3XX redirect"/"redirect chain" are all proper 308s — the phantom inlink is Ahrefs' own crawl seed (apex); optional cleanup is to set the Ahrefs project URL to the www host. "Redirected JavaScript" (8) is client-component routing; Googlebot renders JS, not worth chasing.
 - Verified via local prod build: og:url matches canonical on every route, og:image present (1200×630), `/loved-ones` has an h1, descriptions 120–160. Build clean, lint unchanged (8/5/3, all pre-existing).
+- **PR #3 shipped, PR #4 followed** (Next replaces the whole `openGraph` object on page-level override → file-convention OG image was dropped on the `routeMeta` pages; `routeMeta` now names the image explicitly). Both merged & live. Re-audit: health 100, 0 errors, **warnings 31 → 12** (remaining 12 = the accepted redirected-JS + 308-redirect set).
+
+### Phase 18d: E-E-A-T pages — branch `seo/eeat-pages` (2026-08-27)
+
+Adds the "who's behind this" and "how content is made" signals that were the post-HCU gap (affiliate transparency already existed via `/disclosure`).
+- **New `app/how-we-choose/page.tsx`** — methodology + editorial standards in one page: what inputs go into a pick, the rules the recommender follows (real/specific/available, budget as hard constraint, store routing, links-to-search), what's an estimate, what we don't do (no pay-for-placement, no commission-ranking, no bestseller dump, no data selling), who's accountable, and a corrections path. In `/sitemap.ts` (priority 0.4) and the footer.
+- **`app/about/page.tsx`** — new "Who's behind this" card naming **Dan Maghini** as the independent solo maker, why the site exists (framed as the problem it solves, not a fabricated anecdote), links to `/how-we-choose` + contact email.
+- **`app/disclosure/page.tsx`** — added a Viator/experiences section (was Amazon + Etsy only), refreshed the date to 2026-08-27, added "commission rates play no part" + a link to `/how-we-choose`.
+- **`app/layout.tsx`** — Organization JSON-LD now has `founder: {@type: Person, name: "Dan Maghini"}` and `email`.
+- **Dan's revisions applied (2026-08-27):** name is **"Daniel M."** everywhere (About copy + Organization JSON-LD `founder`); the About "why" is now his real first-person motivation ("I've always loved giving gifts… take the time and guesswork out of it, so giving a good gift can feel fun again"); phrase "time and guesswork" used. **No-AI rule waived for `/how-we-choose` only** — final wording (Dan's): "Behind the wizard is a recommendation engine we built and maintain by hand — one that uses AI and machine learning to work through your answers, inside a set of rules we wrote." The rest of the site keeps the no-AI rule.
+- Also this session: new memory `feedback_avoid_ai_writing_tells` — strip LLM-prose markers from all user-facing copy going forward (Dan's standing request).
+- Verified via local prod build: `/how-we-choose` 200, one `<h1>`, canonical = og:url, AI mechanism named, founder "Daniel M." in JSON-LD, footer link present. Build clean, lint unchanged. PR #5 open.
 
 ## Prioritized Roadmap
 

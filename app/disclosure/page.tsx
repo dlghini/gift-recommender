@@ -25,13 +25,13 @@ export default function DisclosurePage() {
           <ShieldCheck className="w-6 h-6 text-amber-500" />
           <h1 className="font-heading text-4xl text-stone-900">Affiliate Disclosure</h1>
         </div>
-        <p className="text-stone-400 text-sm mb-10">Last updated: June 1, 2026</p>
+        <p className="text-stone-400 text-sm mb-10">Last updated: August 27, 2026</p>
 
         <div className="space-y-6 text-stone-600 text-sm leading-relaxed">
 
           <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 text-amber-800 text-sm">
             <strong>Summary:</strong> Some links on this site are affiliate links. If you click
-            through and make a purchase, we may earn a commission — at no extra cost to you.
+            through and make a purchase, we may earn a commission, at no extra cost to you.
             This never affects what we recommend.
           </div>
 
@@ -44,8 +44,8 @@ export default function DisclosurePage() {
             </p>
             <p className="mt-3">
               When you click a &quot;Buy now&quot; button that links to Amazon, you will be directed
-              to Amazon.com with an affiliate tracking link. If you purchase the product — or
-              anything else during that session — we may receive a small commission. The price
+              to Amazon.com with an affiliate tracking link. If you purchase the product, or
+              anything else during that session, we may receive a small commission. The price
               you pay is exactly the same whether or not you use our link.
             </p>
           </section>
@@ -61,12 +61,28 @@ export default function DisclosurePage() {
           </section>
 
           <section>
+            <h2 className="font-heading text-xl text-stone-800 mb-3">Viator (experiences)</h2>
+            <p>
+              When a recommendation is an experience, like a class, a tasting, or a tour, it links
+              to Viator through their partner program. If you book after clicking through, we may
+              earn a commission at no extra cost to you. Experience pricing shown on the site is
+              pulled from Viator where available and is a starting &ldquo;from&rdquo; price, not a
+              quote.
+            </p>
+          </section>
+
+          <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">Our recommendations are independent</h2>
             <p>
               Affiliate relationships do not influence which gifts we recommend. Our suggestions
-              are based solely on the information you provide in the wizard — the recipient&apos;s
+              are based solely on the information you provide in the wizard: the recipient&apos;s
               relationship, age, occasion, interests, and your budget. No advertiser or affiliate
-              partner has any input into our recommendations.
+              partner has any input into our recommendations, and commission rates play no part in
+              what gets suggested. For the full method, see{" "}
+              <Link href="/how-we-choose" className="text-amber-600 hover:text-amber-700 underline underline-offset-2">
+                how we choose gifts
+              </Link>
+              .
             </p>
           </section>
 
