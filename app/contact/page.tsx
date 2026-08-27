@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Gift, Mail } from "lucide-react";
+import { routeMeta } from "@/lib/site";
 
-export const metadata = {
-  title: "Contact",
-  description: "Get in touch with The Gift Whisperer team.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata = routeMeta(
+  "/contact",
+  "Contact",
+  "Questions, feedback, or a partnership idea? Get in touch with the team behind The Gift Whisperer — we read every message."
+);
 
 export default function ContactPage() {
   return (
