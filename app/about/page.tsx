@@ -82,6 +82,33 @@ export default function AboutPage() {
           </Card>
         </div>
 
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-amber-600 text-xs font-semibold uppercase tracking-widest">Who&apos;s behind this</span>
+          </div>
+          <p className="text-stone-500 text-sm leading-relaxed">
+            The Gift Whisperer is built and run by <strong className="text-stone-700">Dan Maghini</strong>,
+            an independent maker working on it solo. There&apos;s no team, no investors, and no
+            advertiser deciding what you see &mdash; just one person maintaining the recommender and
+            the guardrails around it.
+          </p>
+          <p className="text-stone-500 text-sm leading-relaxed mt-3">
+            It exists because the hard part of gift-giving isn&apos;t caring &mdash; it&apos;s the time it
+            takes to turn what you know about someone into an actual thing to buy. This is an attempt
+            to do that legwork for you, honestly, in about a minute.
+          </p>
+          <p className="text-stone-500 text-sm leading-relaxed mt-3">
+            Want the detail on how picks are made and what we will and won&apos;t do?{" "}
+            <Link href="/how-we-choose" className="text-amber-600 hover:text-amber-700 underline underline-offset-2">
+              Read how we choose gifts.
+            </Link>{" "}
+            Questions or corrections go straight to{" "}
+            <a href="mailto:dan.maghini@gmail.com" className="text-amber-600 hover:text-amber-700 underline underline-offset-2">
+              dan.maghini@gmail.com
+            </a>.
+          </p>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm p-6 flex items-start gap-4">
           <ShieldCheck className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
