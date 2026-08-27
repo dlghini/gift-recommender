@@ -83,12 +83,16 @@ async function handleReminderRun(request: Request): Promise<Response> {
           user.emailAddresses[0]?.emailAddress;
         if (!primaryEmail) continue;
 
-        await resend.emails.send({
+        const { error: sendResultError } = await resend.emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: `${occasion.label} is coming up 🎁`,
           html: renderReminderEmail(occasion.label, occasion.lovedOneId),
         });
+        if (sendResultError) {
+          console.error("[send-reminders] Resend returned an error", occasion, sendResultError);
+          continue;
+        }
         sent += 1;
       } catch (sendError) {
         console.error("[send-reminders] failed to send", occasion, sendError);
