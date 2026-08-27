@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { after } from "next/server";
 import { getDb } from "@/lib/db";
 
 const ratelimit =
@@ -121,15 +122,34 @@ async function fetchViatorListing(
   }
 }
 
-async function searchUnsplash(query: string, accessKey: string): Promise<string | undefined> {
+interface UnsplashImage {
+  url: string;
+  photographerName: string;
+  photographerProfileUrl: string;
+  downloadLocation: string;
+}
+
+async function searchUnsplash(query: string, accessKey: string): Promise<UnsplashImage | undefined> {
   try {
     const res = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=squarish`,
       { headers: { Authorization: `Client-ID ${accessKey}` }, cache: "no-store" }
     );
     if (!res.ok) return undefined;
-    const data = (await res.json()) as { results?: { urls?: { thumb?: string } }[] };
-    return data.results?.[0]?.urls?.thumb;
+    const data = (await res.json()) as {
+      results?: {
+        urls?: { thumb?: string };
+        user?: { name?: string; links?: { html?: string } };
+        links?: { download_location?: string };
+      }[];
+    };
+    const photo = data.results?.[0];
+    const url = photo?.urls?.thumb;
+    const photographerName = photo?.user?.name;
+    const photographerProfileUrl = photo?.user?.links?.html;
+    const downloadLocation = photo?.links?.download_location;
+    if (!url || !photographerName || !photographerProfileUrl || !downloadLocation) return undefined;
+    return { url, photographerName, photographerProfileUrl, downloadLocation };
   } catch (err) {
     console.error("[unsplash search]", err);
     return undefined;
@@ -141,16 +161,29 @@ async function searchUnsplash(query: string, accessKey: string): Promise<string 
 // so if the first search comes up empty, retry with the gift's tags — broader, more photogenic terms
 // that are far more likely to have real Unsplash coverage. Tags are tried one at a time (not joined) so an
 // unrelated tag pairing (e.g. "travel" + "outdoors") can't dominate the result and pull in an off-topic photo.
-async function fetchUnsplashImage(query: string, tags: string[]): Promise<string | undefined> {
+async function fetchUnsplashImage(query: string, tags: string[]): Promise<UnsplashImage | undefined> {
   const accessKey = process.env.UNSPLASH_ACCESS_KEY;
   if (!accessKey) return undefined;
-  const primary = await searchUnsplash(query, accessKey);
-  if (primary) return primary;
+  let image = await searchUnsplash(query, accessKey);
   for (const tag of tags) {
-    const result = await searchUnsplash(tag, accessKey);
-    if (result) return result;
+    if (image) break;
+    image = await searchUnsplash(tag, accessKey);
   }
-  return undefined;
+  // Unsplash's API guidelines require pinging this endpoint whenever a photo is actually
+  // shown to a user — required for Production tier, not just a courtesy for Demo.
+  if (image) {
+    const downloadLocation = image.downloadLocation;
+    after(() =>
+      fetch(downloadLocation, { headers: { Authorization: `Client-ID ${accessKey}` } }).catch((err) =>
+        console.error("[unsplash download trigger]", err)
+      )
+    );
+  }
+  return image;
+}
+
+function toAttribution(image: UnsplashImage | undefined) {
+  return image ? { name: image.photographerName, profileUrl: image.photographerProfileUrl } : undefined;
 }
 
 const BUDGET_LABELS: Record<string, string> = {
@@ -253,14 +286,20 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
         const query = gift.searchQuery || gift.name;
 
         if (gift.store !== "viator") {
-          const imageUrl = await fetchUnsplashImage(query, gift.tags);
-          return { ...gift, imageUrl };
+          const image = await fetchUnsplashImage(query, gift.tags);
+          return { ...gift, imageUrl: image?.url, imageAttribution: toAttribution(image) };
         }
 
         const listing = await fetchViatorListing(query);
-        const imageUrl = listing?.imageUrl ?? (await fetchUnsplashImage(query, gift.tags));
-        if (!listing) return { ...gift, imageUrl };
-        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl };
+        let imageUrl = listing?.imageUrl;
+        let imageAttribution: { name: string; profileUrl: string } | undefined;
+        if (!imageUrl) {
+          const image = await fetchUnsplashImage(query, gift.tags);
+          imageUrl = image?.url;
+          imageAttribution = toAttribution(image);
+        }
+        if (!listing) return { ...gift, imageUrl, imageAttribution };
+        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl, imageAttribution };
       })
     );
 
