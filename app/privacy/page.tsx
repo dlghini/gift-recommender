@@ -4,6 +4,7 @@ import { Gift } from "lucide-react";
 export const metadata = {
   title: "Privacy Policy",
   description: "Privacy policy for The Gift Whisperer.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

@@ -4,6 +4,7 @@ import { Gift, Mail } from "lucide-react";
 export const metadata = {
   title: "Contact",
   description: "Get in touch with The Gift Whisperer team.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
