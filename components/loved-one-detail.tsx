@@ -342,7 +342,7 @@ export function LovedOneDetail({ id }: { id: string }) {
                 value={lovedOne.interests_notes ?? ""}
                 onChange={(e) => setLovedOne({ ...lovedOne, interests_notes: e.target.value })}
                 onBlur={() => saveProfile({})}
-                placeholder="What do they love? Sizes, allergies, things they already own…"
+                placeholder="What do they love? Hobbies, things they already own, things they've mentioned wanting…"
                 rows={3}
                 className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:border-amber-400 focus:outline-none resize-none"
               />
