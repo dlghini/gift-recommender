@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { Show, SignInButton } from "@clerk/nextjs";
 import { LovedOneDetail } from "@/components/loved-one-detail";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+
+// Per-user, auth-gated content — never index individual profile pages.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function LovedOneDetailPage({
   params,

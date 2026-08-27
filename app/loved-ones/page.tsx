@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { Show, SignInButton } from "@clerk/nextjs";
 import { LovedOnesList } from "@/components/loved-ones-list";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+
+export const metadata: Metadata = {
+  title: "Loved Ones",
+  description:
+    "Save gift ideas by person, keep a history of what you've given, and get a reminder before each occasion.",
+  alternates: { canonical: "/loved-ones" },
+};
 
 export default function LovedOnesPage() {
   return (

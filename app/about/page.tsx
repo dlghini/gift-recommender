@@ -6,6 +6,7 @@ export const metadata = {
   title: "About",
   description:
     "How The Gift Whisperer finds a genuinely well-matched gift for anyone on your list.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

@@ -4,6 +4,7 @@ import { Gift, ShieldCheck } from "lucide-react";
 export const metadata = {
   title: "Affiliate Disclosure",
   description: "Affiliate disclosure for The Gift Whisperer.",
+  alternates: { canonical: "/disclosure" },
 };
 
 export default function DisclosurePage() {
