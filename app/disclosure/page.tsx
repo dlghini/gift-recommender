@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Gift, ShieldCheck } from "lucide-react";
 
 export const metadata = {
-  title: "Affiliate Disclosure — The Gift Whisperer",
+  title: "Affiliate Disclosure",
   description: "Affiliate disclosure for The Gift Whisperer.",
 };
 

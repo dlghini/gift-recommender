@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Gift } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy — The Gift Whisperer",
+  title: "Privacy Policy",
   description: "Privacy policy for The Gift Whisperer.",
 };
 

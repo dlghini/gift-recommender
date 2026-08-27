@@ -1,7 +1,7 @@
-import { Resend } from "resend";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
+import { getResend } from "@/lib/resend";
 import { fetchPixabayImage } from "@/lib/pixabay";
 
 const ratelimit =
@@ -12,8 +12,6 @@ const ratelimit =
         prefix: "giftwhisperer:email-ratelimit",
       })
     : null;
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
 const ETSY_MID = "54027";
@@ -134,7 +132,7 @@ export async function POST(request: Request) {
       console.error("[subscriber logging]", dbError);
     }
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
       to: email,
       subject: "Your gift picks from The Gift Whisperer 🎁",
