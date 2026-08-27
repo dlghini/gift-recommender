@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
+import { allGuideSlugs } from "@/lib/gift-guides";
 
-// Hand-maintained while the route count is small. Once programmatic gift pages
-// land, generate their entries from the data source and concat them here (or
-// split into a nested sitemap under that segment).
+// Hand-maintained for the core pages; the gift-guide entries are generated from
+// the guide data so a new guide shows up here automatically.
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
@@ -14,6 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }[] = [
     { path: "/", changeFrequency: "weekly", priority: 1 },
     { path: "/wizard", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/gifts-for", changeFrequency: "weekly", priority: 0.8 },
+    ...allGuideSlugs().map((slug) => ({
+      path: `/gifts-for/${slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     { path: "/loved-ones", changeFrequency: "monthly", priority: 0.5 },
     { path: "/about", changeFrequency: "monthly", priority: 0.5 },
     { path: "/how-we-choose", changeFrequency: "monthly", priority: 0.4 },
