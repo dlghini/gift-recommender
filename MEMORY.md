@@ -297,6 +297,17 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev: all 7 pages + index render, no console errors, canonical + og:url = self, 5 JSON-LD blocks (2 layout + 3 page), affiliate hrefs correct with `rel="sponsored nofollow noopener"`, Pixabay images resolving, unknown slug → 404. `RESEND_API_KEY="" npx next build` clean.
 - **Next**: user merges PR. Then publish the 8 Pinterest pins linked to these URLs (staggered 1–2/day), and request-index the guide URLs in GSC.
 
+### Phase 18f: Era gift-guide pages (grew up in the 70s/80s/90s) — branch `seo/era-gift-guides` (2026-08-28)
+
+3 more `/gifts-for/[slug]` guides, same infra as Phase 18e (no page/route/sitemap/footer changes needed — all auto-generated from the registry). Purpose: rank for "gifts for people who grew up in the 80s/90s/70s" and, later, serve as the landing pages for the **Vanished Americana** Facebook Reels channel (separate business, see auto-memory `vanished_americana`) — the channel drives 2–3 seasonal pushes/year to these.
+
+- **New files**: `lib/gift-guides/people-who-grew-up-in-the-{70s,80s,90s}.ts`. Each: 3 sections × 5 real picks (reissued consoles/toys, vinyl reissues, retro candy boxes, AT-LP60X turntable, Etsy personalized prints/newspaper/signs, Viator tribute-show/arcade-bar/driving/roller-rink experiences), 3-para intro, 4 FAQ, cross-linked `related` (each other + `person-who-has-everything`), `updated: 2026-08-28`.
+- **Registry** (`lib/gift-guides/index.ts`): imported + appended to `GIFT_GUIDES` in order 80s, 90s, 70s (merchandising: highest-appeal first on the `/gifts-for` index).
+- **`lib/gift-emoji.ts`**: added one key, `Retro: "📼"`. Each guide's first pick (the console) is tagged `["Retro", "Gaming"]` so all three show 📼 on the index — reads as an intentional nostalgia cluster.
+- Content accuracy checked (same guardrail as the history channel): every named product is real and currently in production (Atari 2600+, NES/SNES Classic, Genesis Mini, Tamagotchi reissue, Fujifilm Instax, Dunkaroos-back-since-2020, etc.). Named discontinued items (Crystal Pepsi, Surge) deliberately left out.
+- Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), canonical + og:url = self www URL, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml includes all 3, unknown slug `people-who-grew-up-in-the-60s` → 404. `RESEND_API_KEY="" npm run build` clean.
+- **Next**: user merges PR, then request-index the 3 URLs in GSC. Optional follow-ups (not done): add the era slugs to existing guides' `related` arrays for inbound internal links; broaden the `/gifts-for` index meta description.
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE

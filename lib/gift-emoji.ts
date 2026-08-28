@@ -8,6 +8,7 @@ export const TAG_EMOJI: Record<string, string> = {
   Wine: "🍷", Tea: "🫖", Pets: "🐾", Dogs: "🐶", Cats: "🐱",
   Garden: "🪴", Home: "🏠", Personalized: "🎀", Keepsake: "🎀",
   Experience: "🎟️", Luxury: "✨", Drinks: "🥂", Subscription: "📦",
+  Retro: "📼",
 };
 
 export function pickEmoji(tags: string[]): string {
