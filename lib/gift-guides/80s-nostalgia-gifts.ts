@@ -1,14 +1,14 @@
 import type { GiftGuide } from "./types";
 
-export const peopleWhoGrewUpInThe80s: GiftGuide = {
-  slug: "people-who-grew-up-in-the-80s",
-  keyword: "gifts for people who grew up in the 80s",
-  h1: "Gifts for People Who Grew Up in the 80s",
-  title: "Gifts for People Who Grew Up in the 80s",
+export const nostalgiaGifts80s: GiftGuide = {
+  slug: "80s-nostalgia-gifts",
+  keyword: "80s nostalgia gifts",
+  h1: "80s Nostalgia Gifts",
+  title: "80s Nostalgia Gifts",
   description:
-    "Gift ideas for someone who grew up in the 1980s: reissued consoles and toys, the vinyl and movies they memorized, retro candy, and experiences from the decade.",
+    "80s nostalgia gifts for someone who grew up in the decade: reissued consoles and toys, the vinyl and movies they memorized, retro candy, and days out.",
   intro: [
-    "The 80s kid is now somewhere between forty-five and sixty, with a full house and an empty wish list. The gifts that work are the specific ones: the toy that was on the shelf, the movie they can still recite, the album that never left the tape deck.",
+    "The 80s kid is now somewhere between forty-five and sixty, with a full house and an empty wish list. The nostalgia gifts that work are the specific ones: the toy that was on the shelf, the movie they can still recite, the album that never left the tape deck.",
     "Keep it precise. Plastic sunglasses, leg warmers, and “I Love the 80s” mugs read as a joke rather than a gift. A single real object from their childhood, given on its own, does the job a themed party kit cannot.",
     "Everything links to a store search rather than a single listing, and the prices are rough. If you know the one film, band, or game they never shut up about, tell the Whisperer and get a list built around that.",
   ],
@@ -45,11 +45,11 @@ export const peopleWhoGrewUpInThe80s: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What is a good gift for someone who grew up in the 1980s?", a: "The specific thing from their bedroom or the TV: a reissue of the toy they had, a vinyl copy of the record they wore out, the movie they quote, or a proper retro candy box. One real item beats a themed hamper." },
-    { q: "What is the best gift for a 40th or 50th birthday?", a: "Something tied to the exact year on top of the nostalgia: a framed front page from their birth date, a star map of the night they were born, a birth-year wine or whisky, or a concert by an act they loved." },
+    { q: "What is a good 80s nostalgia gift?", a: "The specific thing from their bedroom or the TV: a reissue of the toy they had, a vinyl copy of the record they wore out, the movie they quote, or a proper retro candy box. One real item beats a themed hamper." },
+    { q: "What is the best 80s gift for a 40th or 50th birthday?", a: "Something tied to the exact year on top of the nostalgia: a framed front page from their birth date, a star map of the night they were born, a birth-year wine or whisky, or a concert by an act they loved." },
     { q: "What should I avoid?", a: "Generic “80s party” kits, novelty sunglasses and leg warmers, and “I Love the 80s” mugs. They read as a punchline. Also skip anything that needs a cassette or a specific old console unless you know they still have the hardware." },
-    { q: "Any cheap options under $30?", a: "A retro candy box, one vinyl reissue, a reissued card or board game, a framed poster print, or a set of the trading cards they collected." },
+    { q: "Any 80s nostalgia gifts under $30?", a: "A retro candy box, one vinyl reissue, a reissued card or board game, a framed poster print, or a set of the trading cards they collected." },
   ],
-  related: ["people-who-grew-up-in-the-70s", "people-who-grew-up-in-the-90s", "person-who-has-everything"],
+  related: ["90s-nostalgia-gifts", "retro-gifts", "person-who-has-everything"],
   updated: "2026-08-28",
 };

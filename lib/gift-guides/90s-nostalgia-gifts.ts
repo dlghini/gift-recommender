@@ -1,14 +1,14 @@
 import type { GiftGuide } from "./types";
 
-export const peopleWhoGrewUpInThe90s: GiftGuide = {
-  slug: "people-who-grew-up-in-the-90s",
-  keyword: "gifts for people who grew up in the 90s",
-  h1: "Gifts for People Who Grew Up in the 90s",
-  title: "Gifts for People Who Grew Up in the 90s",
+export const nostalgiaGifts90s: GiftGuide = {
+  slug: "90s-nostalgia-gifts",
+  keyword: "90s nostalgia gifts",
+  h1: "90s Nostalgia Gifts",
+  title: "90s Nostalgia Gifts",
   description:
-    "Gift ideas for someone who grew up in the 1990s: reissued handhelds, the albums and movies they wore out, a proper 90s snack box, and hands-on days out.",
+    "90s nostalgia gifts for someone who grew up in the decade: reissued handhelds, the albums and movies they wore out, a proper 90s snack box, and days out.",
   intro: [
-    "People who grew up in the 1990s are hitting the milestone birthdays now, and most of them will tell you they don't want anything. What they mean is they don't want more stuff. Something they actually owned or begged for in 1996 is a different matter.",
+    "People who grew up in the 1990s are hitting the milestone birthdays now, and most of them will tell you they don't want anything. What they mean is they don't want more stuff. A nostalgia gift they actually owned or begged for in 1996 is a different matter.",
     "The good version of a 90s gift is specific. Slogan T-shirts and “90s kid” mugs are a punchline. The console they saved up for, the album they taped off the radio, or the snacks that got confiscated at school are a real gift.",
     "Each pick links to a store search rather than one product, and prices are estimates. If you know their band, their game, or the movie they wore out on VHS, tell the Whisperer about them for a tighter list.",
   ],
@@ -45,11 +45,11 @@ export const peopleWhoGrewUpInThe90s: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What is a good gift for someone who grew up in the 1990s?", a: "The specific thing they owned or wanted: a reissued console or Tamagotchi, a vinyl copy of the album they played on repeat, a proper 90s snack box, or the movie they wore out on VHS." },
-    { q: "What is a good gift for a 30th or 40th birthday?", a: "Add something tied to the year: a front page from their birth date, a star map of the night they were born, a birth-year drink, or tickets to a 90s act on a reunion tour." },
+    { q: "What is a good 90s nostalgia gift?", a: "The specific thing they owned or wanted: a reissued console or Tamagotchi, a vinyl copy of the album they played on repeat, a proper 90s snack box, or the movie they wore out on VHS." },
+    { q: "What is a good 90s gift for a 30th or 40th birthday?", a: "Add something tied to the year: a front page from their birth date, a star map of the night they were born, a birth-year drink, or tickets to a 90s act on a reunion tour." },
     { q: "What should I avoid?", a: "“90s kid” slogan mugs and T-shirts, inflatable furniture, and anything that assumes they kept a VCR or a dial-up modem. Nostalgia lands; a punchline doesn't." },
-    { q: "Any options under $30?", a: "A 90s snack box, a single vinyl reissue, a reissued handheld toy, a framed poster print, or a pack of the trading cards or Pogs they collected." },
+    { q: "Any 90s nostalgia gifts under $30?", a: "A 90s snack box, a single vinyl reissue, a reissued handheld toy, a framed poster print, or a pack of the trading cards or Pogs they collected." },
   ],
-  related: ["people-who-grew-up-in-the-80s", "people-who-grew-up-in-the-70s", "person-who-has-everything"],
+  related: ["80s-nostalgia-gifts", "retro-gifts", "person-who-has-everything"],
   updated: "2026-08-28",
 };
