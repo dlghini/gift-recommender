@@ -508,7 +508,8 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
                 </div>
                 <p className="text-stone-500 text-sm leading-relaxed">
                   A free Loved Ones profile keeps every idea, remembers what you&apos;ve already
-                  given each person, and nudges you two weeks before their birthday.
+                  given each person, and nudges you two weeks before every birthday, holiday,
+                  and anniversary.
                 </p>
                 <a
                   href="/loved-ones"

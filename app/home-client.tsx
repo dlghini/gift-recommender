@@ -146,7 +146,7 @@ export default function Home() {
               <p className="text-sm text-stone-600 leading-relaxed">
                 An account adds <span className="font-medium text-stone-900">Loved Ones</span>: a saved profile for
                 each person you shop for, a history of what you&apos;ve already given them, and a reminder two weeks
-                before their birthday or a holiday.
+                before their birthday, a holiday, or an anniversary.
               </p>
               <a
                 href="/loved-ones"
@@ -196,7 +196,7 @@ export default function Home() {
       <div className="max-w-2xl mx-auto px-4 pb-16">
         <div className="flex items-center gap-2 mb-8 justify-center">
           <Sparkles className="w-5 h-5 text-amber-500" />
-          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Examples only — yours will be personalized</span>
+          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Example gifts — yours will be personalized</span>
         </div>
         <div className="flex flex-col gap-4">
           {EXAMPLE_GIFTS.map((gift, idx) => (

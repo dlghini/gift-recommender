@@ -67,8 +67,8 @@ export function LovedOnesNudge() {
         </div>
         <p className="text-xs leading-relaxed text-stone-600">
           Keep a profile for each person you shop for: saved ideas, a history of what
-          you&apos;ve given, and a reminder before their birthday. The gift finder still
-          works without an account.
+          you&apos;ve given, and a reminder before every birthday, holiday, and
+          anniversary. The gift finder still works without an account.
         </p>
         <Link
           href="/loved-ones"

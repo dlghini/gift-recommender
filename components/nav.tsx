@@ -35,7 +35,7 @@ export function Nav() {
               <span className="block text-xs leading-relaxed text-stone-600">
                 The gift finder works without an account. Loved Ones adds a saved profile for
                 each person, a history of what you&apos;ve given, and a reminder before
-                birthdays and holidays.
+                birthdays, holidays, and anniversaries.
               </span>
             </span>
           </span>
