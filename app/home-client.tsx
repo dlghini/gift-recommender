@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, Sparkles, Gift, Heart } from "lucide-react";
+import { ExternalLink, Sparkles, Gift, Heart, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
@@ -100,6 +100,7 @@ function ExampleThumb({ gift }: { gift: (typeof EXAMPLE_GIFTS)[number] }) {
 
 export default function Home() {
   const posthog = usePostHog();
+  const [accountNoteOpen, setAccountNoteOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-amber-50">
@@ -122,6 +123,41 @@ export default function Home() {
         >
           Find the perfect gift ✨
         </a>
+
+        <div className="mt-5 flex flex-col items-center gap-2 text-sm text-stone-500">
+          <p>Free to use. No account required.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setAccountNoteOpen((open) => {
+                if (!open) posthog?.capture("account_note_opened", { location: "hero" });
+                return !open;
+              });
+            }}
+            aria-expanded={accountNoteOpen}
+            className="inline-flex items-center gap-1 font-medium text-amber-600 hover:text-amber-700"
+          >
+            Do I need an account?
+            <ChevronDown className={cn("w-4 h-4 transition-transform", accountNoteOpen && "rotate-180")} />
+          </button>
+          {accountNoteOpen && (
+            <div className="mt-1 max-w-sm rounded-xl border border-amber-100 bg-white px-4 py-3 text-left shadow-sm">
+              <p className="font-heading text-sm text-stone-900 mb-1">No. The gift finder always works without signing in.</p>
+              <p className="text-sm text-stone-600 leading-relaxed">
+                An account adds <span className="font-medium text-stone-900">Loved Ones</span>: a saved profile for
+                each person you shop for, a history of what you&apos;ve already given them, and a reminder two weeks
+                before their birthday or a holiday.
+              </p>
+              <a
+                href="/loved-ones"
+                onClick={() => posthog?.capture("cta_clicked", { location: "hero_account_note" })}
+                className="mt-2 inline-block text-sm font-medium text-amber-600 hover:text-amber-700"
+              >
+                See how Loved Ones works →
+              </a>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Example gifts */}

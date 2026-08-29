@@ -310,6 +310,10 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 19: Hero "Do I need an account?" disclosure — `app/home-client.tsx` (2026-08-29)
+
+Small marketing-side change, no new deps. Under the hero CTA on `/`: a static line "Free to use. No account required." plus a `ChevronDown` toggle button ("Do I need an account?") that reveals a white amber-bordered card. Card copy: "No. The gift finder always works without signing in." + one sentence pitching **Loved Ones** (saved profile per person, gift history, 2-week occasion reminder) + a "See how Loved Ones works →" link to `/loved-ones`. Purpose: convert the account-shy while still surfacing Loved Ones as the upgrade. Local `useState` (`accountNoteOpen`); fires PostHog `account_note_opened` on first open and `cta_clicked` (`location: "hero_account_note"`) on the link. Note `/loved-ones` still shows the "almost here" state in prod until Clerk keys land (unchanged). Verified in dev at desktop + 375px, `npm run build` clean, no console errors.
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE
