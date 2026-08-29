@@ -499,6 +499,28 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
             </CardContent>
           </Card>
 
+          {!isSignedIn && (
+            <Card className="bg-white border-0 shadow-sm mt-6">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="w-4 h-4 text-rose-500" />
+                  <span className="text-sm font-semibold text-stone-700">Save these for next time</span>
+                </div>
+                <p className="text-stone-500 text-sm leading-relaxed">
+                  A free Loved Ones profile keeps every idea, remembers what you&apos;ve already
+                  given each person, and nudges you two weeks before their birthday.
+                </p>
+                <a
+                  href="/loved-ones"
+                  onClick={() => posthog?.capture("cta_clicked", { location: "wizard_results_loved_ones" })}
+                  className="mt-3 inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 px-5 text-sm rounded-md transition-colors"
+                >
+                  Set up Loved Ones →
+                </a>
+              </CardContent>
+            </Card>
+          )}
+
           {savedGifts.length > 0 && (
             <div className="mt-10">
               <div className="flex items-center gap-2 mb-4">

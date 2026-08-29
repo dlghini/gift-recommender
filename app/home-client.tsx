@@ -160,6 +160,38 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Loved Ones */}
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="flex items-center gap-2 mb-8 justify-center">
+          <Heart className="w-5 h-5 text-rose-500" />
+          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">New: Loved Ones</span>
+        </div>
+        <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
+        <p className="text-stone-500 text-base mb-10 max-w-xl mx-auto">
+          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or scrambling last minute.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+          {[
+            { emoji: "🎁", title: "Save ideas by person", desc: "Every recommendation gets tucked under the right profile instead of one big pile of favorites." },
+            { emoji: "📝", title: "Log what you've given", desc: "Keep a running history for each person so you're never guessing whether you already got them that." },
+            { emoji: "🔔", title: "Get reminded in time", desc: "We'll nudge you two weeks before their birthday, anniversary, or a holiday like Mother's Day." },
+          ].map((item) => (
+            <div key={item.title}>
+              <div className="text-4xl mb-3">{item.emoji}</div>
+              <h3 className="font-heading text-base text-stone-900 mb-1">{item.title}</h3>
+              <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+        <a
+          href="/loved-ones"
+          onClick={() => posthog?.capture("cta_clicked", { location: "loved_ones" })}
+          className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
+        >
+          Set up Loved Ones →
+        </a>
+      </div>
+
       {/* Example gifts */}
       <div className="max-w-2xl mx-auto px-4 pb-16">
         <div className="flex items-center gap-2 mb-8 justify-center">
@@ -233,38 +265,6 @@ export default function Home() {
             Try it now — it&apos;s free ✨
           </a>
         </div>
-      </div>
-
-      {/* Loved Ones */}
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="flex items-center gap-2 mb-8 justify-center">
-          <Heart className="w-5 h-5 text-rose-500" />
-          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">New: Loved Ones</span>
-        </div>
-        <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
-        <p className="text-stone-500 text-base mb-10 max-w-xl mx-auto">
-          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or scrambling last minute.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
-          {[
-            { emoji: "🎁", title: "Save ideas by person", desc: "Every recommendation gets tucked under the right profile instead of one big pile of favorites." },
-            { emoji: "📝", title: "Log what you've given", desc: "Keep a running history for each person so you're never guessing whether you already got them that." },
-            { emoji: "🔔", title: "Get reminded in time", desc: "We'll nudge you two weeks before their birthday, anniversary, or a holiday like Mother's Day." },
-          ].map((item) => (
-            <div key={item.title}>
-              <div className="text-4xl mb-3">{item.emoji}</div>
-              <h3 className="font-heading text-base text-stone-900 mb-1">{item.title}</h3>
-              <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-        <a
-          href="/loved-ones"
-          onClick={() => posthog?.capture("cta_clicked", { location: "loved_ones" })}
-          className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
-        >
-          Set up Loved Ones →
-        </a>
       </div>
     </div>
   );
