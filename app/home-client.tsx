@@ -141,7 +141,7 @@ export default function Home() {
           </button>
           {accountNoteOpen && (
             <div className="mt-1 max-w-sm rounded-xl border border-amber-100 bg-white px-4 py-3 text-left shadow-sm">
-              <p className="font-heading text-sm text-stone-900 mb-1">No. The gift finder always works without signing in.</p>
+              <p className="font-heading text-sm text-stone-900 mb-1">The gift finder always works without signing in.</p>
               <p className="text-sm text-stone-600 leading-relaxed">
                 An account adds <span className="font-medium text-stone-900">Loved Ones</span>: a saved profile for
                 each person you shop for, a history of what you&apos;ve already given them, and a reminder two weeks
