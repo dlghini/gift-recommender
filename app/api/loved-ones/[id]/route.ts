@@ -45,6 +45,7 @@ export async function PATCH(
       birthdayYear: number | null;
       anniversaryMonth: number | null;
       anniversaryDay: number | null;
+      interests: string[] | null;
       interestsNotes: string | null;
       birthdayReminderEnabled: boolean;
       anniversaryReminderEnabled: boolean;
@@ -64,6 +65,7 @@ export async function PATCH(
         birthday_year = ${body.birthdayYear ?? null},
         anniversary_month = ${body.anniversaryMonth ?? null},
         anniversary_day = ${body.anniversaryDay ?? null},
+        interests = ${JSON.stringify(body.interests ?? [])},
         interests_notes = ${body.interestsNotes ?? null},
         birthday_reminder_enabled = ${body.birthdayReminderEnabled ?? true},
         anniversary_reminder_enabled = ${body.anniversaryReminderEnabled ?? true}

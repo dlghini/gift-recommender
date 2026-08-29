@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, Sparkles, Gift, Heart } from "lucide-react";
+import { ExternalLink, Sparkles, Gift, Heart, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
@@ -100,6 +100,7 @@ function ExampleThumb({ gift }: { gift: (typeof EXAMPLE_GIFTS)[number] }) {
 
 export default function Home() {
   const posthog = usePostHog();
+  const [accountNoteOpen, setAccountNoteOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-amber-50">
@@ -122,13 +123,79 @@ export default function Home() {
         >
           Find the perfect gift ✨
         </a>
+
+        <div className="mt-5 flex flex-col items-center gap-2 text-sm text-stone-500">
+          <button
+            type="button"
+            onClick={() => {
+              setAccountNoteOpen((open) => {
+                if (!open) posthog?.capture("account_note_opened", { location: "hero" });
+                return !open;
+              });
+            }}
+            aria-expanded={accountNoteOpen}
+            className="inline-flex items-center gap-1 font-medium text-amber-600 hover:text-amber-700"
+          >
+            Free to use. No account required.
+            <ChevronDown className={cn("w-4 h-4 transition-transform", accountNoteOpen && "rotate-180")} />
+          </button>
+          {accountNoteOpen && (
+            <div className="mt-1 max-w-sm rounded-xl border border-amber-100 bg-white px-4 py-3 text-left shadow-sm">
+              <p className="font-heading text-sm text-stone-900 mb-1">The gift finder always works without signing in.</p>
+              <p className="text-sm text-stone-600 leading-relaxed">
+                An account adds <span className="font-medium text-stone-900">Loved Ones</span>: a saved profile for
+                each person you shop for, a history of what you&apos;ve already given them, and a reminder two weeks
+                before their birthday, a holiday, or an anniversary.
+              </p>
+              <a
+                href="/loved-ones"
+                onClick={() => posthog?.capture("cta_clicked", { location: "hero_account_note" })}
+                className="mt-2 inline-block text-sm font-medium text-amber-600 hover:text-amber-700"
+              >
+                See how Loved Ones works →
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Loved Ones */}
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="flex items-center gap-2 mb-8 justify-center">
+          <Heart className="w-5 h-5 text-rose-500" />
+          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">New: Loved Ones</span>
+        </div>
+        <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
+        <p className="text-stone-500 text-base mb-10 max-w-xl mx-auto">
+          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or scrambling last minute.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+          {[
+            { emoji: "🎁", title: "Save ideas by person", desc: "Every recommendation gets tucked under the right profile instead of one big pile of favorites." },
+            { emoji: "📝", title: "Log what you've given", desc: "Keep a running history for each person so you're never guessing whether you already got them that." },
+            { emoji: "🔔", title: "Get reminded in time", desc: "We'll nudge you two weeks before their birthday, anniversary, or a holiday like Mother's Day." },
+          ].map((item) => (
+            <div key={item.title}>
+              <div className="text-4xl mb-3">{item.emoji}</div>
+              <h3 className="font-heading text-base text-stone-900 mb-1">{item.title}</h3>
+              <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+        <a
+          href="/loved-ones"
+          onClick={() => posthog?.capture("cta_clicked", { location: "loved_ones" })}
+          className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
+        >
+          Set up Loved Ones →
+        </a>
       </div>
 
       {/* Example gifts */}
       <div className="max-w-2xl mx-auto px-4 pb-16">
         <div className="flex items-center gap-2 mb-8 justify-center">
           <Sparkles className="w-5 h-5 text-amber-500" />
-          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Examples only — yours will be personalized</span>
+          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Example gifts — yours will be personalized</span>
         </div>
         <div className="flex flex-col gap-4">
           {EXAMPLE_GIFTS.map((gift, idx) => (
@@ -197,38 +264,6 @@ export default function Home() {
             Try it now — it&apos;s free ✨
           </a>
         </div>
-      </div>
-
-      {/* Loved Ones */}
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="flex items-center gap-2 mb-8 justify-center">
-          <Heart className="w-5 h-5 text-rose-500" />
-          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">New: Loved Ones</span>
-        </div>
-        <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
-        <p className="text-stone-500 text-base mb-10 max-w-xl mx-auto">
-          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or scrambling last minute.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
-          {[
-            { emoji: "🎁", title: "Save ideas by person", desc: "Every recommendation gets tucked under the right profile instead of one big pile of favorites." },
-            { emoji: "📝", title: "Log what you've given", desc: "Keep a running history for each person so you're never guessing whether you already got them that." },
-            { emoji: "🔔", title: "Get reminded in time", desc: "We'll nudge you two weeks before their birthday, anniversary, or a holiday like Mother's Day." },
-          ].map((item) => (
-            <div key={item.title}>
-              <div className="text-4xl mb-3">{item.emoji}</div>
-              <h3 className="font-heading text-base text-stone-900 mb-1">{item.title}</h3>
-              <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-        <a
-          href="/loved-ones"
-          onClick={() => posthog?.capture("cta_clicked", { location: "loved_ones" })}
-          className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
-        >
-          Set up Loved Ones →
-        </a>
       </div>
     </div>
   );

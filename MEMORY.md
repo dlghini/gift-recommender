@@ -310,6 +310,28 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 20: Loved One profiles feed the wizard — branch `feature/loved-ones-visibility` (2026-08-29)
+
+Two connected changes so opening the wizard from a Loved One profile isn't starting from scratch.
+
+**Structured interests on the profile.** New `interests JSONB` column on `loved_ones` (`app/api/setup/route.ts` adds it to the CREATE plus an `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` for the existing table — **prod needs a `/api/setup` GET after deploy**, done locally). `INTERESTS` list moved out of `wizard-client.tsx` into `lib/interests.ts` and shared. `components/loved-one-detail.tsx` gets an interest pill group (same 10 options as the wizard) that saves via the existing `saveProfile` → `PATCH /api/loved-ones/[id]`; the old "Interests & notes" textarea is now just "Notes". PATCH route accepts `interests: string[]`, writes `${JSON.stringify(...)}`.
+
+**Wizard skips known steps** (`app/wizard/wizard-client.tsx`). `/wizard?lovedOneId=` now: fetches the profile; prefills relationship, age (from `birthday_year`), **checked interests**, and notes→freetext; starts on step 2 (occasion) when an age is known; skips step 3 (interests) when the profile has interests checked **or** notes. Fully-filled profile = 2 taps (occasion + budget). New state `lovedOne` / `prefilledSteps {s1,s3}` / `loadingLovedOne` ("Pulling up their profile…" screen instead of a step-1 flash). `next`/`back` hop over step 3 when skipped. Step 3 `canProceed` also accepts non-empty freetext now. Amber "Shopping for {name}" banner at the top of the wizard card. Bogus/missing `lovedOneId` degrades to a normal step-1 start (verified). Happy path is build-verified + logic-reviewed only, not click-tested (needs Clerk sign-in).
+
+### Phase 19: Loved Ones visibility push — branch `feature/loved-ones-visibility` (2026-08-29)
+
+Marketing-side pass to make Loved Ones obviously a feature, not a footnote. No new deps. All uncommitted-to-main (on the branch). Five parts:
+
+1. **Hero "Do I need an account?" disclosure** (`app/home-client.tsx`) — under the hero CTA: static line "Free to use. No account required." + a `ChevronDown` toggle ("Do I need an account?") revealing a white amber-bordered card: "No. The gift finder always works without signing in." + one sentence pitching Loved Ones + "See how Loved Ones works →" link. Local `useState` (`accountNoteOpen`); PostHog `account_note_opened` on first open, `cta_clicked` (`location: "hero_account_note"`) on the link.
+2. **Nav treatment** (`components/nav.tsx`) — the "Loved ones" item now has a `Heart` icon + an amber "New" pill, and a CSS-only hover/focus tooltip ("Optional, and free" + the same reassurance copy). Nav stays a server component.
+3. **First-visit nudge** (`components/loved-ones-nudge.tsx`, NEW, `"use client"`) — fixed bubble top-right under the header with an up-caret, shows ~1.2s after load, once per browser (`localStorage` key `gw:lovedones-nudge:v1`), never on `/loved-ones`. Heading "New: Loved Ones" + short copy + "Take a look →". Rendered from `nav.tsx`. PostHog: `loved_ones_nudge_shown` / `_clicked` / `_dismissed`.
+4. **Homepage section reorder** (`app/home-client.tsx`) — the existing "New: Loved Ones" 3-column block moved from last on the page to directly under the hero (order is now Hero → Loved Ones → Example gifts → How it works).
+5. **Wizard results prompt** (`app/wizard/wizard-client.tsx`) — after the "Send these to your inbox" card, a `!isSignedIn`-only card: "Save these for next time" + Loved Ones pitch + "Set up Loved Ones →" link. PostHog `cta_clicked` (`location: "wizard_results_loved_ones"`).
+
+`/loved-ones` still shows the Clerk signed-out screen locally (Daniel has a local `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`) and the "almost here" placeholder in Vercel prod (no key there yet) — every new CTA above lands there, same as the pre-existing ones. Verified: `npm run build` clean; homepage renders all of 1–4 in dev (screenshot), correct section order. Part 5 build-verified only, not clicked through. Stale Turbopack "module not found" console errors after adding the new file cleared on a dev-server restart.
+
+Follow-up same day: reminder copy on all four Loved Ones surfaces (hero disclosure card, nav tooltip, first-visit nudge, wizard results card) now reads "birthday, holiday, and anniversary" instead of birthday-only. Homepage example-gifts eyebrow changed from "Examples only — yours will be personalized" to "Example gifts — yours will be personalized". Hero disclosure: dropped the plain "Free to use. No account required." line; the amber toggle itself now carries that text (was "Do I need an account?").
+
 ## Prioritized Roadmap
 
 1. ~~Session logging~~ ✅ DONE

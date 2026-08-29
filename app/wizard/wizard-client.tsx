@@ -10,6 +10,7 @@ import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw,
 import { cn } from "@/lib/utils";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { INTERESTS } from "@/lib/interests";
 import { useResolvedImage } from "@/lib/use-resolved-image";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
@@ -76,7 +77,6 @@ const OCCASIONS = [
   { label: "Baby Shower", emoji: "👶" },
   { label: "Just Because", emoji: "💝" },
 ];
-const INTERESTS = ["Cooking", "Travel", "Fitness", "Gaming", "Reading", "Music", "Art", "Outdoors", "Tech", "Fashion"];
 const GIFT_PREFERENCES: { label: string; value: FormState["giftPreference"] }[] = [
   { label: "Physical gifts", value: "gifts" },
   { label: "Experiences", value: "experiences" },
@@ -188,6 +188,13 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const [emailValue, setEmailValue] = useState("");
   const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [emailError, setEmailError] = useState<string | null>(null);
+  // Set when the wizard is opened from a Loved One profile (?lovedOneId=). We
+  // prefill everything the profile already knows and skip those steps.
+  const [lovedOne, setLovedOne] = useState<{ name: string } | null>(null);
+  const [prefilledSteps, setPrefilledSteps] = useState<{ s1: boolean; s3: boolean }>({ s1: false, s3: false });
+  const [loadingLovedOne, setLoadingLovedOne] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("lovedOneId")
+  );
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -199,6 +206,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
         setGifts(decoded.gifts);
         setStep("results");
       }
+      setLoadingLovedOne(false);
       return;
     }
     const lovedOneId = params.get("lovedOneId");
@@ -206,16 +214,30 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       fetch(`/api/loved-ones/${lovedOneId}`)
         .then((res) => res.json())
         .then((data) => {
-          const lovedOne = data.lovedOne;
-          if (!lovedOne) return;
+          const lo = data.lovedOne;
+          if (!lo) {
+            setLoadingLovedOne(false);
+            return;
+          }
+          const age = ageRangeFromBirthYear(lo.birthday_year);
+          const notes = (lo.interests_notes || "").trim();
+          const savedInterests: string[] = Array.isArray(lo.interests) ? lo.interests : [];
           setForm((f) => ({
             ...f,
-            relationship: lovedOne.relationship,
-            ageRange: ageRangeFromBirthYear(lovedOne.birthday_year) || f.ageRange,
-            freetext: lovedOne.interests_notes || f.freetext,
+            relationship: lo.relationship,
+            ageRange: age || f.ageRange,
+            interests: savedInterests.length ? savedInterests : f.interests,
+            freetext: notes || f.freetext,
           }));
+          setLovedOne({ name: lo.name });
+          // Step 1 is relationship + age. Relationship always comes from the
+          // profile, so step 1 is only "done" if we also got an age. Step 3 is
+          // covered if the profile has interests checked or notes written.
+          setPrefilledSteps({ s1: !!age, s3: savedInterests.length > 0 || !!notes });
+          setStep(age ? 2 : 1);
+          setLoadingLovedOne(false);
         })
-        .catch(() => {});
+        .catch(() => setLoadingLovedOne(false));
     }
   }, []);
 
@@ -243,7 +265,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       : step === 2
         ? form.occasion !== ""
         : step === 3
-          ? form.interests.length > 0
+          ? form.interests.length > 0 || form.freetext.trim() !== ""
           : step === 4
             ? form.budget !== ""
             : false;
@@ -285,13 +307,19 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       fetchRecommendations(false);
     } else if (typeof step === "number") {
       posthog?.capture("wizard_step_completed", { step, ...form });
-      setStep((step + 1) as Step);
+      let target = step + 1;
+      if (target === 3 && prefilledSteps.s3) target = 4;
+      setStep(target as Step);
     }
   };
 
   const back = () => {
     if (step === "results") { setStep(4); setAttempt(0); setSeenGifts([]); }
-    else if (typeof step === "number" && step > 1) setStep((step - 1) as Step);
+    else if (typeof step === "number" && step > 1) {
+      let target = step - 1;
+      if (target === 3 && prefilledSteps.s3) target = 2;
+      setStep(target as Step);
+    }
   };
 
   const toggleInterest = (interest: string) => {
@@ -358,6 +386,15 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
     posthog?.capture("buy_clicked", { gift: gift.name, store: gift.store, price: gift.price, ...form });
     window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer");
   };
+
+  if (loadingLovedOne) {
+    return (
+      <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center gap-4">
+        <div className="text-5xl animate-bounce">🎁</div>
+        <p className="font-heading text-2xl text-stone-800">Pulling up their profile…</p>
+      </div>
+    );
+  }
 
   if (step === "loading") {
     return (
@@ -499,6 +536,29 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
             </CardContent>
           </Card>
 
+          {!isSignedIn && (
+            <Card className="bg-white border-0 shadow-sm mt-6">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="w-4 h-4 text-rose-500" />
+                  <span className="text-sm font-semibold text-stone-700">Save these for next time</span>
+                </div>
+                <p className="text-stone-500 text-sm leading-relaxed">
+                  A free Loved Ones profile keeps every idea, remembers what you&apos;ve already
+                  given each person, and nudges you two weeks before every birthday, holiday,
+                  and anniversary.
+                </p>
+                <a
+                  href="/loved-ones"
+                  onClick={() => posthog?.capture("cta_clicked", { location: "wizard_results_loved_ones" })}
+                  className="mt-3 inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 px-5 text-sm rounded-md transition-colors"
+                >
+                  Set up Loved Ones →
+                </a>
+              </CardContent>
+            </Card>
+          )}
+
           {savedGifts.length > 0 && (
             <div className="mt-10">
               <div className="flex items-center gap-2 mb-4">
@@ -568,6 +628,16 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
             <div className="relative h-1.5 w-full rounded-full bg-amber-100 mb-8">
               <div className="h-full rounded-full bg-amber-500 transition-all duration-300" style={{ width: `${progress}%` }} />
             </div>
+
+            {lovedOne && (
+              <div className="flex items-start gap-2 mb-6 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2.5 text-sm text-amber-800">
+                <Sparkles className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>
+                  Shopping for <span className="font-semibold">{lovedOne.name}</span>. We&apos;ve filled in
+                  what their profile tells us, so you can skip ahead.
+                </span>
+              </div>
+            )}
 
             {apiError && (
               <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3 mb-6">

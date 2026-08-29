@@ -37,11 +37,14 @@ export async function GET() {
       birthday_year     INTEGER,
       anniversary_month INTEGER,
       anniversary_day   INTEGER,
+      interests         JSONB,
       interests_notes   TEXT,
       birthday_reminder_enabled    BOOLEAN NOT NULL DEFAULT TRUE,
       anniversary_reminder_enabled BOOLEAN NOT NULL DEFAULT TRUE
     )
   `;
+  // Added after the table shipped — no-op once the column exists.
+  await sql`ALTER TABLE loved_ones ADD COLUMN IF NOT EXISTS interests JSONB`;
   await sql`CREATE INDEX IF NOT EXISTS loved_ones_clerk_user_id_idx ON loved_ones (clerk_user_id)`;
   await sql`
     CREATE TABLE IF NOT EXISTS loved_one_gifts (

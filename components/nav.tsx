@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Gift } from "lucide-react";
+import { Gift, Heart } from "lucide-react";
 import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { LovedOnesNudge } from "@/components/loved-ones-nudge";
 
 export function Nav() {
   return (
@@ -15,9 +16,29 @@ export function Nav() {
           <Link href="/wizard" className="hover:text-stone-900">
             Find a gift
           </Link>
-          <Link href="/loved-ones" className="hover:text-stone-900">
-            Loved ones
-          </Link>
+          <span className="group relative inline-flex">
+            <Link href="/loved-ones" className="inline-flex items-center gap-1.5 hover:text-stone-900">
+              <Heart className="h-4 w-4 text-rose-400" />
+              Loved ones
+              <span className="rounded-full bg-amber-100 px-1.5 py-px text-[10px] font-bold uppercase leading-tight tracking-wide text-amber-700">
+                New
+              </span>
+            </Link>
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute left-1/2 top-full z-50 mt-3 w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2 translate-y-1 rounded-xl border border-amber-100 bg-white p-3 text-left opacity-0 shadow-lg transition-all duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+            >
+              <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-amber-100 bg-white" />
+              <span className="mb-1 block font-heading text-xs font-semibold text-stone-900">
+                Optional, and free
+              </span>
+              <span className="block text-xs leading-relaxed text-stone-600">
+                The gift finder works without an account. Loved Ones adds a saved profile for
+                each person, a history of what you&apos;ve given, and a reminder before
+                birthdays, holidays, and anniversaries.
+              </span>
+            </span>
+          </span>
           {CLERK_ENABLED && (
             <>
               <Show when="signed-out">
@@ -34,6 +55,7 @@ export function Nav() {
           )}
         </nav>
       </div>
+      <LovedOnesNudge />
     </header>
   );
 }
