@@ -20,6 +20,7 @@ import {
   pickRelationshipEmoji,
 } from "@/components/relationship-emoji";
 import { applicableHolidays } from "@/lib/holidays";
+import { INTERESTS } from "@/lib/interests";
 import { cn } from "@/lib/utils";
 import { useResolvedImage } from "@/lib/use-resolved-image";
 
@@ -36,6 +37,7 @@ interface LovedOneRow {
   birthday_year: number | null;
   anniversary_month: number | null;
   anniversary_day: number | null;
+  interests: string[] | null;
   interests_notes: string | null;
   birthday_reminder_enabled: boolean;
   anniversary_reminder_enabled: boolean;
@@ -182,6 +184,7 @@ export function LovedOneDetail({ id }: { id: string }) {
           birthdayYear: next.birthday_year,
           anniversaryMonth: next.anniversary_month,
           anniversaryDay: next.anniversary_day,
+          interests: next.interests ?? [],
           interestsNotes: next.interests_notes,
           birthdayReminderEnabled: next.birthday_reminder_enabled,
           anniversaryReminderEnabled: next.anniversary_reminder_enabled,
@@ -192,6 +195,14 @@ export function LovedOneDetail({ id }: { id: string }) {
     } catch {
       setSaveStatus("error");
     }
+  };
+
+  const toggleInterest = (interest: string) => {
+    const current = lovedOne?.interests ?? [];
+    const next = current.includes(interest)
+      ? current.filter((i) => i !== interest)
+      : [...current, interest];
+    saveProfile({ interests: next });
   };
 
   const markGiven = async (giftId: string) => {
@@ -362,9 +373,33 @@ export function LovedOneDetail({ id }: { id: string }) {
             )}
 
             <div>
-              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">
-                Interests &amp; notes
+              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Interests</p>
+              <div className="flex flex-wrap gap-2">
+                {INTERESTS.map((i) => {
+                  const on = (lovedOne.interests ?? []).includes(i);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => toggleInterest(i)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer",
+                        on
+                          ? "bg-amber-500 text-white border-amber-500"
+                          : "bg-white text-stone-400 border-stone-200 hover:border-amber-200"
+                      )}
+                    >
+                      {i}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-stone-400 mt-1.5">
+                Checked interests are sent straight to the search when you get ideas for {lovedOne.name}.
               </p>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Notes</p>
               <textarea
                 value={lovedOne.interests_notes ?? ""}
                 onChange={(e) => setLovedOne({ ...lovedOne, interests_notes: e.target.value })}

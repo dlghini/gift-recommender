@@ -10,6 +10,7 @@ import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw,
 import { cn } from "@/lib/utils";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { INTERESTS } from "@/lib/interests";
 import { useResolvedImage } from "@/lib/use-resolved-image";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
@@ -76,7 +77,6 @@ const OCCASIONS = [
   { label: "Baby Shower", emoji: "👶" },
   { label: "Just Because", emoji: "💝" },
 ];
-const INTERESTS = ["Cooking", "Travel", "Fitness", "Gaming", "Reading", "Music", "Art", "Outdoors", "Tech", "Fashion"];
 const GIFT_PREFERENCES: { label: string; value: FormState["giftPreference"] }[] = [
   { label: "Physical gifts", value: "gifts" },
   { label: "Experiences", value: "experiences" },
@@ -221,16 +221,19 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
           }
           const age = ageRangeFromBirthYear(lo.birthday_year);
           const notes = (lo.interests_notes || "").trim();
+          const savedInterests: string[] = Array.isArray(lo.interests) ? lo.interests : [];
           setForm((f) => ({
             ...f,
             relationship: lo.relationship,
             ageRange: age || f.ageRange,
+            interests: savedInterests.length ? savedInterests : f.interests,
             freetext: notes || f.freetext,
           }));
           setLovedOne({ name: lo.name });
           // Step 1 is relationship + age. Relationship always comes from the
-          // profile, so step 1 is only "done" if we also got an age.
-          setPrefilledSteps({ s1: !!age, s3: !!notes });
+          // profile, so step 1 is only "done" if we also got an age. Step 3 is
+          // covered if the profile has interests checked or notes written.
+          setPrefilledSteps({ s1: !!age, s3: savedInterests.length > 0 || !!notes });
           setStep(age ? 2 : 1);
           setLoadingLovedOne(false);
         })
