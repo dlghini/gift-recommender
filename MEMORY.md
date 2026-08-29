@@ -322,7 +322,7 @@ Marketing-side pass to make Loved Ones obviously a feature, not a footnote. No n
 
 `/loved-ones` still shows the Clerk signed-out screen locally (Daniel has a local `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`) and the "almost here" placeholder in Vercel prod (no key there yet) — every new CTA above lands there, same as the pre-existing ones. Verified: `npm run build` clean; homepage renders all of 1–4 in dev (screenshot), correct section order. Part 5 build-verified only, not clicked through. Stale Turbopack "module not found" console errors after adding the new file cleared on a dev-server restart.
 
-Follow-up same day: reminder copy on all four Loved Ones surfaces (hero disclosure card, nav tooltip, first-visit nudge, wizard results card) now reads "birthday, holiday, and anniversary" instead of birthday-only. Homepage example-gifts eyebrow changed from "Examples only — yours will be personalized" to "Example gifts — yours will be personalized".
+Follow-up same day: reminder copy on all four Loved Ones surfaces (hero disclosure card, nav tooltip, first-visit nudge, wizard results card) now reads "birthday, holiday, and anniversary" instead of birthday-only. Homepage example-gifts eyebrow changed from "Examples only — yours will be personalized" to "Example gifts — yours will be personalized". Hero disclosure: dropped the plain "Free to use. No account required." line; the amber toggle itself now carries that text (was "Do I need an account?").
 
 ## Prioritized Roadmap
 

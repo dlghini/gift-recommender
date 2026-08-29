@@ -125,7 +125,6 @@ export default function Home() {
         </a>
 
         <div className="mt-5 flex flex-col items-center gap-2 text-sm text-stone-500">
-          <p>Free to use. No account required.</p>
           <button
             type="button"
             onClick={() => {
@@ -137,7 +136,7 @@ export default function Home() {
             aria-expanded={accountNoteOpen}
             className="inline-flex items-center gap-1 font-medium text-amber-600 hover:text-amber-700"
           >
-            Do I need an account?
+            Free to use. No account required.
             <ChevronDown className={cn("w-4 h-4 transition-transform", accountNoteOpen && "rotate-180")} />
           </button>
           {accountNoteOpen && (
