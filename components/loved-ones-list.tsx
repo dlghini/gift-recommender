@@ -58,7 +58,9 @@ function nextOccasion(lo: LovedOneRow): { label: string; date: Date } | null {
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  // The occasion dates are built with Date.UTC(...), so format in UTC too —
+  // otherwise a viewer west of UTC sees the day before (Sep 19 -> "Sep 18").
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 export function LovedOnesList() {
