@@ -23,42 +23,47 @@ interface LovedOneRow {
 
 const LEGACY_SAVED_KEY = "giftspark_saved";
 
-function nextOccasion(lo: LovedOneRow): { label: string; date: Date } | null {
+// Every occasion we know for this person (birthday + anniversary the user
+// entered, plus the holidays that apply to the relationship), each resolved to
+// its next upcoming date and sorted soonest-first.
+function upcomingOccasions(lo: LovedOneRow): { label: string; date: Date }[] {
   const today = new Date();
   const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
   const years = [todayUtc.getUTCFullYear(), todayUtc.getUTCFullYear() + 1];
-  const candidates: { label: string; date: Date }[] = [];
+  const out: { label: string; date: Date }[] = [];
 
-  const consider = (label: string, month: number | null, day: number | null) => {
+  const addFixed = (label: string, month: number | null, day: number | null) => {
     if (!month || !day) return;
     for (const year of years) {
       const date = new Date(Date.UTC(year, month - 1, day));
       if (date.getTime() >= todayUtc.getTime()) {
-        candidates.push({ label, date });
+        out.push({ label, date });
         return;
       }
     }
   };
 
-  consider("Birthday", lo.birthday_month, lo.birthday_day);
-  consider("Anniversary", lo.anniversary_month, lo.anniversary_day);
+  addFixed("Birthday", lo.birthday_month, lo.birthday_day);
+  addFixed("Anniversary", lo.anniversary_month, lo.anniversary_day);
   for (const rule of applicableHolidays(lo.relationship)) {
     for (const year of years) {
       const { month, day } = rule.getDate(year);
       const date = new Date(Date.UTC(year, month - 1, day));
       if (date.getTime() >= todayUtc.getTime()) {
-        candidates.push({ label: rule.label, date });
+        out.push({ label: rule.label, date });
         break;
       }
     }
   }
 
-  candidates.sort((a, b) => a.date.getTime() - b.date.getTime());
-  return candidates[0] ?? null;
+  out.sort((a, b) => a.date.getTime() - b.date.getTime());
+  return out;
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  // The occasion dates are built with Date.UTC(...), so format in UTC too —
+  // otherwise a viewer west of UTC sees the day before (Sep 19 -> "Sep 18").
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 export function LovedOnesList() {
@@ -161,7 +166,7 @@ export function LovedOnesList() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {lovedOnes.map((lo) => {
-            const occasion = nextOccasion(lo);
+            const occasions = upcomingOccasions(lo);
             return (
               <Link key={lo.id} href={`/loved-ones/${lo.id}`}>
                 <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
@@ -170,10 +175,14 @@ export function LovedOnesList() {
                     <div className="min-w-0">
                       <p className="font-heading text-base text-stone-900 truncate">{lo.name}</p>
                       <p className="text-xs text-stone-400">{lo.relationship}</p>
-                      {occasion && (
-                        <p className="text-xs text-amber-600 font-medium mt-1">
-                          {occasion.label} · {formatDate(occasion.date)}
-                        </p>
+                      {occasions.length > 0 && (
+                        <div className="mt-1 flex flex-col gap-0.5">
+                          {occasions.map((o) => (
+                            <p key={o.label} className="text-xs text-amber-600 font-medium">
+                              {o.label} · {formatDate(o.date)}
+                            </p>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </CardContent>
