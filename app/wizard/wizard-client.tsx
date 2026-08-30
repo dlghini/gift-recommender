@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
+import { pickRelationshipEmoji } from "@/components/relationship-emoji";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
 import { INTERESTS } from "@/lib/interests";
 import { useResolvedImage } from "@/lib/use-resolved-image";
@@ -195,6 +196,48 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const [loadingLovedOne, setLoadingLovedOne] = useState(
     () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("lovedOneId")
   );
+  // Signed-in users see their saved profiles on step 1 as a shortcut.
+  const [savedProfiles, setSavedProfiles] = useState<{ id: string; name: string; relationship: string }[]>([]);
+
+  // Prefill from a Loved One profile and skip the steps it already answers.
+  const applyLovedOne = (lo: {
+    name: string;
+    relationship: string;
+    birthday_year: number | null;
+    interests: unknown;
+    interests_notes: string | null;
+  }) => {
+    const age = ageRangeFromBirthYear(lo.birthday_year);
+    const notes = (lo.interests_notes || "").trim();
+    const savedInterests: string[] = Array.isArray(lo.interests) ? lo.interests : [];
+    setForm((f) => ({
+      ...f,
+      relationship: lo.relationship,
+      ageRange: age || f.ageRange,
+      interests: savedInterests.length ? savedInterests : f.interests,
+      freetext: notes || f.freetext,
+    }));
+    setLovedOne({ name: lo.name });
+    // Step 1 is relationship + age; relationship always comes from the profile,
+    // so it's only "done" if we also got an age. Step 3 is covered if the
+    // profile has interests checked or notes written.
+    setPrefilledSteps({ s1: !!age, s3: savedInterests.length > 0 || !!notes });
+    setStep(age ? 2 : 1);
+  };
+
+  const pickLovedOne = (id: string) => {
+    setLoadingLovedOne(true);
+    fetch(`/api/loved-ones/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.lovedOne) {
+          applyLovedOne(data.lovedOne);
+          posthog?.capture("wizard_loved_one_picked", { location: "step1" });
+        }
+        setLoadingLovedOne(false);
+      })
+      .catch(() => setLoadingLovedOne(false));
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -214,32 +257,24 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       fetch(`/api/loved-ones/${lovedOneId}`)
         .then((res) => res.json())
         .then((data) => {
-          const lo = data.lovedOne;
-          if (!lo) {
-            setLoadingLovedOne(false);
-            return;
-          }
-          const age = ageRangeFromBirthYear(lo.birthday_year);
-          const notes = (lo.interests_notes || "").trim();
-          const savedInterests: string[] = Array.isArray(lo.interests) ? lo.interests : [];
-          setForm((f) => ({
-            ...f,
-            relationship: lo.relationship,
-            ageRange: age || f.ageRange,
-            interests: savedInterests.length ? savedInterests : f.interests,
-            freetext: notes || f.freetext,
-          }));
-          setLovedOne({ name: lo.name });
-          // Step 1 is relationship + age. Relationship always comes from the
-          // profile, so step 1 is only "done" if we also got an age. Step 3 is
-          // covered if the profile has interests checked or notes written.
-          setPrefilledSteps({ s1: !!age, s3: savedInterests.length > 0 || !!notes });
-          setStep(age ? 2 : 1);
+          if (data.lovedOne) applyLovedOne(data.lovedOne);
           setLoadingLovedOne(false);
         })
         .catch(() => setLoadingLovedOne(false));
     }
   }, []);
+
+  // Load the user's saved profiles once Clerk reports them signed in (unless
+  // they arrived via a share link or a specific profile already).
+  useEffect(() => {
+    if (!isSignedIn) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("r") || params.get("lovedOneId")) return;
+    fetch("/api/loved-ones")
+      .then((res) => res.json())
+      .then((data) => setSavedProfiles(Array.isArray(data.lovedOnes) ? data.lovedOnes : []))
+      .catch(() => {});
+  }, [isSignedIn]);
 
   useEffect(() => {
     if (step === "results" && gifts.length > 0) {
@@ -650,6 +685,26 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
               <div>
                 <h1 className="font-heading text-2xl text-stone-900 mb-1">Who are you buying for?</h1>
                 <p className="text-stone-400 text-sm mb-6">Select their relationship and age range</p>
+                {savedProfiles.length > 0 && !lovedOne && (
+                  <div className="mb-6">
+                    <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">
+                      Shopping for someone you&apos;ve saved?
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {savedProfiles.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => pickLovedOne(p.id)}
+                          className="px-4 py-2 rounded-full text-sm font-medium border border-stone-200 bg-white text-stone-700 hover:border-amber-300 hover:bg-amber-50 transition-all cursor-pointer"
+                        >
+                          <span className="mr-1">{pickRelationshipEmoji(p.relationship)}</span>
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Relationship</p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {RELATIONSHIPS.map((r) => (

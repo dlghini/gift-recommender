@@ -28,6 +28,14 @@ const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
+// Today's calendar date in the viewer's own zone, as YYYY-MM-DD. Going through
+// toISOString() would use UTC and record tomorrow's date for evening users west
+// of UTC.
+function todayLocalISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 interface LovedOneRow {
   id: string;
   name: string;
@@ -209,7 +217,7 @@ export function LovedOneDetail({ id }: { id: string }) {
     await fetch(`/api/loved-ones/${id}/gifts/${giftId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ givenAt: todayLocalISO() }),
     });
     load();
   };
@@ -228,7 +236,7 @@ export function LovedOneDetail({ id }: { id: string }) {
         status: "given",
         name: logName.trim(),
         occasionLabel: logOccasion.trim() || undefined,
-        givenAt: new Date().toISOString().slice(0, 10),
+        givenAt: todayLocalISO(),
       }),
     });
     setLogName("");
