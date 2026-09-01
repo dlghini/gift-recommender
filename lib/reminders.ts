@@ -26,9 +26,9 @@ function toUtcDate(year: number, month: number, day: number): Date {
   return new Date(Date.UTC(year, month - 1, day));
 }
 
-function withinLeadWindow(today: Date, occasion: Date): boolean {
+function withinLeadWindow(today: Date, occasion: Date, leadDays: number): boolean {
   const diffDays = (occasion.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-  return diffDays >= 0 && diffDays <= REMINDER_LEAD_DAYS;
+  return diffDays >= 0 && diffDays <= leadDays;
 }
 
 /**
@@ -40,7 +40,8 @@ function withinLeadWindow(today: Date, occasion: Date): boolean {
 export function findDueOccasions(
   lovedOnes: LovedOneRow[],
   disabledHolidayKeys: Set<string>,
-  today: Date = new Date()
+  today: Date = new Date(),
+  leadDays: number = REMINDER_LEAD_DAYS
 ): DueOccasion[] {
   const due: DueOccasion[] = [];
   const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
@@ -51,7 +52,7 @@ export function findDueOccasions(
     if (lovedOne.birthday_reminder_enabled && lovedOne.birthday_month && lovedOne.birthday_day) {
       for (const year of years) {
         const date = toUtcDate(year, lovedOne.birthday_month, lovedOne.birthday_day);
-        if (withinLeadWindow(todayUtc, date)) {
+        if (withinLeadWindow(todayUtc, date, leadDays)) {
           due.push({
             lovedOneId: lovedOne.id,
             occasionKey: "birthday",
@@ -66,7 +67,7 @@ export function findDueOccasions(
     if (lovedOne.anniversary_reminder_enabled && lovedOne.anniversary_month && lovedOne.anniversary_day) {
       for (const year of years) {
         const date = toUtcDate(year, lovedOne.anniversary_month, lovedOne.anniversary_day);
-        if (withinLeadWindow(todayUtc, date)) {
+        if (withinLeadWindow(todayUtc, date, leadDays)) {
           due.push({
             lovedOneId: lovedOne.id,
             occasionKey: "anniversary",
@@ -83,7 +84,7 @@ export function findDueOccasions(
       for (const year of years) {
         const { month, day } = rule.getDate(year);
         const date = toUtcDate(year, month, day);
-        if (withinLeadWindow(todayUtc, date)) {
+        if (withinLeadWindow(todayUtc, date, leadDays)) {
           due.push({
             lovedOneId: lovedOne.id,
             occasionKey: rule.key,

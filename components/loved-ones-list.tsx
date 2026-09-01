@@ -73,6 +73,7 @@ export function LovedOnesList() {
   const [createOpen, setCreateOpen] = useState(false);
   const [pendingLegacyGifts, setPendingLegacyGifts] = useState<AssignableGift[]>([]);
   const [assigningGift, setAssigningGift] = useState<AssignableGift | null>(null);
+  const [digestEnabled, setDigestEnabled] = useState(true);
 
   const load = () => {
     setLoading(true);
@@ -82,8 +83,21 @@ export function LovedOnesList() {
       .finally(() => setLoading(false));
   };
 
+  const toggleDigest = (next: boolean) => {
+    setDigestEnabled(next);
+    fetch("/api/email-prefs", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ digestEnabled: next }),
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     load();
+    fetch("/api/email-prefs")
+      .then((res) => res.json())
+      .then((data) => setDigestEnabled(data.digestEnabled ?? true))
+      .catch(() => {});
     try {
       const stored = localStorage.getItem(LEGACY_SAVED_KEY);
       if (stored) {
@@ -119,6 +133,18 @@ export function LovedOnesList() {
           <Plus className="w-4 h-4 mr-1" /> Add
         </Button>
       </div>
+
+      {!loading && lovedOnes.length > 0 && (
+        <label className="mb-6 flex cursor-pointer select-none items-center gap-2 text-sm text-stone-500">
+          <input
+            type="checkbox"
+            checked={digestEnabled}
+            onChange={(e) => toggleDigest(e.target.checked)}
+            className="h-4 w-4 rounded border-stone-300 text-amber-500 focus:ring-amber-400"
+          />
+          Email me a monthly summary of upcoming occasions
+        </label>
+      )}
 
       {pendingLegacyGifts.length > 0 && (
         <Card className="bg-white border-0 shadow-sm mb-6">
