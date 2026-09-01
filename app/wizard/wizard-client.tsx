@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DoodleIcon, type DoodleName } from "@/components/doodle-icon";
+import { AffiliateDisclosure } from "@/components/affiliate-disclosure";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
 import { pickRelationshipEmoji } from "@/components/relationship-emoji";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
@@ -474,7 +475,8 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
             <Sparkles className="w-4 h-4 text-amber-500" />
             <span className="text-amber-600 text-xs font-semibold uppercase tracking-widest">Your picks</span>
           </div>
-          <h1 className="font-heading text-3xl text-stone-900 mb-8">3 gifts they&apos;ll love</h1>
+          <h1 className="font-heading text-3xl text-stone-900 mb-3">3 gifts they&apos;ll love</h1>
+          <AffiliateDisclosure className="mb-8" />
 
           <div className="flex flex-col gap-4">
             {gifts.map((gift, idx) => (

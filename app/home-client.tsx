@@ -5,6 +5,7 @@ import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink, ChevronDown } from "lucide-react";
 import { DoodleIcon } from "@/components/doodle-icon";
+import { AffiliateDisclosure } from "@/components/affiliate-disclosure";
 import { cn } from "@/lib/utils";
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
@@ -194,10 +195,11 @@ export default function Home() {
 
       {/* Example gifts */}
       <div className="max-w-2xl mx-auto px-4 pb-16">
-        <div className="flex items-center gap-2 mb-8 justify-center">
+        <div className="flex items-center gap-2 mb-4 justify-center">
           <DoodleIcon name="sparkle" className="w-5 h-5 text-amber-600" />
           <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Example gifts. Yours will be personalized</span>
         </div>
+        <AffiliateDisclosure className="mb-6 text-center" />
         <div className="flex flex-col gap-4">
           {EXAMPLE_GIFTS.map((gift, idx) => (
             <Card key={idx} className="bg-white border-0 shadow-sm opacity-90">
