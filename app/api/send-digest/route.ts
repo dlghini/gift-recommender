@@ -3,7 +3,6 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
 import { getResend } from "@/lib/resend";
 import { findDueOccasions, type DueOccasion, type LovedOneRow } from "@/lib/reminders";
-import { buildAffiliateUrl, type Store } from "@/lib/affiliate";
 import { ensureUnsubToken, unsubscribeUrl } from "@/lib/email-prefs";
 import { MAILING_ADDRESS } from "@/lib/site";
 
@@ -42,8 +41,6 @@ interface PersonBlock {
 interface GeneratedIdea {
   name: string;
   why: string;
-  store: Store;
-  searchQuery: string;
 }
 
 const IDEAS_SCHEMA = {
@@ -62,10 +59,8 @@ const IDEAS_SCHEMA = {
               properties: {
                 name: { type: "string" },
                 why: { type: "string" },
-                store: { type: "string", enum: ["amazon", "etsy", "viator"] },
-                searchQuery: { type: "string" },
               },
-              required: ["name", "why", "store", "searchQuery"],
+              required: ["name", "why"],
               additionalProperties: false,
             },
           },
@@ -102,9 +97,8 @@ async function generateIdeas(blocks: PersonBlock[]): Promise<Map<string, Generat
           type: "text",
           text: [
             "You suggest gift ideas for a monthly summary email. For each person, give exactly 2 specific, real, widely-available gift ideas suited to their interests and the upcoming occasion.",
-            "Each idea needs: `name` (a concrete product or experience, not a category), `why` (one warm sentence, plain punctuation, no em dashes), `store`, and `searchQuery` (2 to 5 words that reliably surface it).",
-            "`store` is one of: \"etsy\" for handmade, personalized, custom, artisan, or vintage physical items; \"viator\" for real in-person bookable experiences (tours, classes, tastings) - never virtual/online-only ones; \"amazon\" for mainstream branded products, books, electronics, and anything mass-produced.",
-            "Optimize `searchQuery` for the chosen store's search. Do not repeat an idea across people.",
+            "Each idea needs: `name` (a concrete product or experience, not a category) and `why` (one warm sentence, plain punctuation, no em dashes).",
+            "Do not repeat an idea across people.",
           ].join(" "),
         },
       ],
@@ -148,17 +142,17 @@ function renderDigestEmail(
         )
         .join("");
 
+      // No store links in email: Amazon Associates (and Rakuten / Viator) all
+      // prohibit affiliate links in email. Ideas are plain text; the only link
+      // per person points back to the site, where the tagged links live.
       const ideas = ideasByLovedOne.get(lovedOne.id) ?? [];
       const ideasHtml = ideas.length
         ? `<ul style="margin:12px 0 0 0;padding-left:18px;">${ideas
             .map(
               (idea) =>
-                `<li style="font-size:13px;color:#2f3a33;margin-bottom:8px;"><a href="${buildAffiliateUrl(
-                  idea.store,
-                  idea.searchQuery || idea.name
-                )}" style="color:#7a3a28;text-decoration:none;font-weight:600;">${escapeHtml(
+                `<li style="font-size:13px;color:#2f3a33;margin-bottom:8px;"><strong>${escapeHtml(
                   idea.name
-                )}</a><br><span style="color:#6c756b;">${escapeHtml(idea.why)}</span></li>`
+                )}</strong><br><span style="color:#6c756b;">${escapeHtml(idea.why)}</span></li>`
             )
             .join("")}</ul>`
         : "";

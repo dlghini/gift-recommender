@@ -320,6 +320,7 @@ The reminder + digest emails had no in-email unsubscribe or postal address. Fixe
 - **`lib/site.ts`**: `MAILING_ADDRESS = "[YOUR MAILING ADDRESS]"` placeholder — **Daniel must set a real physical address (PO box / registered-agent OK) before these emails are truly CAN-SPAM compliant.**
 - **`/api/email-prefs`**: GET/PATCH now also handle `remindersEnabled`. **`components/loved-ones-list.tsx`** shows two checkboxes (reminder + monthly summary).
 - Verified: build clean; unsub endpoint smoke-tested against the DB — `?type=digest` flips only `digest_enabled`, `resubscribe=1` reverts, bad token → expired page. Test row cleaned up.
+- **Also in this PR (compliance fix):** removed affiliate-tagged links from the digest email. Amazon Associates (and Rakuten / Viator) prohibit affiliate links in email. `generateIdeas` no longer asks for `store`/`searchQuery`; digest ideas render as plain bold text; the only per-person link is "More ideas for X →" to `/wizard?lovedOneId=` (own domain). `lib/affiliate.ts` import dropped from the digest.
 
 ### Phase 26: "What's your gifting style?" quiz — branch `feature/gifting-style-quiz` (2026-09-01)
 
