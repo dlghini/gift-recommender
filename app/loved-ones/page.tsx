@@ -37,7 +37,7 @@ export default function LovedOnesPage() {
           <div className="text-center py-20">
             <h1 className="font-heading text-2xl text-stone-900 mb-2">Loved ones is almost here</h1>
             <p className="text-stone-500 text-sm max-w-sm mx-auto">
-              We&apos;re still finishing setup on this one — check back soon.
+              We&apos;re still finishing setup on this one. Check back soon.
             </p>
           </div>
         )}

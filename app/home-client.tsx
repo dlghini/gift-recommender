@@ -14,7 +14,7 @@ const EXAMPLE_GIFTS = [
   {
     name: "Japanese Cast Iron Tetsubin Tea Kettle Set",
     price: "$55–$80",
-    rationale: "A ritual disguised as a kitchen item. For the person who takes their morning routine seriously — this cast iron kettle turns making tea into something meditative. Functional art that lasts decades.",
+    rationale: "A ritual disguised as a kitchen item. For the person who takes their morning routine seriously, this cast iron kettle turns making tea into something meditative. Functional art that lasts decades.",
     tags: ["Cooking", "Mindfulness", "Home"],
     searchQuery: "japanese cast iron tetsubin tea kettle set",
     store: "amazon" as const,
@@ -23,7 +23,7 @@ const EXAMPLE_GIFTS = [
   {
     name: "Private Sunset Sailing Cruise",
     price: "From $85 per person",
-    rationale: "A bookable experience instead of another object — a couple of hours on the water as the sky turns gold. Perfect for someone who'd rather collect memories than more stuff.",
+    rationale: "A bookable experience instead of another object. A couple of hours on the water as the sky turns gold. Perfect for someone who'd rather collect memories than more stuff.",
     tags: ["Travel", "Romance", "Outdoors"],
     searchQuery: "private sunset sailing cruise",
     store: "viator" as const,
@@ -41,7 +41,7 @@ const EXAMPLE_GIFTS = [
   {
     name: "Leather-Bound Travel Journal with Vintage World Map",
     price: "$35–$50",
-    rationale: "For the friend who romanticizes every trip they take — this isn't just a notebook, it's a place to collect stamps, ticket stubs, and memories. The kind of gift that gets better-looking the more it's used.",
+    rationale: "For the friend who romanticizes every trip they take. This isn't just a notebook, it's a place to collect stamps, ticket stubs, and memories. The kind of gift that gets better-looking the more it's used.",
     tags: ["Travel", "Writing", "Personalized"],
     searchQuery: "leather bound travel journal vintage world map",
     store: "amazon" as const,
@@ -114,7 +114,7 @@ export default function Home() {
           Never give a bad<br />gift again.
         </h1>
         <p className="text-stone-500 text-lg mb-10 max-w-xl mx-auto">
-          Tell us about who you&apos;re buying for. We&apos;ll do the thinking — and find something they&apos;ll actually love.
+          Tell us about who you&apos;re buying for. We&apos;ll do the thinking, and find something they&apos;ll actually love.
         </p>
         <a
           href="/wizard"
@@ -167,7 +167,7 @@ export default function Home() {
         </div>
         <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
         <p className="text-stone-500 text-base mb-10 max-w-xl mx-auto">
-          Create a free profile for the people you shop for so you&apos;re never starting from scratch — or scrambling last minute.
+          Create a free profile for the people you shop for so you&apos;re never starting from scratch, or scrambling last minute.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
           {[
@@ -195,7 +195,7 @@ export default function Home() {
       <div className="max-w-2xl mx-auto px-4 pb-16">
         <div className="flex items-center gap-2 mb-8 justify-center">
           <Sparkles className="w-5 h-5 text-amber-500" />
-          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Example gifts — yours will be personalized</span>
+          <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Example gifts. Yours will be personalized</span>
         </div>
         <div className="flex flex-col gap-4">
           {EXAMPLE_GIFTS.map((gift, idx) => (
@@ -245,7 +245,7 @@ export default function Home() {
           <h2 className="font-heading text-2xl text-stone-900 mb-10">How it works</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
-              { emoji: "🧠", title: "Tell us about them", desc: "Relationship, age, occasion, interests — takes under a minute." },
+              { emoji: "🧠", title: "Tell us about them", desc: "Relationship, age, occasion, interests. Takes under a minute." },
               { emoji: "✨", title: "We pick the gifts", desc: "We think through thousands of ideas and surface 3 picks tailored to them." },
               { emoji: "🛍️", title: "Buy with one click", desc: "Each gift links directly to the store so you can order instantly." },
             ].map((item) => (
@@ -261,7 +261,7 @@ export default function Home() {
             onClick={() => posthog?.capture("cta_clicked", { location: "how_it_works" })}
             className="mt-12 inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
           >
-            Try it now — it&apos;s free ✨
+            Try it now, it&apos;s free ✨
           </a>
         </div>
       </div>

@@ -26,7 +26,7 @@ const lora = Lora({
   weight: ["400", "500", "600", "700"],
 });
 
-const TITLE_DEFAULT = `${SITE_NAME} — Find the perfect gift`;
+const TITLE_DEFAULT = `${SITE_NAME}: Find the perfect gift`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

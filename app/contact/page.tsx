@@ -5,7 +5,7 @@ import { routeMeta } from "@/lib/site";
 export const metadata = routeMeta(
   "/contact",
   "Contact",
-  "Questions, feedback, or a partnership idea? Get in touch with the team behind The Gift Whisperer — we read every message."
+  "Questions, feedback, or a partnership idea? Get in touch with the team behind The Gift Whisperer. We read every message."
 );
 
 export default function ContactPage() {
@@ -59,7 +59,7 @@ export default function ContactPage() {
           <div className="bg-white rounded-xl shadow-sm p-5">
             <div className="text-2xl mb-2">🎁</div>
             <p className="font-medium text-stone-700 mb-1">Gift win?</p>
-            <p className="text-xs text-stone-400">Share the story — we love hearing them.</p>
+            <p className="text-xs text-stone-400">Share the story. We love hearing them.</p>
           </div>
         </div>
       </main>

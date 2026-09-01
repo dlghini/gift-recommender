@@ -28,7 +28,7 @@ Only suggest real products or experiences that actually exist and are widely ava
 For each gift provide:
 - name: a specific, real product name (e.g. "Kindle Paperwhite" not "e-reader") or a specific experience type (e.g. "Sunset Sailing Cruise" not "boat activity")
 - price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y". For experiences, this is a placeholder — real pricing is fetched separately.
-- rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person
+- rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person. Use plain punctuation: no em dashes, use commas or periods instead
 - tags: 2–4 short interest or theme tags
 - affiliateUrl: set to "#"
 - type: either "product" or "experience". Use "experience" for real, in-person bookable tours, classes, activities, workshops, or tastings. Use "product" for physical items.

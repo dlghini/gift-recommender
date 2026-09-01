@@ -45,8 +45,8 @@ export default function PrivacyPage() {
             <h2 className="font-heading text-xl text-stone-800 mb-3">2. How we use your information</h2>
             <p>
               We use the information you provide to generate personalized gift recommendations.
-              We also store anonymized session data — including your wizard inputs and the gifts
-              we recommended — to analyze usage patterns and improve our service. We do not sell
+              We also store anonymized session data, including your wizard inputs and the gifts
+              we recommended, to analyze usage patterns and improve our service. We do not sell
               your data to third parties.
             </p>
           </section>
