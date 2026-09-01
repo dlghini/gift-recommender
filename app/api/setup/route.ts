@@ -112,5 +112,37 @@ export async function GET() {
       updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
   `;
+  // Group gift lists: an owner (signed-in) builds a list for a recipient and
+  // shares `share_id`; anyone with the link can claim items with just a name.
+  await sql`
+    CREATE TABLE IF NOT EXISTS gift_lists (
+      id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      clerk_user_id  TEXT NOT NULL,
+      share_id       TEXT NOT NULL UNIQUE,
+      recipient_name TEXT NOT NULL,
+      occasion       TEXT,
+      loved_one_id   UUID REFERENCES loved_ones(id) ON DELETE SET NULL,
+      updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS gift_lists_clerk_user_id_idx ON gift_lists (clerk_user_id)`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS gift_list_items (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      list_id       UUID NOT NULL REFERENCES gift_lists(id) ON DELETE CASCADE,
+      name          TEXT NOT NULL,
+      price         TEXT,
+      rationale     TEXT,
+      url           TEXT,
+      image_url     TEXT,
+      claimed_by    TEXT,
+      claimed_email TEXT,
+      claimed_at    TIMESTAMP WITH TIME ZONE,
+      purchased     BOOLEAN NOT NULL DEFAULT FALSE
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS gift_list_items_list_id_idx ON gift_list_items (list_id)`;
   return NextResponse.json({ ok: true, message: "Tables ready" });
 }

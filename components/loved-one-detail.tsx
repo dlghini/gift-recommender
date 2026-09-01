@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
-import { AlertCircle, ArrowLeft, Check, Gift as GiftIcon, Heart, Sparkles, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Check, Gift as GiftIcon, Heart, Sparkles, Trash2, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -144,6 +145,8 @@ function DateFields({
 
 export function LovedOneDetail({ id }: { id: string }) {
   const posthog = usePostHog();
+  const router = useRouter();
+  const [startingList, setStartingList] = useState(false);
   const [lovedOne, setLovedOne] = useState<LovedOneRow | null>(null);
   const [holidayPrefs, setHolidayPrefs] = useState<HolidayPref[]>([]);
   const [gifts, setGifts] = useState<GiftRow[]>([]);
@@ -239,6 +242,22 @@ export function LovedOneDetail({ id }: { id: string }) {
     load();
   };
 
+  const startGroupList = async () => {
+    if (startingList || !lovedOne) return;
+    setStartingList(true);
+    try {
+      const res = await fetch("/api/lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipientName: lovedOne.name, lovedOneId: id }),
+      });
+      const data = await res.json();
+      if (data.list?.share_id) router.push(`/lists/${data.list.share_id}`);
+    } finally {
+      setStartingList(false);
+    }
+  };
+
   // Post-purchase feedback on a given gift. Clicking the active reception again clears it.
   const saveReception = async (
     gift: GiftRow,
@@ -315,11 +334,21 @@ export function LovedOneDetail({ id }: { id: string }) {
           </div>
         </div>
 
-        <Link href={`/wizard?lovedOneId=${id}`}>
-          <Button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold mb-8">
-            <Sparkles className="w-4 h-4 mr-1.5" /> Get ideas for {lovedOne.name}
+        <div className="flex flex-wrap gap-2 mb-8">
+          <Link href={`/wizard?lovedOneId=${id}`}>
+            <Button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold">
+              <Sparkles className="w-4 h-4 mr-1.5" /> Get ideas for {lovedOne.name}
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            onClick={startGroupList}
+            disabled={startingList}
+            className="border-stone-200 text-stone-600 font-medium"
+          >
+            <Users className="w-4 h-4 mr-1.5" /> Start a group list
           </Button>
-        </Link>
+        </div>
 
         <Card className="bg-white border-0 shadow-sm mb-6">
           <CardContent className="p-6 flex flex-col gap-5">

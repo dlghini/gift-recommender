@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Gift as GiftIcon, X } from "lucide-react";
+import { Plus, Gift as GiftIcon, Users, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { pickRelationshipEmoji } from "@/components/relationship-emoji";
@@ -133,6 +133,13 @@ export function LovedOnesList() {
           <Plus className="w-4 h-4 mr-1" /> Add
         </Button>
       </div>
+
+      <Link
+        href="/lists"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700"
+      >
+        <Users className="w-4 h-4" /> Group gift lists
+      </Link>
 
       {!loading && lovedOnes.length > 0 && (
         <label className="mb-6 flex cursor-pointer select-none items-center gap-2 text-sm text-stone-500">
