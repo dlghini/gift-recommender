@@ -292,7 +292,7 @@ export function LovedOneDetail({ id }: { id: string }) {
               )}
               {saveStatus === "error" && (
                 <p className="text-xs text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> Couldn&apos;t save — try again
+                  <AlertCircle className="w-3 h-3" /> Couldn&apos;t save. Try again
                 </p>
               )}
             </div>
@@ -343,7 +343,7 @@ export function LovedOneDetail({ id }: { id: string }) {
                 className="w-40 border-stone-200 focus:border-amber-400 mt-2"
               />
               <p className="text-xs text-stone-400 mt-1.5">
-                Know their birth year? It helps us fine-tune recommendations — totally optional.
+                Know their birth year? It helps us fine-tune recommendations. Totally optional.
               </p>
               {lovedOne.birthday_month && lovedOne.birthday_day && (
                 <label className="flex items-center gap-2 text-sm text-stone-600 mt-3 cursor-pointer">
@@ -456,7 +456,7 @@ export function LovedOneDetail({ id }: { id: string }) {
           <TabsContent value="ideas">
             {ideas.length === 0 ? (
               <p className="text-stone-400 text-sm py-6 text-center">
-                No ideas saved yet — try &quot;Get ideas for {lovedOne.name}&quot; above.
+                No ideas saved yet. Try &quot;Get ideas for {lovedOne.name}&quot; above.
               </p>
             ) : (
               <div className="flex flex-col gap-3 mt-4">

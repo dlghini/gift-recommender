@@ -4,7 +4,7 @@ import { SITE_NAME } from "@/lib/site";
 // Site-wide social share image. The file convention applies this to every route
 // (and nested segments) automatically, so it fixes the missing og:image
 // everywhere at once. Text-only + default font to keep the build dependency-free.
-export const alt = `${SITE_NAME} — thoughtful gift ideas for any person and any occasion`;
+export const alt = `${SITE_NAME}: thoughtful gift ideas for any person and any occasion`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -8,7 +8,7 @@ import { routeMeta } from "@/lib/site";
 export const metadata = routeMeta(
   "/wizard",
   "Find a gift",
-  "Answer a few quick questions about the person and the occasion, and get a short list of gift ideas actually matched to them — free, no sign-up."
+  "Answer a few quick questions about the person and the occasion, and get a short list of gift ideas actually matched to them. Free, no sign-up."
 );
 
 export default function Page() {

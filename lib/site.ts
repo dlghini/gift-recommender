@@ -6,9 +6,9 @@ import type { Metadata } from "next";
 export const SITE_URL = "https://www.thegiftwhisperer.gifts";
 export const SITE_NAME = "The Gift Whisperer";
 export const SITE_DESCRIPTION =
-  "Thoughtful gift ideas for any person and any occasion. Tell The Gift Whisperer who you're shopping for and we'll do the thinking — free, no sign-up.";
+  "Thoughtful gift ideas for any person and any occasion. Tell The Gift Whisperer who you're shopping for and we'll do the thinking. Free, no sign-up.";
 
-const OG_IMAGE_ALT = `${SITE_NAME} — thoughtful gift ideas for any person and any occasion`;
+const OG_IMAGE_ALT = `${SITE_NAME}: thoughtful gift ideas for any person and any occasion`;
 
 const OG_BASE = {
   type: "website" as const,
