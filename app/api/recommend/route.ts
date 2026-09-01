@@ -40,7 +40,12 @@ For each gift provide:
 - affiliateUrl: set to "#"
 - type: either "product" or "experience". Use "experience" for real, in-person bookable tours, classes, activities, workshops, or tastings. Use "product" for physical items.
 - store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift. Viator's catalog is in-person only — do not suggest purely virtual/online-only experiences (e.g. a "virtual cooking class" or "online workshop") for this store, since there's no real inventory for those and the resulting link will be irrelevant.
-- searchQuery: a concise 2–5 word search query that will reliably surface this product/experience. For "amazon"/"etsy" gifts, optimize for that store's search. For "viator" gifts, optimize for Viator's search (e.g. "sunset sailing cruise" or "pottery making class").
+- searchQuery: the exact text a shopper would type into the store's own search box so the results page fills with the right item. Write it the way someone searches, not the way a catalog titles a listing. Rules:
+    * 2 to 6 words. Lead with the concrete object, then the 1-2 attributes that matter most (material, style, format, "personalized", "for <interest>").
+    * If "name" is a specific real product you are confident exists (e.g. "Yeti Rambler", "Lodge Cast Iron Skillet", "Kindle Paperwhite"), the searchQuery should surface THAT product: use the distinctive part of its name. Never pair a brand with a model number you are guessing at.
+    * If "name" is more of a product type, or the item is niche, or you are not fully sure it exists under that exact name, use a broad category query instead ("linen throw blanket", not "stonewashed Belgian flax lumbar throw"; "over-ear gaming headset", not an invented model).
+    * Drop filler words: "great", "unique", "perfect", "best", "gift for", "high quality".
+    * By store — amazon: category + key attributes ("cast iron tea kettle", "weighted blanket 15 lb", "beginner watercolor set"). etsy: material or technique + object + personalization/style ("personalized cutting board", "hand poured soy candle set", "custom star map print"). viator: the activity type only, never a city or country ("sunset sailing cruise", "pasta making class", "wine tasting tour").
 
 Make the gifts feel personal and considered. Since the recipient's location is unknown, favor experience types that are common and widely available in most cities (e.g. a sunset sailing cruise, a cooking class, a wine tasting) rather than something hyper-specific to one place — Viator surfaces options near the person once they click through.`;
 

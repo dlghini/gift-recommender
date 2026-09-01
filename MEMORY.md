@@ -310,6 +310,14 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 30: Smarter searchQuery prompt tuning — branch `prompt/smarter-search-queries` (2026-09-01)
+
+Prompt-only change to `SYSTEM_PROMPT` in `app/api/recommend/route.ts`. The `searchQuery` field becomes the affiliate link (`?k=`/`?q=`/`?text=` on a store *search* page), so its wording decides whether the landing page is full of the right item. Replaced the one-line instruction with a spec:
+- 2-6 words, shopper phrasing, lead with the object then 1-2 key attributes; drop filler ("great", "perfect", "gift for", "high quality").
+- If `name` is a specific real product you're confident exists (Kindle Paperwhite, Lodge Cast Iron Skillet), the query surfaces THAT product using the distinctive part of the name. If it's a product *type*, niche, or uncertain, use a broad category query instead. Never pair a brand with a guessed model number.
+- Per store: amazon = category + attributes; etsy = material/technique + object + personalization/style; viator = activity type only, never a city or country.
+- Verified against 4 varied profiles: iconic products kept their name (`"Kindle Paperwhite Signature Edition"`), generic ones got category queries (`"over-ear gaming headset"` style), etsy got the personalization pattern, viator queries had no locations. Build clean. No schema/client change. Pairs with Phase 28 instrumentation — can tune from buy-click vs regenerate data later.
+
 ### Phase 29: Terms of Service + Privacy Policy rewrite — branch `legal/terms-and-privacy` (2026-09-01)
 
 Closes the last compliance gap after the 2026-09-01 feature queue.
