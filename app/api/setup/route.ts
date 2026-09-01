@@ -92,5 +92,25 @@ export async function GET() {
       UNIQUE (loved_one_id, occasion_key, occasion_year)
     )
   `;
+  // One row per user per calendar month the "month ahead" digest was sent,
+  // so a re-fired cron can't double-send. year_month is "YYYY-MM".
+  await sql`
+    CREATE TABLE IF NOT EXISTS digest_log (
+      id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      clerk_user_id  TEXT NOT NULL,
+      year_month     TEXT NOT NULL,
+      sent_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      UNIQUE (clerk_user_id, year_month)
+    )
+  `;
+  // Per-user email preferences. Absence of a row = defaults (digest on),
+  // so we only ever write a row when a user changes something.
+  await sql`
+    CREATE TABLE IF NOT EXISTS user_email_prefs (
+      clerk_user_id  TEXT PRIMARY KEY,
+      digest_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `;
   return NextResponse.json({ ok: true, message: "Tables ready" });
 }
