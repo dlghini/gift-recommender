@@ -310,6 +310,15 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 31: Wizard results → group list entry point — branch `feature/wizard-group-list-entry` (2026-09-01)
+
+Deferred sub-feature from Phase 25 (group gift lists). Adds a way to turn a set of wizard recommendations straight into a shareable group list, the strongest viral hook the lists feature has.
+- **`app/wizard/wizard-client.tsx`** only. New card on the results screen ("Sharing the cost with family?") with a recipient-name input + "Make a list" button. On submit: `POST /api/lists` (recipientName + `form.occasion`), then `POST /api/lists/[shareId]/items` once per shown gift (name/price/rationale/`buildBuyUrl(gift)`/imageUrl, sequential + best-effort), then `router.push('/lists/[shareId]')`.
+- **Signed-in only** — creating a list needs an account (the API 401s otherwise). The card sits in the same slot as the existing "Set up Loved Ones" card, which already renders for signed-out users, so no empty state. A signed-out entry point (sign-in-then-create) is a deliberate follow-up.
+- Recipient name prefills from the Loved One's name when the wizard was opened via `?lovedOneId=`; blank with a placeholder otherwise.
+- Analytics: PostHog `group_list_created` `{ from: "wizard_results", items }` + a `group_list_created` run_event on `runIdRef`.
+- Verified: `npm run build` clean; homepage/wizard load with no console errors in dev. The card itself renders only for a signed-in user on the results screen, so it was checked by build + code review (mirrors the adjacent email-capture card and the Phase 25 endpoints), not clicked through end to end.
+
 ### Phase 30: Smarter searchQuery prompt tuning — branch `prompt/smarter-search-queries` (2026-09-01)
 
 Prompt-only change to `SYSTEM_PROMPT` in `app/api/recommend/route.ts`. The `searchQuery` field becomes the affiliate link (`?k=`/`?q=`/`?text=` on a store *search* page), so its wording decides whether the landing page is full of the right item. Replaced the one-line instruction with a spec:
