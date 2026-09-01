@@ -29,6 +29,7 @@ export interface AssignableGift {
   store?: string;
   searchQuery?: string;
   imageUrl?: string;
+  runId?: string;
 }
 
 interface LovedOne {
@@ -120,6 +121,7 @@ export function AssignGiftDialog({ gift, open, onOpenChange, onAssigned }: Assig
           store: gift.store,
           searchQuery: gift.searchQuery,
           imageUrl: gift.imageUrl,
+          runId: gift.runId,
         }),
       });
       const giftData = await giftRes.json();

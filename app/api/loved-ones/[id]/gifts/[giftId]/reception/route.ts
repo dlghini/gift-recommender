@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
+import { logRunEvent } from "@/lib/run-events";
 
 const RECEPTIONS = ["loved", "liked", "missed"] as const;
 type Reception = (typeof RECEPTIONS)[number];
@@ -40,6 +41,15 @@ export async function PATCH(
       RETURNING *
     `;
     if (!gift) return Response.json({ error: "Not found." }, { status: 404 });
+
+    // Gold-label signal for the run this gift came from (if it came from a run).
+    if (gift.run_id && body.reception) {
+      await logRunEvent(sql, gift.run_id as string, "reception_recorded", {
+        reception: body.reception,
+        giftName: gift.name,
+      });
+    }
+
     return Response.json({ gift });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

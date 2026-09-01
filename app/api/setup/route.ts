@@ -17,6 +17,28 @@ export async function GET() {
       attempt     INTEGER DEFAULT 1
     )
   `;
+  // Wizard-run instrumentation, groundwork for the future recommender model.
+  // candidates = full ranked LLM pool (each item carries shown + position);
+  // question_meta = per-question timing / skipped / changed.
+  await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS run_id UUID`;
+  await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS candidates JSONB`;
+  await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS question_meta JSONB`;
+  await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS is_internal BOOLEAN NOT NULL DEFAULT FALSE`;
+  await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS quality_score REAL`;
+  await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS score_version INTEGER`;
+  await sql`CREATE INDEX IF NOT EXISTS sessions_run_id_idx ON sessions (run_id)`;
+  // Durable per-run event log: the training-data substrate. In Postgres (not
+  // only PostHog) so labelling/analysis is pure SQL.
+  await sql`
+    CREATE TABLE IF NOT EXISTS run_events (
+      id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      run_id     UUID NOT NULL,
+      event      TEXT NOT NULL,
+      meta       JSONB
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS run_events_run_id_idx ON run_events (run_id)`;
   await sql`
     CREATE TABLE IF NOT EXISTS subscribers (
       id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -68,6 +90,9 @@ export async function GET() {
     )
   `;
   await sql`CREATE INDEX IF NOT EXISTS loved_one_gifts_loved_one_id_idx ON loved_one_gifts (loved_one_id)`;
+  // Links a saved gift back to the wizard run that produced it, so #5's
+  // `reception` feedback joins to the exact inputs + candidate pool.
+  await sql`ALTER TABLE loved_one_gifts ADD COLUMN IF NOT EXISTS run_id UUID`;
   // Post-purchase feedback on a "given" gift: how it landed, plus an optional note.
   // Values: 'loved' | 'liked' | 'missed'. Added after the table shipped.
   await sql`ALTER TABLE loved_one_gifts ADD COLUMN IF NOT EXISTS reception TEXT`;

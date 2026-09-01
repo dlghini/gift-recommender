@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePostHog } from "posthog-js/react";
+import { applyInternalParam, getIsInternal, runEvent } from "@/lib/wizard-telemetry";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DoodleIcon, type DoodleName } from "@/components/doodle-icon";
+import { AffiliateDisclosure } from "@/components/affiliate-disclosure";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
 import { pickRelationshipEmoji } from "@/components/relationship-emoji";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
@@ -50,6 +52,7 @@ interface GiftResult {
   store: "amazon" | "etsy" | "viator";
   searchQuery: string;
   imageUrl?: string;
+  runId?: string;
 }
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
@@ -199,6 +202,10 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   );
   // Signed-in users see their saved profiles on step 1 as a shortcut.
   const [savedProfiles, setSavedProfiles] = useState<{ id: string; name: string; relationship: string }[]>([]);
+  // Wizard-run instrumentation: a fresh id per recommendation request, plus a
+  // lightweight per-question trail. See lib/run-events.ts.
+  const runIdRef = useRef<string | null>(null);
+  const questionMetaRef = useRef<{ step: number; tMs: number; prefilled: boolean }[]>([]);
 
   // Prefill from a Loved One profile and skip the steps it already answers.
   const applyLovedOne = (lo: {
@@ -241,6 +248,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   };
 
   useEffect(() => {
+    applyInternalParam();
     const params = new URLSearchParams(window.location.search);
     const r = params.get("r");
     if (r) {
@@ -290,6 +298,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
     await navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     posthog?.capture("results_shared");
+    runEvent(runIdRef.current, "results_shared", {});
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -312,8 +321,15 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
     setAttempt(nextAttempt);
     setApiError(null);
     setStep("loading");
+
+    // A regenerate is a new run against the same inputs.
+    const runId = crypto.randomUUID();
+    runIdRef.current = runId;
+    const isInternal = getIsInternal();
+
     if (isRegenerate) {
       posthog?.capture("regenerate_clicked", { attempt: nextAttempt, ...form });
+      runEvent(runId, "regenerate_clicked", { attempt: nextAttempt });
     } else {
       posthog?.capture("wizard_completed", form);
     }
@@ -321,15 +337,23 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       const res = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, attempt: nextAttempt, exclude }),
+        body: JSON.stringify({
+          ...form,
+          attempt: nextAttempt,
+          exclude,
+          runId,
+          isInternal,
+          questionMeta: questionMetaRef.current,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "API error");
-      const results = (data as Omit<GiftResult, "id">[]).map((g) => ({ ...g, id: crypto.randomUUID() }));
+      const results = (data as Omit<GiftResult, "id">[]).map((g) => ({ ...g, id: crypto.randomUUID(), runId }));
       setSeenGifts((prev) => [...prev, ...results.map((g) => g.name)]);
       setGifts(results);
       setStep("results");
       posthog?.capture("recommendations_shown", { attempt: nextAttempt, gifts: results.map((g) => g.name) });
+      runEvent(runId, "results_shown", { attempt: nextAttempt, count: results.length });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong. Please try again.";
       setApiError(msg);
@@ -343,6 +367,8 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       fetchRecommendations(false);
     } else if (typeof step === "number") {
       posthog?.capture("wizard_step_completed", { step, ...form });
+      const prefilled = (step === 1 && prefilledSteps.s1) || (step === 3 && prefilledSteps.s3);
+      questionMetaRef.current.push({ step, tMs: Date.now(), prefilled });
       let target = step + 1;
       if (target === 3 && prefilledSteps.s3) target = 4;
       setStep(target as Step);
@@ -381,6 +407,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
         : [...prev, gift];
       localStorage.setItem("giftspark_saved", JSON.stringify(next));
       posthog?.capture(isAlreadySaved ? "gift_unsaved" : "gift_saved", { gift: gift.name, store: gift.store });
+      runEvent(gift.runId ?? runIdRef.current, isAlreadySaved ? "gift_unsaved" : "gift_saved", { gift: gift.name });
       return next;
     });
   };
@@ -410,6 +437,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       if (!res.ok) throw new Error(data?.error ?? "Something went wrong. Please try again.");
       setEmailStatus("sent");
       posthog?.capture("results_emailed", { gifts: gifts.map((g) => g.name) });
+      runEvent(runIdRef.current, "results_emailed", {});
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong. Please try again.";
       setEmailError(msg);
@@ -420,6 +448,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
 
   const handleBuyClick = (gift: GiftResult) => {
     posthog?.capture("buy_clicked", { gift: gift.name, store: gift.store, price: gift.price, ...form });
+    runEvent(gift.runId ?? runIdRef.current, "buy_clicked", { gift: gift.name, store: gift.store });
     window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer");
   };
 
@@ -474,7 +503,8 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
             <Sparkles className="w-4 h-4 text-amber-500" />
             <span className="text-amber-600 text-xs font-semibold uppercase tracking-widest">Your picks</span>
           </div>
-          <h1 className="font-heading text-3xl text-stone-900 mb-8">3 gifts they&apos;ll love</h1>
+          <h1 className="font-heading text-3xl text-stone-900 mb-3">3 gifts they&apos;ll love</h1>
+          <AffiliateDisclosure className="mb-8" />
 
           <div className="flex flex-col gap-4">
             {gifts.map((gift, idx) => (
