@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
 import { getResend } from "@/lib/resend";
@@ -11,8 +10,6 @@ import { MAILING_ADDRESS } from "@/lib/site";
 const DIGEST_LEAD_DAYS = 45;
 
 const SITE = "https://www.thegiftwhisperer.gifts";
-
-const client = new Anthropic();
 
 function escapeHtml(text: string): string {
   return text
@@ -29,8 +26,6 @@ function formatOccasionDate(date: Date): string {
 
 interface LovedOneFull extends LovedOneRow {
   clerk_user_id: string;
-  interests: string[] | null;
-  interests_notes: string | null;
 }
 
 interface PersonBlock {
@@ -38,97 +33,10 @@ interface PersonBlock {
   occasions: DueOccasion[];
 }
 
-interface GeneratedIdea {
-  name: string;
-  why: string;
-}
-
-const IDEAS_SCHEMA = {
-  type: "object",
-  properties: {
-    people: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          lovedOneId: { type: "string" },
-          ideas: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                why: { type: "string" },
-              },
-              required: ["name", "why"],
-              additionalProperties: false,
-            },
-          },
-        },
-        required: ["lovedOneId", "ideas"],
-        additionalProperties: false,
-      },
-    },
-  },
-  required: ["people"],
-  additionalProperties: false,
-};
-
-// One Claude call per user: a couple of concrete ideas per person, keyed by id.
-// Returns an empty map on any failure so the email still goes out (occasion list
-// + wizard links), just without inline ideas.
-async function generateIdeas(blocks: PersonBlock[]): Promise<Map<string, GeneratedIdea[]>> {
-  const result = new Map<string, GeneratedIdea[]>();
-  const people = blocks.map(({ lovedOne, occasions }) => {
-    const interests = (lovedOne.interests ?? []).join(", ") || "unknown";
-    const notes = lovedOne.interests_notes ? ` Notes: ${lovedOne.interests_notes}.` : "";
-    const occ = occasions
-      .map((o) => `${o.label} (${formatOccasionDate(o.date)})`)
-      .join("; ");
-    return `- id ${lovedOne.id}: ${lovedOne.name}, ${lovedOne.relationship}. Interests: ${interests}.${notes} Coming up: ${occ}`;
-  });
-
-  try {
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1200,
-      system: [
-        {
-          type: "text",
-          text: [
-            "You suggest gift ideas for a monthly summary email. For each person, give exactly 2 specific, real, widely-available gift ideas suited to their interests and the upcoming occasion.",
-            "Each idea needs: `name` (a concrete product or experience, not a category) and `why` (one warm sentence, plain punctuation, no em dashes).",
-            "Do not repeat an idea across people.",
-          ].join(" "),
-        },
-      ],
-      output_config: { format: { type: "json_schema", schema: IDEAS_SCHEMA } },
-      messages: [
-        {
-          role: "user",
-          content: `People and their upcoming occasions:\n${people.join("\n")}`,
-        },
-      ],
-    });
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") return result;
-    const data = JSON.parse(textBlock.text) as {
-      people: { lovedOneId: string; ideas: GeneratedIdea[] }[];
-    };
-    for (const p of data.people) {
-      result.set(p.lovedOneId, p.ideas.slice(0, 2));
-    }
-  } catch (error) {
-    console.error("[send-digest] idea generation failed", error);
-  }
-  return result;
-}
-
-function renderDigestEmail(
-  blocks: PersonBlock[],
-  ideasByLovedOne: Map<string, GeneratedIdea[]>,
-  unsubUrl: string
-): string {
+// The digest is a nudge, not a recommendation: one card per person with their
+// upcoming dates and a button into the wizard, where the real (tagged) ideas
+// live. No LLM call, no failure mode.
+function renderDigestEmail(blocks: PersonBlock[], unsubUrl: string): string {
   const occasionCount = blocks.reduce((n, b) => n + b.occasions.length, 0);
 
   const personHtml = blocks
@@ -142,41 +50,19 @@ function renderDigestEmail(
         )
         .join("");
 
-      // No store links in email: Amazon Associates (and Rakuten / Viator) all
-      // prohibit affiliate links in email. Ideas are plain text; the only link
-      // per person points back to the site, where the tagged links live.
-      const ideas = ideasByLovedOne.get(lovedOne.id) ?? [];
-      const ideasHtml = ideas.length
-        ? `<ul style="margin:12px 0 0 0;padding-left:18px;">${ideas
-            .map(
-              (idea) =>
-                `<li style="font-size:13px;color:#2f3a33;margin-bottom:8px;"><strong>${escapeHtml(
-                  idea.name
-                )}</strong><br><span style="color:#6c756b;">${escapeHtml(idea.why)}</span></li>`
-            )
-            .join("")}</ul>`
-        : "";
-
       const wizardUrl = `${SITE}/wizard?lovedOneId=${lovedOne.id}`;
 
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:14px;">
-          <tr><td style="padding:24px;">
+          <tr><td style="padding:24px;text-align:center;">
             <p style="margin:0 0 12px 0;font-family:Georgia,serif;font-size:17px;color:#2f3a33;">${escapeHtml(
               lovedOne.name
             )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8f978d;">&middot; ${escapeHtml(
               lovedOne.relationship
             )}</span></p>
             ${occLines}
-            ${
-              ideasHtml
-                ? `<div style="margin-top:14px;padding-top:14px;border-top:1px solid #f0e6da;">${ideasHtml}</div>`
-                : ""
-            }
-            <div style="text-align:center;margin-top:18px;">
-              <a href="${wizardUrl}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:13px;padding:9px 18px;border-radius:6px;text-decoration:none;">More ideas for ${escapeHtml(
-                lovedOne.name
-              )} &rarr;</a>
+            <div style="margin-top:18px;">
+              <a href="${wizardUrl}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">Get gift ideas &rarr;</a>
             </div>
           </td></tr>
         </table>`;
@@ -214,8 +100,7 @@ async function handleDigestRun(request: Request): Promise<Response> {
     const lovedOnes = (await sql`
       SELECT id, clerk_user_id, name, relationship,
         birthday_month, birthday_day, anniversary_month, anniversary_day,
-        birthday_reminder_enabled, anniversary_reminder_enabled,
-        interests, interests_notes
+        birthday_reminder_enabled, anniversary_reminder_enabled
       FROM loved_ones
     `) as LovedOneFull[];
 
@@ -287,14 +172,13 @@ async function handleDigestRun(request: Request): Promise<Response> {
           user.emailAddresses[0]?.emailAddress;
         if (!primaryEmail) continue;
 
-        const ideasByLovedOne = await generateIdeas(blocks);
         const unsubUrl = unsubscribeUrl(await ensureUnsubToken(sql, clerkUserId), "digest");
 
         const { error: sendResultError } = await getResend().emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: "Your gifting month ahead",
-          html: renderDigestEmail(blocks, ideasByLovedOne, unsubUrl),
+          html: renderDigestEmail(blocks, unsubUrl),
           headers: {
             "List-Unsubscribe": `<${unsubUrl}>`,
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
