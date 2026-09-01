@@ -160,18 +160,24 @@ function renderDigestEmail(
       const wizardUrl = `${SITE}/wizard?lovedOneId=${lovedOne.id}`;
 
       return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:12px;">
-          <tr><td style="padding:20px;">
-            <p style="margin:0 0 10px 0;font-family:Georgia,serif;font-size:16px;color:#2f3a33;">${escapeHtml(
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:14px;">
+          <tr><td style="padding:24px;">
+            <p style="margin:0 0 12px 0;font-family:Georgia,serif;font-size:17px;color:#2f3a33;">${escapeHtml(
               lovedOne.name
             )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8f978d;">&middot; ${escapeHtml(
               lovedOne.relationship
             )}</span></p>
             ${occLines}
-            ${ideasHtml}
-            <p style="margin:14px 0 0 0;"><a href="${wizardUrl}" style="font-size:13px;color:#7a3a28;text-decoration:none;font-weight:600;">More ideas for ${escapeHtml(
-              lovedOne.name
-            )} &rarr;</a></p>
+            ${
+              ideasHtml
+                ? `<div style="margin-top:14px;padding-top:14px;border-top:1px solid #f0e6da;">${ideasHtml}</div>`
+                : ""
+            }
+            <div style="text-align:center;margin-top:18px;">
+              <a href="${wizardUrl}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:13px;padding:9px 18px;border-radius:6px;text-decoration:none;">More ideas for ${escapeHtml(
+                lovedOne.name
+              )} &rarr;</a>
+            </div>
           </td></tr>
         </table>`;
     })
