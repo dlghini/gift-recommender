@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { applyInternalParam, getIsInternal, runEvent } from "@/lib/wizard-telemetry";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
+import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DoodleIcon, type DoodleName } from "@/components/doodle-icon";
 import { AffiliateDisclosure } from "@/components/affiliate-disclosure";
@@ -164,6 +165,7 @@ export default function WizardPage() {
 
 function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const posthog = usePostHog();
+  const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [assigningGift, setAssigningGift] = useState<GiftResult | null>(null);
   const [savedGifts, setSavedGifts] = useState<GiftResult[]>(() => {
@@ -193,6 +195,11 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const [emailValue, setEmailValue] = useState("");
   const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [emailError, setEmailError] = useState<string | null>(null);
+  // "Make this a group list" on the results screen (signed-in only — creating a
+  // list needs an account). Seeds a new list with the 3 gifts just shown.
+  const [groupListName, setGroupListName] = useState("");
+  const [groupListStatus, setGroupListStatus] = useState<"idle" | "creating" | "error">("idle");
+  const [groupListError, setGroupListError] = useState<string | null>(null);
   // Set when the wizard is opened from a Loved One profile (?lovedOneId=). We
   // prefill everything the profile already knows and skip those steps.
   const [lovedOne, setLovedOne] = useState<{ name: string } | null>(null);
@@ -423,6 +430,55 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
     });
   };
 
+  // Prefill the group-list recipient with the Loved One's name when the wizard
+  // was opened from a profile; leave it blank otherwise so the placeholder shows.
+  useEffect(() => {
+    if (step === "results" && lovedOne?.name) {
+      setGroupListName((n) => n || lovedOne.name);
+    }
+  }, [step, lovedOne]);
+
+  const handleCreateGroupList = async () => {
+    const recipientName = groupListName.trim();
+    if (!recipientName || groupListStatus === "creating") return;
+    setGroupListStatus("creating");
+    setGroupListError(null);
+    try {
+      const res = await fetch("/api/lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipientName, occasion: form.occasion || null }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.list?.share_id) {
+        throw new Error(data?.error ?? "Couldn't create the list. Please try again.");
+      }
+      const shareId = data.list.share_id as string;
+      // Seed the list with the gifts we just showed. Sequential and best-effort:
+      // the list is already usable even if one insert fails.
+      for (const gift of gifts) {
+        await fetch(`/api/lists/${shareId}/items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: gift.name,
+            price: gift.price,
+            rationale: gift.rationale,
+            url: buildBuyUrl(gift),
+            imageUrl: gift.imageUrl ?? null,
+          }),
+        }).catch(() => {});
+      }
+      posthog?.capture("group_list_created", { from: "wizard_results", items: gifts.length });
+      runEvent(runIdRef.current, "group_list_created", { items: gifts.length });
+      router.push(`/lists/${shareId}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Couldn't create the list. Please try again.";
+      setGroupListError(msg);
+      setGroupListStatus("error");
+    }
+  };
+
   const handleSendEmail = async () => {
     if (!emailValue || emailStatus === "sending") return;
     setEmailStatus("sending");
@@ -601,6 +657,39 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
               )}
             </CardContent>
           </Card>
+
+          {isSignedIn && (
+            <Card className="bg-white border-0 shadow-sm mt-6">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm font-semibold text-stone-700">Sharing the cost with family?</span>
+                </div>
+                <p className="text-stone-500 text-sm leading-relaxed mb-3">
+                  Turn these into a group list. Everyone claims a gift with their name, so
+                  nobody doubles up.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Who's the list for? (e.g. Mom)"
+                    value={groupListName}
+                    onChange={(e) => setGroupListName(e.target.value)}
+                    className="border-stone-200 focus:border-amber-400"
+                  />
+                  <Button
+                    onClick={handleCreateGroupList}
+                    disabled={!groupListName.trim() || groupListStatus === "creating"}
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-semibold shrink-0"
+                  >
+                    {groupListStatus === "creating" ? "Creating…" : "Make a list"}
+                  </Button>
+                </div>
+                {groupListStatus === "error" && (
+                  <p className="text-xs text-red-600 mt-2">{groupListError}</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {!isSignedIn && (
             <Card className="bg-white border-0 shadow-sm mt-6">

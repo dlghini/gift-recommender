@@ -321,6 +321,14 @@ Deferred polish from Phase 26. The quiz is the main Pinterest/IG/Reddit asset, s
 - **`app/gifting-style/page.tsx`** + **`[archetype]/page.tsx`**: pass their new image paths to `routeMeta`. Verified in dev — `og:image` / `twitter:image` on `/gifting-style/last-minute` point at `/gifting-style/last-minute/opengraph-image`, single tag, no generic fallback; the image renders correctly.
 - **`app/home-client.tsx`**: new full-width quiz card between the Loved Ones section and the example gifts — 🎁 + "What's your gifting style?" + one-line blurb + arrow, links to `/gifting-style`, PostHog `cta_clicked` `{ location: "home_gifting_style" }`. (The homepage-card item from Phase 26's deferred list.)
 - Verified: `npm run build` clean (6 archetype + landing + root images prerender); images inspected — sage ground, clay eyebrow, Lora heading, all on-brand; `og:image`/`twitter:image` on `/gifting-style/last-minute` point at the per-archetype route, single tag, no generic fallback; homepage card renders between the Loved Ones section and the example gifts.
+### Phase 31: Wizard results → group list entry point — branch `feature/wizard-group-list-entry` (2026-09-01)
+
+Deferred sub-feature from Phase 25 (group gift lists). Adds a way to turn a set of wizard recommendations straight into a shareable group list, the strongest viral hook the lists feature has.
+- **`app/wizard/wizard-client.tsx`** only. New card on the results screen ("Sharing the cost with family?") with a recipient-name input + "Make a list" button. On submit: `POST /api/lists` (recipientName + `form.occasion`), then `POST /api/lists/[shareId]/items` once per shown gift (name/price/rationale/`buildBuyUrl(gift)`/imageUrl, sequential + best-effort), then `router.push('/lists/[shareId]')`.
+- **Signed-in only** — creating a list needs an account (the API 401s otherwise). The card sits in the same slot as the existing "Set up Loved Ones" card, which already renders for signed-out users, so no empty state. A signed-out entry point (sign-in-then-create) is a deliberate follow-up.
+- Recipient name prefills from the Loved One's name when the wizard was opened via `?lovedOneId=`; blank with a placeholder otherwise.
+- Analytics: PostHog `group_list_created` `{ from: "wizard_results", items }` + a `group_list_created` run_event on `runIdRef`.
+- Verified: `npm run build` clean; homepage/wizard load with no console errors in dev. The card itself renders only for a signed-in user on the results screen, so it was checked by build + code review (mirrors the adjacent email-capture card and the Phase 25 endpoints), not clicked through end to end.
 
 ### Phase 30: Smarter searchQuery prompt tuning — branch `prompt/smarter-search-queries` (2026-09-01)
 
