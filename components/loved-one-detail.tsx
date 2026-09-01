@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 import { AlertCircle, ArrowLeft, Check, Gift as GiftIcon, Heart, Sparkles, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,14 @@ interface LovedOneRow {
   anniversary_reminder_enabled: boolean;
 }
 
+type Reception = "loved" | "liked" | "missed";
+
+const RECEPTION_OPTIONS: { value: Reception; label: string }[] = [
+  { value: "loved", label: "Loved it" },
+  { value: "liked", label: "It was fine" },
+  { value: "missed", label: "Missed the mark" },
+];
+
 interface GiftRow {
   id: string;
   status: "idea" | "given";
@@ -62,6 +71,8 @@ interface GiftRow {
   image_url: string | null;
   search_query: string | null;
   tags: string[] | null;
+  reception: Reception | null;
+  reception_note: string | null;
 }
 
 // Same real-photo-or-fallback pattern as the wizard's GiftThumb, with the same retry-before-giving-up
@@ -132,6 +143,7 @@ function DateFields({
 }
 
 export function LovedOneDetail({ id }: { id: string }) {
+  const posthog = usePostHog();
   const [lovedOne, setLovedOne] = useState<LovedOneRow | null>(null);
   const [holidayPrefs, setHolidayPrefs] = useState<HolidayPref[]>([]);
   const [gifts, setGifts] = useState<GiftRow[]>([]);
@@ -224,6 +236,34 @@ export function LovedOneDetail({ id }: { id: string }) {
 
   const deleteGift = async (giftId: string) => {
     await fetch(`/api/loved-ones/${id}/gifts/${giftId}`, { method: "DELETE" });
+    load();
+  };
+
+  // Post-purchase feedback on a given gift. Clicking the active reception again clears it.
+  const saveReception = async (
+    gift: GiftRow,
+    reception: Reception | null,
+    receptionNote?: string | null
+  ) => {
+    const note = receptionNote ?? gift.reception_note;
+    // Optimistic: update the local row so the buttons respond instantly.
+    setGifts((prev) =>
+      prev.map((g) =>
+        g.id === gift.id ? { ...g, reception, reception_note: note ?? null } : g
+      )
+    );
+    await fetch(`/api/loved-ones/${id}/gifts/${gift.id}/reception`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reception, receptionNote: note ?? null }),
+    });
+    if (reception) {
+      posthog?.capture("gift_reception_recorded", {
+        reception,
+        lovedOneId: id,
+        hasNote: Boolean(note?.trim()),
+      });
+    }
     load();
   };
 
@@ -523,21 +563,59 @@ export function LovedOneDetail({ id }: { id: string }) {
               <div className="flex flex-col gap-3 mt-4">
                 {given.map((gift) => (
                   <Card key={gift.id} className="bg-white border-0 shadow-sm">
-                    <CardContent className="p-4 flex items-center gap-3">
-                      <LovedOneGiftThumb gift={gift} />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
-                        <p className="text-xs text-stone-400">
-                          {[gift.occasion_label, gift.given_at].filter(Boolean).join(" · ")}
-                        </p>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <LovedOneGiftThumb gift={gift} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-heading text-sm text-stone-900 truncate">{gift.name}</p>
+                          <p className="text-xs text-stone-400">
+                            {[gift.occasion_label, gift.given_at].filter(Boolean).join(" · ")}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => deleteGift(gift.id)}
+                          className="text-stone-300 hover:text-stone-500 shrink-0 cursor-pointer"
+                          aria-label="Remove"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => deleteGift(gift.id)}
-                        className="text-stone-300 hover:text-stone-500 shrink-0 cursor-pointer"
-                        aria-label="Remove"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="mt-3 pt-3 border-t border-stone-100">
+                        <p className="text-xs text-stone-400 mb-1.5">How did it land?</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {RECEPTION_OPTIONS.map((opt) => {
+                            const active = gift.reception === opt.value;
+                            return (
+                              <button
+                                key={opt.value}
+                                onClick={() => saveReception(gift, active ? null : opt.value)}
+                                className={cn(
+                                  "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer",
+                                  active
+                                    ? "bg-amber-50 border-amber-500 text-amber-700"
+                                    : "bg-white border-stone-200 text-stone-500 hover:border-amber-200"
+                                )}
+                              >
+                                {opt.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {gift.reception && (
+                          <input
+                            key={`${gift.id}-note`}
+                            defaultValue={gift.reception_note ?? ""}
+                            placeholder="Add a note (optional)"
+                            onBlur={(e) => {
+                              const v = e.target.value.trim();
+                              if (v !== (gift.reception_note ?? "")) {
+                                saveReception(gift, gift.reception, v || null);
+                              }
+                            }}
+                            className="mt-2 w-full bg-transparent border-b border-stone-200 py-1 text-xs outline-none placeholder:text-stone-300 focus:border-amber-400"
+                          />
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

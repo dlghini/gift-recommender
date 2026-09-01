@@ -68,6 +68,10 @@ export async function GET() {
     )
   `;
   await sql`CREATE INDEX IF NOT EXISTS loved_one_gifts_loved_one_id_idx ON loved_one_gifts (loved_one_id)`;
+  // Post-purchase feedback on a "given" gift: how it landed, plus an optional note.
+  // Values: 'loved' | 'liked' | 'missed'. Added after the table shipped.
+  await sql`ALTER TABLE loved_one_gifts ADD COLUMN IF NOT EXISTS reception TEXT`;
+  await sql`ALTER TABLE loved_one_gifts ADD COLUMN IF NOT EXISTS reception_note TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS holiday_reminder_prefs (
       id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
