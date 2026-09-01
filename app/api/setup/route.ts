@@ -103,15 +103,20 @@ export async function GET() {
       UNIQUE (clerk_user_id, year_month)
     )
   `;
-  // Per-user email preferences. Absence of a row = defaults (digest on),
-  // so we only ever write a row when a user changes something.
+  // Per-user email preferences. Absence of a row = defaults (all on), so we
+  // only write a row when a user changes something or an email needs a token.
   await sql`
     CREATE TABLE IF NOT EXISTS user_email_prefs (
-      clerk_user_id  TEXT PRIMARY KEY,
-      digest_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-      updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      clerk_user_id     TEXT PRIMARY KEY,
+      digest_enabled    BOOLEAN NOT NULL DEFAULT TRUE,
+      reminders_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      unsubscribe_token TEXT UNIQUE,
+      updated_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
   `;
+  await sql`ALTER TABLE user_email_prefs ADD COLUMN IF NOT EXISTS reminders_enabled BOOLEAN NOT NULL DEFAULT TRUE`;
+  await sql`ALTER TABLE user_email_prefs ADD COLUMN IF NOT EXISTS unsubscribe_token TEXT`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS user_email_prefs_unsub_token_idx ON user_email_prefs (unsubscribe_token)`;
   // Group gift lists: an owner (signed-in) builds a list for a recipient and
   // shares `share_id`; anyone with the link can claim items with just a name.
   await sql`

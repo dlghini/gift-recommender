@@ -74,6 +74,7 @@ export function LovedOnesList() {
   const [pendingLegacyGifts, setPendingLegacyGifts] = useState<AssignableGift[]>([]);
   const [assigningGift, setAssigningGift] = useState<AssignableGift | null>(null);
   const [digestEnabled, setDigestEnabled] = useState(true);
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
 
   const load = () => {
     setLoading(true);
@@ -83,12 +84,13 @@ export function LovedOnesList() {
       .finally(() => setLoading(false));
   };
 
-  const toggleDigest = (next: boolean) => {
-    setDigestEnabled(next);
+  const savePref = (patch: { digestEnabled?: boolean; remindersEnabled?: boolean }) => {
+    if (typeof patch.digestEnabled === "boolean") setDigestEnabled(patch.digestEnabled);
+    if (typeof patch.remindersEnabled === "boolean") setRemindersEnabled(patch.remindersEnabled);
     fetch("/api/email-prefs", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digestEnabled: next }),
+      body: JSON.stringify(patch),
     }).catch(() => {});
   };
 
@@ -96,7 +98,10 @@ export function LovedOnesList() {
     load();
     fetch("/api/email-prefs")
       .then((res) => res.json())
-      .then((data) => setDigestEnabled(data.digestEnabled ?? true))
+      .then((data) => {
+        setDigestEnabled(data.digestEnabled ?? true);
+        setRemindersEnabled(data.remindersEnabled ?? true);
+      })
       .catch(() => {});
     try {
       const stored = localStorage.getItem(LEGACY_SAVED_KEY);
@@ -142,15 +147,26 @@ export function LovedOnesList() {
       </Link>
 
       {!loading && lovedOnes.length > 0 && (
-        <label className="mb-6 flex cursor-pointer select-none items-center gap-2 text-sm text-stone-500">
-          <input
-            type="checkbox"
-            checked={digestEnabled}
-            onChange={(e) => toggleDigest(e.target.checked)}
-            className="h-4 w-4 rounded border-stone-300 text-amber-500 focus:ring-amber-400"
-          />
-          Email me a monthly summary of upcoming occasions
-        </label>
+        <div className="mb-6 flex flex-col gap-2">
+          <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-stone-500">
+            <input
+              type="checkbox"
+              checked={remindersEnabled}
+              onChange={(e) => savePref({ remindersEnabled: e.target.checked })}
+              className="h-4 w-4 rounded border-stone-300 text-amber-500 focus:ring-amber-400"
+            />
+            Email me a reminder before each occasion
+          </label>
+          <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-stone-500">
+            <input
+              type="checkbox"
+              checked={digestEnabled}
+              onChange={(e) => savePref({ digestEnabled: e.target.checked })}
+              className="h-4 w-4 rounded border-stone-300 text-amber-500 focus:ring-amber-400"
+            />
+            Email me a monthly summary of upcoming occasions
+          </label>
+        </div>
       )}
 
       {pendingLegacyGifts.length > 0 && (

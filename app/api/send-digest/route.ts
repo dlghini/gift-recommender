@@ -4,6 +4,8 @@ import { getDb } from "@/lib/db";
 import { getResend } from "@/lib/resend";
 import { findDueOccasions, type DueOccasion, type LovedOneRow } from "@/lib/reminders";
 import { buildAffiliateUrl, type Store } from "@/lib/affiliate";
+import { ensureUnsubToken, unsubscribeUrl } from "@/lib/email-prefs";
+import { MAILING_ADDRESS } from "@/lib/site";
 
 // How far ahead the monthly digest looks. Wider than the 14-day single-event
 // reminder window so one email covers "the month ahead" plus a little slack.
@@ -130,7 +132,8 @@ async function generateIdeas(blocks: PersonBlock[]): Promise<Map<string, Generat
 
 function renderDigestEmail(
   blocks: PersonBlock[],
-  ideasByLovedOne: Map<string, GeneratedIdea[]>
+  ideasByLovedOne: Map<string, GeneratedIdea[]>,
+  unsubUrl: string
 ): string {
   const occasionCount = blocks.reduce((n, b) => n + b.occasions.length, 0);
 
@@ -188,7 +191,12 @@ function renderDigestEmail(
     occasionCount === 1 ? "" : "s"
   } coming up in the next few weeks.</p>
       ${personHtml}
-      <p style="font-size:12px;color:#8f978d;text-align:center;margin:24px 0 0 0;">You get this once a month because upcoming-occasion summaries are on for your account. Turn them off on your <a href="${SITE}/loved-ones" style="color:#8f978d;">Loved ones</a> page.</p>
+      <p style="font-size:12px;color:#8f978d;text-align:center;margin:24px 0 0 0;line-height:1.6;">
+        You get this monthly summary because you have a Gift Whisperer account.
+        <a href="${unsubUrl}" style="color:#8f978d;">Unsubscribe</a> &middot;
+        <a href="${SITE}/loved-ones" style="color:#8f978d;">manage email</a><br>
+        ${MAILING_ADDRESS}
+      </p>
     </div>`;
 }
 
@@ -280,12 +288,17 @@ async function handleDigestRun(request: Request): Promise<Response> {
         if (!primaryEmail) continue;
 
         const ideasByLovedOne = await generateIdeas(blocks);
+        const unsubUrl = unsubscribeUrl(await ensureUnsubToken(sql, clerkUserId), "digest");
 
         const { error: sendResultError } = await getResend().emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: "Your gifting month ahead",
-          html: renderDigestEmail(blocks, ideasByLovedOne),
+          html: renderDigestEmail(blocks, ideasByLovedOne, unsubUrl),
+          headers: {
+            "List-Unsubscribe": `<${unsubUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
         if (sendResultError) {
           console.error("[send-digest] Resend error", clerkUserId, sendResultError);

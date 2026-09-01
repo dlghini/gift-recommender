@@ -310,6 +310,17 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 27: Email unsubscribe + CAN-SPAM footers — branch `fix/email-unsubscribe` (2026-09-01)
+
+The reminder + digest emails had no in-email unsubscribe or postal address. Fixed both.
+- **Schema** (`user_email_prefs`, **needs `/api/setup` re-run**): `+ reminders_enabled BOOLEAN DEFAULT TRUE`, `+ unsubscribe_token TEXT UNIQUE`.
+- **`lib/email-prefs.ts`** (new): `ensureUnsubToken(sql, clerkUserId)` upserts the prefs row and returns a stable random token (`crypto.randomUUID` no dashes); `unsubscribeUrl(token, type)`.
+- **`app/api/email-unsubscribe/route.ts`** (new): GET `?token&type=digest|reminders` — flips the flag immediately, returns a small self-contained HTML page with a "turn it back on" link (`&resubscribe=1`). Bad/missing token → friendly "expired" page. No auth.
+- **`send-digest` + `send-reminders`**: each send now builds an unsub URL via `ensureUnsubToken`, puts an Unsubscribe link + `${MAILING_ADDRESS}` in the footer, and sets `List-Unsubscribe` / `List-Unsubscribe-Post: List-Unsubscribe=One-Click` headers. `send-reminders` also gained a user-level opt-out: it now skips users in `user_email_prefs WHERE reminders_enabled = false`, **before** the `reminder_log` insert so an opted-out user isn't silently marked "sent" for the year.
+- **`lib/site.ts`**: `MAILING_ADDRESS = "[YOUR MAILING ADDRESS]"` placeholder — **Daniel must set a real physical address (PO box / registered-agent OK) before these emails are truly CAN-SPAM compliant.**
+- **`/api/email-prefs`**: GET/PATCH now also handle `remindersEnabled`. **`components/loved-ones-list.tsx`** shows two checkboxes (reminder + monthly summary).
+- Verified: build clean; unsub endpoint smoke-tested against the DB — `?type=digest` flips only `digest_enabled`, `resubscribe=1` reverts, bad token → expired page. Test row cleaned up.
+
 ### Phase 26: "What's your gifting style?" quiz — branch `feature/gifting-style-quiz` (2026-09-01)
 
 Feature-backlog #2. A standalone acquisition asset, **deliberately walled off from the recommendation engine** — an archetype result only changes which CTA the result page shows; it never feeds the wizard or `/api/recommend`. Not a wizard step, not in the main nav (footer link + sitemap only).
