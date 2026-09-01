@@ -27,12 +27,27 @@ const OG_BASE = {
 
 // Per-route metadata: a self-referencing canonical plus an og:url that matches
 // it. `path` is root-relative ("/about") and resolves against `metadataBase`.
-export function routeMeta(path: string, title: string, description: string): Metadata {
+// Pass `ogImage` (a root-relative route, e.g. a colocated opengraph-image) to
+// override the site-wide social image for this route; omit it to keep the default.
+export function routeMeta(
+  path: string,
+  title: string,
+  description: string,
+  ogImage?: string
+): Metadata {
+  const images = ogImage
+    ? [{ url: ogImage, width: 1200, height: 630, alt: title }]
+    : OG_BASE.images;
   return {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { ...OG_BASE, title, description, url: path },
-    twitter: { card: "summary_large_image", title, description, images: ["/opengraph-image"] },
+    openGraph: { ...OG_BASE, title, description, url: path, images },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage ?? "/opengraph-image"],
+    },
   };
 }

@@ -25,7 +25,8 @@ export async function generateMetadata({
   return routeMeta(
     `/gifting-style/${id}`,
     `You're ${a.name}`,
-    `${a.tagline} Take the gifting style quiz and find your own.`
+    `${a.tagline} Take the gifting style quiz and find your own.`,
+    `/gifting-style/${id}/opengraph-image`
   );
 }
 

@@ -3,15 +3,14 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { SITE_NAME } from "@/lib/site";
 
-// Site-wide social share image. The file convention applies this to every route
-// (and nested segments) automatically, so it fixes the missing og:image
-// everywhere at once. Palette + type mirror the live site: sage ground,
-// warm-clay eyebrow, Lora (the site's heading face) for the headline.
-export const alt = `${SITE_NAME}: thoughtful gift ideas for any person and any occasion`;
+// Social image for the quiz landing page. Separate from the per-archetype
+// result images so a link to the quiz itself has its own shareable card.
+// Palette + type mirror the live site (sage ground, warm-clay eyebrow, Lora).
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const alt = "What's your gifting style?";
 
-export default async function OpengraphImage() {
+export default async function Image() {
   const lora = await readFile(join(process.cwd(), "assets/Lora.ttf"));
 
   return new ImageResponse(
@@ -30,8 +29,8 @@ export default async function OpengraphImage() {
       >
         <div
           style={{
-            fontSize: 26,
-            letterSpacing: 8,
+            fontSize: 25,
+            letterSpacing: 7,
             textTransform: "uppercase",
             color: "#91462f",
             fontWeight: 600,
@@ -42,26 +41,26 @@ export default async function OpengraphImage() {
         <div
           style={{
             fontFamily: "Lora",
-            fontSize: 84,
+            fontSize: 86,
             fontWeight: 600,
             color: "#2b332d",
             textAlign: "center",
             lineHeight: 1.1,
-            marginTop: 32,
+            marginTop: 30,
           }}
         >
-          Never give a bad gift again
+          What&apos;s your gifting style?
         </div>
         <div
           style={{
             fontSize: 30,
             color: "#6c756b",
             textAlign: "center",
-            marginTop: 28,
-            maxWidth: 760,
+            marginTop: 26,
+            maxWidth: 820,
           }}
         >
-          Tell us who you&apos;re shopping for. We&apos;ll do the thinking.
+          A quick six-question quiz. Find out, and see what to do about it.
         </div>
       </div>
     ),
