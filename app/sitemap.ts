@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { allGuideSlugs } from "@/lib/gift-guides";
+import { ARCHETYPE_ORDER } from "@/lib/gifting-style";
 
 // Hand-maintained for the core pages; the gift-guide entries are generated from
 // the guide data so a new guide shows up here automatically.
@@ -21,6 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
     { path: "/loved-ones", changeFrequency: "monthly", priority: 0.5 },
+    { path: "/gifting-style", changeFrequency: "monthly", priority: 0.5 },
+    ...ARCHETYPE_ORDER.map((a) => ({
+      path: `/gifting-style/${a}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    })),
     { path: "/about", changeFrequency: "monthly", priority: 0.5 },
     { path: "/how-we-choose", changeFrequency: "monthly", priority: 0.4 },
     { path: "/disclosure", changeFrequency: "yearly", priority: 0.3 },

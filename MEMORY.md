@@ -310,6 +310,16 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 26: "What's your gifting style?" quiz — branch `feature/gifting-style-quiz` (2026-09-01)
+
+Feature-backlog #2. A standalone acquisition asset, **deliberately walled off from the recommendation engine** — an archetype result only changes which CTA the result page shows; it never feeds the wizard or `/api/recommend`. Not a wizard step, not in the main nav (footer link + sitemap only).
+- **`lib/gifting-style.ts`**: 6 weighted questions (`QUIZ`), 6 archetypes (`ARCHETYPES`: Overthinker, Last-Minute Legend, Experience Giver, Practical Provider, Sentimental Curator, Portfolio Manager — each with tagline / blurb / kryptonite / CTA target+copy), `scoreQuiz(answers)` = sum weights, argmax over `ARCHETYPE_ORDER` (stable tiebreak). CTAs route to `/wizard` or `/loved-ones` as plain links, no archetype param passed through.
+- **`/gifting-style`** (`components/gifting-style-quiz.tsx`, client): one question at a time, progress bar, Back; on the last answer computes the archetype and `router.push`es `/gifting-style/[archetype]`. PostHog `quiz_started` / `quiz_completed {archetype}`.
+- **`/gifting-style/[archetype]`**: `generateStaticParams` + per-archetype `generateMetadata` (title "You're The Overthinker" etc. for share previews). Renders blurb + kryptonite + CTA with handoff copy that names the you→them switch. `components/gifting-style-result-actions.tsx` (client) = CTA link (`quiz_cta_clicked`), Web Share / copy-link, "Retake".
+- Footer gets a "Gifting style quiz" link; `app/sitemap.ts` lists `/gifting-style` + the 6 archetype URLs (indexable — it's marketing content).
+- **Deferred**: per-archetype OG images (currently the routeMeta default site OG image is used — `routeMeta` forces `openGraph.images` to `/opengraph-image`, so a segment `opengraph-image.tsx` alone won't take; needs a custom metadata object or a routeMeta tweak). Also possible: a homepage card entry point.
+- Verified: build clean; walked all 6 questions in the browser, scored to "The Overthinker" correctly, landed on `/gifting-style/overthinker` with the right per-archetype `<title>`. No app console errors.
+
 ### Phase 25: Group gift lists (claim-a-gift) — branch `feature/group-gift-lists` (2026-09-01)
 
 Feature-backlog #3. A signed-in owner builds a shared list for a recipient; anyone with the link can claim items with just a name so a family doesn't double up.
