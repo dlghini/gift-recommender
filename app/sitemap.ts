@@ -32,6 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/how-we-choose", changeFrequency: "monthly", priority: 0.4 },
     { path: "/disclosure", changeFrequency: "yearly", priority: 0.3 },
     { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
     { path: "/contact", changeFrequency: "yearly", priority: 0.3 },
   ];
 
