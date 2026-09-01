@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, ExternalLink, ArrowLeft, Sparkles, Gift, AlertCircle, RefreshCw, Share2, Check, Ticket, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DoodleIcon, type DoodleName } from "@/components/doodle-icon";
 import { AssignGiftDialog } from "@/components/assign-gift-dialog";
 import { pickRelationshipEmoji } from "@/components/relationship-emoji";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
@@ -70,13 +71,13 @@ function buildBuyUrl(gift: GiftResult): string {
 
 const RELATIONSHIPS = ["Partner", "Friend", "Parent", "Sibling", "Child", "Colleague"];
 const AGE_RANGES = ["Under 10", "10–17", "18–30", "31–60", "60+"];
-const OCCASIONS = [
-  { label: "Birthday", emoji: "🎂" },
-  { label: "Holiday", emoji: "🎁" },
-  { label: "Anniversary", emoji: "💍" },
-  { label: "Graduation", emoji: "🎓" },
-  { label: "Baby Shower", emoji: "👶" },
-  { label: "Just Because", emoji: "💝" },
+const OCCASIONS: { label: string; icon: DoodleName }[] = [
+  { label: "Birthday", icon: "cake" },
+  { label: "Holiday", icon: "gift" },
+  { label: "Anniversary", icon: "ring" },
+  { label: "Graduation", icon: "gradcap" },
+  { label: "Baby Shower", icon: "pram" },
+  { label: "Just Because", icon: "heart" },
 ];
 const GIFT_PREFERENCES: { label: string; value: FormState["giftPreference"] }[] = [
   { label: "Physical gifts", value: "gifts" },
@@ -425,7 +426,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   if (loadingLovedOne) {
     return (
       <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center gap-4">
-        <div className="text-5xl animate-bounce">🎁</div>
+        <DoodleIcon name="gift" className="w-12 h-12 text-amber-600 animate-bounce" />
         <p className="font-heading text-2xl text-stone-800">Pulling up their profile…</p>
       </div>
     );
@@ -434,7 +435,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   if (step === "loading") {
     return (
       <div className="min-h-screen bg-amber-50 flex flex-col items-center justify-center gap-4">
-        <div className="text-5xl animate-bounce">🎁</div>
+        <DoodleIcon name="gift" className="w-12 h-12 text-amber-600 animate-bounce" />
         <p className="font-heading text-2xl text-stone-800">Finding your perfect gifts…</p>
         <p className="text-stone-400 text-sm">Thinking through thousands of ideas for you…</p>
       </div>
@@ -736,7 +737,10 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
                           : "bg-white border-stone-200 text-stone-700 hover:border-amber-200 hover:bg-amber-50/50"
                       )}
                     >
-                      <span className="text-2xl">{o.emoji}</span>
+                      <DoodleIcon
+                        name={o.icon}
+                        className={cn("w-7 h-7", form.occasion === o.label ? "text-amber-700" : "text-amber-600")}
+                      />
                       {o.label}
                     </button>
                   ))}
@@ -800,7 +804,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
                 <div />
               )}
               <Button onClick={next} disabled={!canProceed} className="bg-amber-500 hover:bg-amber-600 text-white font-semibold h-9 px-5">
-                {step === 4 ? "Find my perfect gifts ✨" : "Next →"}
+                {step === 4 ? "Find my perfect gifts" : "Next →"}
               </Button>
             </div>
           </CardContent>
