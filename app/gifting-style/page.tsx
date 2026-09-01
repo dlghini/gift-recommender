@@ -4,7 +4,8 @@ import { routeMeta } from "@/lib/site";
 export const metadata = routeMeta(
   "/gifting-style",
   "What's your gifting style?",
-  "A quick six-question quiz. Are you the Overthinker, the Last-Minute Legend, the Experience Giver, or something else? Find out and see what to do about it."
+  "A quick six-question quiz. Are you the Overthinker, the Last-Minute Legend, the Experience Giver, or something else? Find out and see what to do about it.",
+  "/gifting-style/opengraph-image"
 );
 
 export default function GiftingStylePage() {

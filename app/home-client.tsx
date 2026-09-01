@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, ChevronDown } from "lucide-react";
+import { ExternalLink, ChevronDown, ArrowRight } from "lucide-react";
 import { DoodleIcon } from "@/components/doodle-icon";
 import { AffiliateDisclosure } from "@/components/affiliate-disclosure";
 import { cn } from "@/lib/utils";
@@ -190,6 +190,24 @@ export default function Home() {
           className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
         >
           Set up Loved Ones →
+        </a>
+      </div>
+
+      {/* Gifting style quiz */}
+      <div className="max-w-2xl mx-auto px-4 pb-12">
+        <a
+          href="/gifting-style"
+          onClick={() => posthog?.capture("cta_clicked", { location: "home_gifting_style" })}
+          className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white px-6 py-5 shadow-sm transition-colors hover:border-amber-300"
+        >
+          <span className="text-3xl shrink-0" aria-hidden>🎁</span>
+          <span className="flex-1 min-w-0">
+            <span className="block font-heading text-lg text-stone-900">What&apos;s your gifting style?</span>
+            <span className="block text-stone-500 text-sm mt-0.5">
+              A quick six-question quiz. Are you the Overthinker, the Last-Minute Legend, or something else?
+            </span>
+          </span>
+          <ArrowRight className="w-5 h-5 text-amber-500 shrink-0" />
         </a>
       </div>
 
