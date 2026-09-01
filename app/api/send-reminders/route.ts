@@ -15,13 +15,13 @@ function escapeHtml(text: string): string {
 function renderReminderEmail(label: string, lovedOneId: string): string {
   const url = `https://www.thegiftwhisperer.gifts/wizard?lovedOneId=${lovedOneId}`;
   return `
-    <div style="font-family:Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#fffbeb;">
-      <h1 style="font-family:Georgia,serif;font-size:22px;color:#1c1917;text-align:center;margin-bottom:4px;">🎁 The Gift Whisperer</h1>
-      <p style="text-align:center;color:#78716c;font-size:14px;margin-bottom:24px;">A heads up on an upcoming occasion</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #f0e6d2;">
+    <div style="font-family:Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#e9eee6;">
+      <h1 style="font-family:Georgia,serif;font-size:22px;color:#2f3a33;text-align:center;margin-bottom:4px;">The Gift Whisperer</h1>
+      <p style="text-align:center;color:#6c756b;font-size:14px;margin-bottom:24px;">A heads up on an upcoming occasion</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;">
         <tr><td style="padding:24px;text-align:center;">
-          <p style="font-size:16px;color:#1c1917;margin:0 0 16px 0;">${escapeHtml(label)} is coming up.</p>
-          <a href="${url}" style="display:inline-block;background:#f59e0b;color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">Get gift ideas →</a>
+          <p style="font-size:16px;color:#2f3a33;margin:0 0 16px 0;">${escapeHtml(label)} is coming up.</p>
+          <a href="${url}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">Get gift ideas &rarr;</a>
         </td></tr>
       </table>
     </div>`;
@@ -84,7 +84,7 @@ async function handleReminderRun(request: Request): Promise<Response> {
         const { error: sendResultError } = await getResend().emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
-          subject: `${occasion.label} is coming up 🎁`,
+          subject: `${occasion.label} is coming up`,
           html: renderReminderEmail(occasion.label, occasion.lovedOneId),
         });
         if (sendResultError) {

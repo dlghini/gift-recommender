@@ -3,12 +3,12 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
 import { getResend } from "@/lib/resend";
 import { findDueOccasions, type DueOccasion, type LovedOneRow } from "@/lib/reminders";
+import { buildAffiliateUrl, type Store } from "@/lib/affiliate";
 
 // How far ahead the monthly digest looks. Wider than the 14-day single-event
 // reminder window so one email covers "the month ahead" plus a little slack.
 const DIGEST_LEAD_DAYS = 45;
 
-const AMAZON_TAG = "giftwhisper0e-20";
 const SITE = "https://www.thegiftwhisperer.gifts";
 
 const client = new Anthropic();
@@ -20,10 +20,6 @@ function escapeHtml(text: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function amazonSearchUrl(query: string): string {
-  return `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=${AMAZON_TAG}`;
 }
 
 function formatOccasionDate(date: Date): string {
@@ -44,6 +40,8 @@ interface PersonBlock {
 interface GeneratedIdea {
   name: string;
   why: string;
+  store: Store;
+  searchQuery: string;
 }
 
 const IDEAS_SCHEMA = {
@@ -62,8 +60,10 @@ const IDEAS_SCHEMA = {
               properties: {
                 name: { type: "string" },
                 why: { type: "string" },
+                store: { type: "string", enum: ["amazon", "etsy", "viator"] },
+                searchQuery: { type: "string" },
               },
-              required: ["name", "why"],
+              required: ["name", "why", "store", "searchQuery"],
               additionalProperties: false,
             },
           },
@@ -98,7 +98,12 @@ async function generateIdeas(blocks: PersonBlock[]): Promise<Map<string, Generat
       system: [
         {
           type: "text",
-          text: "You suggest gift ideas for a monthly summary email. For each person, give exactly 2 specific, real, widely-available gift ideas suited to their interests and the upcoming occasion. Each idea: a concrete product or experience name (not a category) and a short reason (one sentence, warm, plain punctuation, no em dashes). Do not repeat an idea across people.",
+          text: [
+            "You suggest gift ideas for a monthly summary email. For each person, give exactly 2 specific, real, widely-available gift ideas suited to their interests and the upcoming occasion.",
+            "Each idea needs: `name` (a concrete product or experience, not a category), `why` (one warm sentence, plain punctuation, no em dashes), `store`, and `searchQuery` (2 to 5 words that reliably surface it).",
+            "`store` is one of: \"etsy\" for handmade, personalized, custom, artisan, or vintage physical items; \"viator\" for real in-person bookable experiences (tours, classes, tastings) - never virtual/online-only ones; \"amazon\" for mainstream branded products, books, electronics, and anything mass-produced.",
+            "Optimize `searchQuery` for the chosen store's search. Do not repeat an idea across people.",
+          ].join(" "),
         },
       ],
       output_config: { format: { type: "json_schema", schema: IDEAS_SCHEMA } },
@@ -134,9 +139,9 @@ function renderDigestEmail(
       const occLines = occasions
         .map(
           (o) =>
-            `<p style="margin:0 0 4px 0;font-size:14px;color:#1c1917;">${escapeHtml(
+            `<p style="margin:0 0 4px 0;font-size:14px;color:#2f3a33;">${escapeHtml(
               o.label
-            )} &middot; <span style="color:#78716c;">${formatOccasionDate(o.date)}</span></p>`
+            )} &middot; <span style="color:#6c756b;">${formatOccasionDate(o.date)}</span></p>`
         )
         .join("");
 
@@ -145,11 +150,12 @@ function renderDigestEmail(
         ? `<ul style="margin:12px 0 0 0;padding-left:18px;">${ideas
             .map(
               (idea) =>
-                `<li style="font-size:13px;color:#1c1917;margin-bottom:8px;"><a href="${amazonSearchUrl(
+                `<li style="font-size:13px;color:#2f3a33;margin-bottom:8px;"><a href="${buildAffiliateUrl(
+                  idea.store,
+                  idea.searchQuery || idea.name
+                )}" style="color:#7a3a28;text-decoration:none;font-weight:600;">${escapeHtml(
                   idea.name
-                )}" style="color:#b45309;text-decoration:none;font-weight:600;">${escapeHtml(
-                  idea.name
-                )}</a><br><span style="color:#78716c;">${escapeHtml(idea.why)}</span></li>`
+                )}</a><br><span style="color:#6c756b;">${escapeHtml(idea.why)}</span></li>`
             )
             .join("")}</ul>`
         : "";
@@ -157,16 +163,16 @@ function renderDigestEmail(
       const wizardUrl = `${SITE}/wizard?lovedOneId=${lovedOne.id}`;
 
       return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #f0e6d2;margin-bottom:12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:12px;">
           <tr><td style="padding:20px;">
-            <p style="margin:0 0 10px 0;font-family:Georgia,serif;font-size:16px;color:#1c1917;">${escapeHtml(
+            <p style="margin:0 0 10px 0;font-family:Georgia,serif;font-size:16px;color:#2f3a33;">${escapeHtml(
               lovedOne.name
-            )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#a8a29e;">&middot; ${escapeHtml(
+            )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8f978d;">&middot; ${escapeHtml(
               lovedOne.relationship
             )}</span></p>
             ${occLines}
             ${ideasHtml}
-            <p style="margin:14px 0 0 0;"><a href="${wizardUrl}" style="font-size:13px;color:#b45309;text-decoration:none;font-weight:600;">More ideas for ${escapeHtml(
+            <p style="margin:14px 0 0 0;"><a href="${wizardUrl}" style="font-size:13px;color:#7a3a28;text-decoration:none;font-weight:600;">More ideas for ${escapeHtml(
               lovedOne.name
             )} &rarr;</a></p>
           </td></tr>
@@ -175,14 +181,14 @@ function renderDigestEmail(
     .join("");
 
   return `
-    <div style="font-family:Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fffbeb;">
-      <h1 style="font-family:Georgia,serif;font-size:22px;color:#1c1917;text-align:center;margin:0 0 4px 0;">The Gift Whisperer</h1>
-      <p style="text-align:center;color:#78716c;font-size:14px;margin:0 0 20px 0;">Your gifting month ahead</p>
-      <p style="font-size:14px;color:#1c1917;margin:0 0 16px 0;">${occasionCount} occasion${
+    <div style="font-family:Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#e9eee6;">
+      <h1 style="font-family:Georgia,serif;font-size:22px;color:#2f3a33;text-align:center;margin:0 0 4px 0;">The Gift Whisperer</h1>
+      <p style="text-align:center;color:#6c756b;font-size:14px;margin:0 0 20px 0;">Your gifting month ahead</p>
+      <p style="font-size:14px;color:#2f3a33;margin:0 0 16px 0;">${occasionCount} occasion${
     occasionCount === 1 ? "" : "s"
   } coming up in the next few weeks.</p>
       ${personHtml}
-      <p style="font-size:12px;color:#a8a29e;text-align:center;margin:24px 0 0 0;">You get this once a month because upcoming-occasion summaries are on for your account. Turn them off on your <a href="${SITE}/loved-ones" style="color:#a8a29e;">Loved ones</a> page.</p>
+      <p style="font-size:12px;color:#8f978d;text-align:center;margin:24px 0 0 0;">You get this once a month because upcoming-occasion summaries are on for your account. Turn them off on your <a href="${SITE}/loved-ones" style="color:#8f978d;">Loved ones</a> page.</p>
     </div>`;
 }
 
