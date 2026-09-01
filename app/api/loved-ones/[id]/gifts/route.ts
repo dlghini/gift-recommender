@@ -51,22 +51,25 @@ export async function POST(
       imageUrl?: string;
       occasionLabel?: string;
       givenAt?: string; // ISO date, only meaningful when status is "given"
+      runId?: string; // wizard run this idea came from, for outcome-feedback joins
     };
 
     if (!body.name?.trim()) {
       return Response.json({ error: "Gift name is required." }, { status: 400 });
     }
 
+    const runId = /^[0-9a-f-]{36}$/i.test(body.runId ?? "") ? body.runId : null;
+
     const [gift] = await sql`
       INSERT INTO loved_one_gifts (
         loved_one_id, clerk_user_id, status, name, price, rationale, tags,
-        affiliate_url, type, store, search_query, image_url, occasion_label, given_at
+        affiliate_url, type, store, search_query, image_url, occasion_label, given_at, run_id
       ) VALUES (
         ${id}, ${userId}, ${body.status ?? "idea"}, ${body.name.trim()}, ${body.price ?? null},
         ${body.rationale ?? null}, ${JSON.stringify(body.tags ?? [])},
         ${body.affiliateUrl ?? null}, ${body.type ?? null}, ${body.store ?? null},
         ${body.searchQuery ?? null}, ${body.imageUrl ?? null}, ${body.occasionLabel ?? null},
-        ${body.givenAt ?? null}
+        ${body.givenAt ?? null}, ${runId}
       )
       RETURNING *
     `;

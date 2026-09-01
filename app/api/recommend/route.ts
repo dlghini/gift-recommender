@@ -3,6 +3,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
 import { fetchPixabayImage } from "@/lib/pixabay";
+import { logRunEvent, isValidRunId } from "@/lib/run-events";
 
 const redis =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN ? Redis.fromEnv() : null;
@@ -17,11 +18,17 @@ const ratelimit = redis
 
 const client = new Anthropic();
 
+// The LLM produces a ranked candidate pool; we show the top SHOWN_COUNT and keep
+// the rest (unenriched) so a future re-ranker has something to re-rank. Logging
+// the full pool now is the one thing we can't backfill later.
+const CANDIDATE_POOL_SIZE = 12;
+const SHOWN_COUNT = 3;
+
 // Sandbox and production keys only authenticate against their matching host.
 const VIATOR_API_BASE =
   process.env.NODE_ENV === "production" ? "https://api.viator.com/partner" : "https://api.sandbox.viator.com/partner";
 
-const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend exactly 3 gifts that are genuinely well-suited to them.
+const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend a ranked list of exactly ${CANDIDATE_POOL_SIZE} gifts (best fit first) that are genuinely well-suited to them. Return all ${CANDIDATE_POOL_SIZE}. Vary the list across price points, categories, and a mix of safe and slightly unexpected picks.
 
 Only suggest real products or experiences that actually exist and are widely available for purchase/booking. Stick to well-known brands and real, bookable experience types — do not invent product names or combine brand names with model numbers you are not sure about.
 
@@ -64,9 +71,9 @@ const GIFT_SCHEMA = {
 };
 
 const GIFT_PREFERENCE_INSTRUCTIONS: Record<string, string> = {
-  experiences: "The user said they're shopping for someone who prefers experiences over physical gifts. All 3 recommendations must be type \"experience\".",
-  gifts: "The user said they're shopping for someone who prefers physical gifts over experiences. All 3 recommendations must be type \"product\".",
-  both: "The user said this person likes both experiences and physical gifts. At most 1 of the 3 recommendations should be type \"experience\" — the rest should be type \"product\".",
+  experiences: "The user said they're shopping for someone who prefers experiences over physical gifts. Every recommendation must be type \"experience\".",
+  gifts: "The user said they're shopping for someone who prefers physical gifts over experiences. Every recommendation must be type \"product\".",
+  both: "The user said this person likes both experiences and physical gifts. Roughly a quarter of the recommendations should be type \"experience\", the rest type \"product\".",
 };
 
 interface ViatorProductResult {
@@ -154,25 +161,30 @@ export async function POST(request: Request) {
       }
     }
 
-    const { relationship, ageRange, occasion, interests, freetext, budget, giftPreference, attempt, exclude } =
-      (await request.json()) as {
-        relationship: string;
-        ageRange: string;
-        occasion: string;
-        interests: string[];
-        freetext: string;
-        budget: string;
-        giftPreference: "experiences" | "gifts" | "both";
-        attempt: number;
-        exclude: string[];
-      };
+    const body = (await request.json()) as {
+      relationship: string;
+      ageRange: string;
+      occasion: string;
+      interests: string[];
+      freetext: string;
+      budget: string;
+      giftPreference: "experiences" | "gifts" | "both";
+      attempt: number;
+      exclude: string[];
+      runId?: string;
+      isInternal?: boolean;
+      questionMeta?: unknown;
+    };
+    const { relationship, ageRange, occasion, interests, freetext, budget, giftPreference, attempt, exclude } = body;
+    const runId = isValidRunId(body.runId) ? body.runId : null;
+    const isInternal = body.isInternal === true;
 
     const budgetLabel = BUDGET_LABELS[budget] ?? budget;
     const interestList = interests.join(", ");
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 1024,
+      max_tokens: 3500,
       system: [
         {
           type: "text",
@@ -190,7 +202,7 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "user",
-          content: `Recommend 3 gifts for:
+          content: `Recommend ${CANDIDATE_POOL_SIZE} gift ideas, ranked best fit first, for:
 - Recipient: ${relationship}, age range ${ageRange}
 - Occasion: ${occasion}
 - Interests: ${interestList}
@@ -219,8 +231,13 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
       }[];
     };
 
+    // Enrich only the SHOWN_COUNT we'll display (images + real Viator pricing).
+    // The rest of the pool is kept raw for a future re-ranker.
+    const shownRaw = data.gifts.slice(0, SHOWN_COUNT);
+    const restRaw = data.gifts.slice(SHOWN_COUNT);
+
     const gifts = await Promise.all(
-      data.gifts.map(async (gift) => {
+      shownRaw.map(async (gift) => {
         const query = gift.searchQuery || gift.name;
 
         if (gift.store !== "viator") {
@@ -235,22 +252,33 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
       })
     );
 
+    const candidates = [
+      ...gifts.map((g, i) => ({ ...g, shown: true, position: i })),
+      ...restRaw.map((g, i) => ({ ...g, shown: false, position: SHOWN_COUNT + i })),
+    ];
+
     // Log session to database — errors here don't affect the user response
     try {
       const sql = getDb();
       await sql`
-        INSERT INTO sessions (relationship, age_range, occasion, interests, freetext, budget, gifts, attempt)
+        INSERT INTO sessions (
+          relationship, age_range, occasion, interests, freetext, budget, gifts, attempt,
+          run_id, candidates, is_internal, question_meta
+        )
         VALUES (
-          ${relationship},
-          ${ageRange},
-          ${occasion},
-          ${JSON.stringify(interests)},
-          ${freetext ?? ""},
-          ${budget},
-          ${JSON.stringify(gifts)},
-          ${attempt}
+          ${relationship}, ${ageRange}, ${occasion}, ${JSON.stringify(interests)},
+          ${freetext ?? ""}, ${budget}, ${JSON.stringify(gifts)}, ${attempt},
+          ${runId}, ${JSON.stringify(candidates)}, ${isInternal},
+          ${body.questionMeta ? JSON.stringify(body.questionMeta) : null}
         )
       `;
+      if (runId) {
+        await logRunEvent(sql, runId, "recommend_generated", {
+          attempt,
+          poolSize: data.gifts.length,
+          isInternal,
+        });
+      }
     } catch (dbError) {
       console.error("[session logging]", dbError);
     }
