@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Gift, Sparkles, Heart, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { DoodleIcon } from "@/components/doodle-icon";
 
 import { routeMeta } from "@/lib/site";
 
@@ -41,7 +42,7 @@ export default function AboutPage() {
         <div className="grid gap-4 mb-12">
           <Card className="bg-white border-0 shadow-sm">
             <CardContent className="p-6 flex gap-4">
-              <div className="text-3xl shrink-0">🧠</div>
+              <DoodleIcon name="person" className="w-7 h-7 shrink-0 text-amber-600" />
               <div>
                 <h2 className="font-heading text-lg text-stone-900 mb-1">Smarter than a bestseller list</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
@@ -55,7 +56,7 @@ export default function AboutPage() {
 
           <Card className="bg-white border-0 shadow-sm">
             <CardContent className="p-6 flex gap-4">
-              <div className="text-3xl shrink-0">🎯</div>
+              <DoodleIcon name="target" className="w-7 h-7 shrink-0 text-amber-600" />
               <div>
                 <h2 className="font-heading text-lg text-stone-900 mb-1">Thoughtful, not generic</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
@@ -69,7 +70,7 @@ export default function AboutPage() {
 
           <Card className="bg-white border-0 shadow-sm">
             <CardContent className="p-6 flex gap-4">
-              <div className="text-3xl shrink-0">💝</div>
+              <DoodleIcon name="heart" className="w-7 h-7 shrink-0 text-amber-600" />
               <div>
                 <h2 className="font-heading text-lg text-stone-900 mb-1">Save your favorites</h2>
                 <p className="text-stone-500 text-sm leading-relaxed">
