@@ -320,7 +320,8 @@ The reminder + digest emails had no in-email unsubscribe or postal address. Fixe
 - **`lib/site.ts`**: `MAILING_ADDRESS = "[YOUR MAILING ADDRESS]"` placeholder — **Daniel must set a real physical address (PO box / registered-agent OK) before these emails are truly CAN-SPAM compliant.**
 - **`/api/email-prefs`**: GET/PATCH now also handle `remindersEnabled`. **`components/loved-ones-list.tsx`** shows two checkboxes (reminder + monthly summary).
 - Verified: build clean; unsub endpoint smoke-tested against the DB — `?type=digest` flips only `digest_enabled`, `resubscribe=1` reverts, bad token → expired page. Test row cleaned up.
-- **Also in this PR (compliance fix):** removed affiliate-tagged links from the digest email. Amazon Associates (and Rakuten / Viator) prohibit affiliate links in email. `generateIdeas` no longer asks for `store`/`searchQuery`; digest ideas render as plain bold text; the only per-person link is "More ideas for X →" to `/wizard?lovedOneId=` (own domain). `lib/affiliate.ts` import dropped from the digest.
+- **Also in this PR (compliance fix):** removed affiliate-tagged links from the digest email — Amazon Associates / Rakuten / Viator all prohibit affiliate links in email.
+- **Also in this PR (2026-09-01, Daniel's call):** dropped the generated idea list from the digest entirely. `generateIdeas`, `IDEAS_SCHEMA`, the `@anthropic-ai/sdk` import and the `interests`/`interests_notes` select are all gone. The digest is now a pure nudge: each person card = name · relationship, upcoming dates, and one "Get gift ideas" button into `/wizard?lovedOneId=` (same shape as the reminder card). No LLM call per send, no failure mode. Tradeoff noted: email is less immediately substantive, so open/click *might* dip — testable later; the reminder email proves a pure-nudge email works.
 
 ### Phase 26: "What's your gifting style?" quiz — branch `feature/gifting-style-quiz` (2026-09-01)
 
