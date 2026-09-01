@@ -310,6 +310,14 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 23: Gift feedback loop — branch `feature/gift-feedback-loop` (2026-09-01)
+
+Post-purchase feedback on given gifts, the first piece of the "which wizard questions are most predictive" plan (it's the outcome-label source; also feeds a future ML recommender).
+- **Schema**: `loved_one_gifts` gains `reception TEXT` ('loved' | 'liked' | 'missed', nullable) + `reception_note TEXT`. Added as `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` in `app/api/setup/route.ts`. **`/api/setup` must be re-run locally and on prod** (same pattern as the `interests` column).
+- **API**: new narrow route `app/api/loved-ones/[id]/gifts/[giftId]/reception/route.ts` — PATCH `{ reception, receptionNote }`, only touches those two columns, requires `status = 'given'` and ownership. `reception: null` clears it.
+- **UI**: `components/loved-one-detail.tsx` given-gift cards get a "How did it land?" row — 3 pill buttons (reuse the wizard selected-pill style `bg-amber-50 border-amber-500 text-amber-700`), click the active one again to clear, optional free-text note (uncontrolled `<input>`, saves on blur). Optimistic local update + `load()` refetch. PostHog `gift_reception_recorded` `{ reception, lovedOneId, hasNote }`.
+- Build clean. NOT runtime-tested — Clerk-gated, needs a signed-in account with a given gift (Claude doesn't create accounts).
+
 ### Phase 21: Loved One date fixes + card dates + wizard step-1 profile picker — branch `fix/loved-one-birthday-off-by-one` → PR #10 (2026-08-30)
 
 Three things, one PR:
