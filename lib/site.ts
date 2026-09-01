@@ -5,6 +5,10 @@ import type { Metadata } from "next";
 // so www is the canonical origin — everything search-facing must use it.
 export const SITE_URL = "https://www.thegiftwhisperer.gifts";
 export const SITE_NAME = "The Gift Whisperer";
+
+// CAN-SPAM requires a valid physical postal address in every marketing email
+// (a PO box or registered-agent address is fine). TODO: replace the placeholder.
+export const MAILING_ADDRESS = "[YOUR MAILING ADDRESS]";
 export const SITE_DESCRIPTION =
   "Thoughtful gift ideas for any person and any occasion. Tell The Gift Whisperer who you're shopping for and we'll do the thinking. Free, no sign-up.";
 

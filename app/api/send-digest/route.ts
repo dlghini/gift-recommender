@@ -1,17 +1,15 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
 import { getResend } from "@/lib/resend";
 import { findDueOccasions, type DueOccasion, type LovedOneRow } from "@/lib/reminders";
-import { buildAffiliateUrl, type Store } from "@/lib/affiliate";
+import { ensureUnsubToken, unsubscribeUrl } from "@/lib/email-prefs";
+import { MAILING_ADDRESS } from "@/lib/site";
 
 // How far ahead the monthly digest looks. Wider than the 14-day single-event
 // reminder window so one email covers "the month ahead" plus a little slack.
 const DIGEST_LEAD_DAYS = 45;
 
 const SITE = "https://www.thegiftwhisperer.gifts";
-
-const client = new Anthropic();
 
 function escapeHtml(text: string): string {
   return text
@@ -28,8 +26,6 @@ function formatOccasionDate(date: Date): string {
 
 interface LovedOneFull extends LovedOneRow {
   clerk_user_id: string;
-  interests: string[] | null;
-  interests_notes: string | null;
 }
 
 interface PersonBlock {
@@ -37,101 +33,10 @@ interface PersonBlock {
   occasions: DueOccasion[];
 }
 
-interface GeneratedIdea {
-  name: string;
-  why: string;
-  store: Store;
-  searchQuery: string;
-}
-
-const IDEAS_SCHEMA = {
-  type: "object",
-  properties: {
-    people: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          lovedOneId: { type: "string" },
-          ideas: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                why: { type: "string" },
-                store: { type: "string", enum: ["amazon", "etsy", "viator"] },
-                searchQuery: { type: "string" },
-              },
-              required: ["name", "why", "store", "searchQuery"],
-              additionalProperties: false,
-            },
-          },
-        },
-        required: ["lovedOneId", "ideas"],
-        additionalProperties: false,
-      },
-    },
-  },
-  required: ["people"],
-  additionalProperties: false,
-};
-
-// One Claude call per user: a couple of concrete ideas per person, keyed by id.
-// Returns an empty map on any failure so the email still goes out (occasion list
-// + wizard links), just without inline ideas.
-async function generateIdeas(blocks: PersonBlock[]): Promise<Map<string, GeneratedIdea[]>> {
-  const result = new Map<string, GeneratedIdea[]>();
-  const people = blocks.map(({ lovedOne, occasions }) => {
-    const interests = (lovedOne.interests ?? []).join(", ") || "unknown";
-    const notes = lovedOne.interests_notes ? ` Notes: ${lovedOne.interests_notes}.` : "";
-    const occ = occasions
-      .map((o) => `${o.label} (${formatOccasionDate(o.date)})`)
-      .join("; ");
-    return `- id ${lovedOne.id}: ${lovedOne.name}, ${lovedOne.relationship}. Interests: ${interests}.${notes} Coming up: ${occ}`;
-  });
-
-  try {
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1200,
-      system: [
-        {
-          type: "text",
-          text: [
-            "You suggest gift ideas for a monthly summary email. For each person, give exactly 2 specific, real, widely-available gift ideas suited to their interests and the upcoming occasion.",
-            "Each idea needs: `name` (a concrete product or experience, not a category), `why` (one warm sentence, plain punctuation, no em dashes), `store`, and `searchQuery` (2 to 5 words that reliably surface it).",
-            "`store` is one of: \"etsy\" for handmade, personalized, custom, artisan, or vintage physical items; \"viator\" for real in-person bookable experiences (tours, classes, tastings) - never virtual/online-only ones; \"amazon\" for mainstream branded products, books, electronics, and anything mass-produced.",
-            "Optimize `searchQuery` for the chosen store's search. Do not repeat an idea across people.",
-          ].join(" "),
-        },
-      ],
-      output_config: { format: { type: "json_schema", schema: IDEAS_SCHEMA } },
-      messages: [
-        {
-          role: "user",
-          content: `People and their upcoming occasions:\n${people.join("\n")}`,
-        },
-      ],
-    });
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") return result;
-    const data = JSON.parse(textBlock.text) as {
-      people: { lovedOneId: string; ideas: GeneratedIdea[] }[];
-    };
-    for (const p of data.people) {
-      result.set(p.lovedOneId, p.ideas.slice(0, 2));
-    }
-  } catch (error) {
-    console.error("[send-digest] idea generation failed", error);
-  }
-  return result;
-}
-
-function renderDigestEmail(
-  blocks: PersonBlock[],
-  ideasByLovedOne: Map<string, GeneratedIdea[]>
-): string {
+// The digest is a nudge, not a recommendation: one card per person with their
+// upcoming dates and a button into the wizard, where the real (tagged) ideas
+// live. No LLM call, no failure mode.
+function renderDigestEmail(blocks: PersonBlock[], unsubUrl: string): string {
   const occasionCount = blocks.reduce((n, b) => n + b.occasions.length, 0);
 
   const personHtml = blocks
@@ -145,36 +50,20 @@ function renderDigestEmail(
         )
         .join("");
 
-      const ideas = ideasByLovedOne.get(lovedOne.id) ?? [];
-      const ideasHtml = ideas.length
-        ? `<ul style="margin:12px 0 0 0;padding-left:18px;">${ideas
-            .map(
-              (idea) =>
-                `<li style="font-size:13px;color:#2f3a33;margin-bottom:8px;"><a href="${buildAffiliateUrl(
-                  idea.store,
-                  idea.searchQuery || idea.name
-                )}" style="color:#7a3a28;text-decoration:none;font-weight:600;">${escapeHtml(
-                  idea.name
-                )}</a><br><span style="color:#6c756b;">${escapeHtml(idea.why)}</span></li>`
-            )
-            .join("")}</ul>`
-        : "";
-
       const wizardUrl = `${SITE}/wizard?lovedOneId=${lovedOne.id}`;
 
       return `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:12px;">
-          <tr><td style="padding:20px;">
-            <p style="margin:0 0 10px 0;font-family:Georgia,serif;font-size:16px;color:#2f3a33;">${escapeHtml(
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:14px;">
+          <tr><td style="padding:24px;text-align:center;">
+            <p style="margin:0 0 12px 0;font-family:Georgia,serif;font-size:17px;color:#2f3a33;">${escapeHtml(
               lovedOne.name
             )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8f978d;">&middot; ${escapeHtml(
               lovedOne.relationship
             )}</span></p>
             ${occLines}
-            ${ideasHtml}
-            <p style="margin:14px 0 0 0;"><a href="${wizardUrl}" style="font-size:13px;color:#7a3a28;text-decoration:none;font-weight:600;">More ideas for ${escapeHtml(
-              lovedOne.name
-            )} &rarr;</a></p>
+            <div style="margin-top:18px;">
+              <a href="${wizardUrl}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">Get gift ideas &rarr;</a>
+            </div>
           </td></tr>
         </table>`;
     })
@@ -188,7 +77,12 @@ function renderDigestEmail(
     occasionCount === 1 ? "" : "s"
   } coming up in the next few weeks.</p>
       ${personHtml}
-      <p style="font-size:12px;color:#8f978d;text-align:center;margin:24px 0 0 0;">You get this once a month because upcoming-occasion summaries are on for your account. Turn them off on your <a href="${SITE}/loved-ones" style="color:#8f978d;">Loved ones</a> page.</p>
+      <p style="font-size:12px;color:#8f978d;text-align:center;margin:24px 0 0 0;line-height:1.6;">
+        You get this monthly summary because you have a Gift Whisperer account.
+        <a href="${unsubUrl}" style="color:#8f978d;">Unsubscribe</a> &middot;
+        <a href="${SITE}/loved-ones" style="color:#8f978d;">manage email</a><br>
+        ${MAILING_ADDRESS}
+      </p>
     </div>`;
 }
 
@@ -206,8 +100,7 @@ async function handleDigestRun(request: Request): Promise<Response> {
     const lovedOnes = (await sql`
       SELECT id, clerk_user_id, name, relationship,
         birthday_month, birthday_day, anniversary_month, anniversary_day,
-        birthday_reminder_enabled, anniversary_reminder_enabled,
-        interests, interests_notes
+        birthday_reminder_enabled, anniversary_reminder_enabled
       FROM loved_ones
     `) as LovedOneFull[];
 
@@ -279,13 +172,17 @@ async function handleDigestRun(request: Request): Promise<Response> {
           user.emailAddresses[0]?.emailAddress;
         if (!primaryEmail) continue;
 
-        const ideasByLovedOne = await generateIdeas(blocks);
+        const unsubUrl = unsubscribeUrl(await ensureUnsubToken(sql, clerkUserId), "digest");
 
         const { error: sendResultError } = await getResend().emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: "Your gifting month ahead",
-          html: renderDigestEmail(blocks, ideasByLovedOne),
+          html: renderDigestEmail(blocks, unsubUrl),
+          headers: {
+            "List-Unsubscribe": `<${unsubUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
         if (sendResultError) {
           console.error("[send-digest] Resend error", clerkUserId, sendResultError);

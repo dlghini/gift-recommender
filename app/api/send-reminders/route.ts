@@ -2,6 +2,8 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { getDb } from "@/lib/db";
 import { getResend } from "@/lib/resend";
 import { findDueOccasions, type LovedOneRow } from "@/lib/reminders";
+import { ensureUnsubToken, unsubscribeUrl } from "@/lib/email-prefs";
+import { MAILING_ADDRESS } from "@/lib/site";
 
 function escapeHtml(text: string): string {
   return text
@@ -12,7 +14,7 @@ function escapeHtml(text: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function renderReminderEmail(label: string, lovedOneId: string): string {
+function renderReminderEmail(label: string, lovedOneId: string, unsubUrl: string): string {
   const url = `https://www.thegiftwhisperer.gifts/wizard?lovedOneId=${lovedOneId}`;
   return `
     <div style="font-family:Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#e9eee6;">
@@ -24,6 +26,11 @@ function renderReminderEmail(label: string, lovedOneId: string): string {
           <a href="${url}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">Get gift ideas &rarr;</a>
         </td></tr>
       </table>
+      <p style="font-size:12px;color:#8f978d;text-align:center;margin:24px 0 0 0;line-height:1.6;">
+        You get occasion reminders because you saved this person in your Gift Whisperer account.
+        <a href="${unsubUrl}" style="color:#8f978d;">Unsubscribe from reminders</a><br>
+        ${MAILING_ADDRESS}
+      </p>
     </div>`;
 }
 
@@ -56,13 +63,25 @@ async function handleReminderRun(request: Request): Promise<Response> {
     const dueOccasions = findDueOccasions(lovedOnes, disabledHolidayKeys);
     const ownerById = new Map(lovedOnes.map((lo) => [lo.id, lo.clerk_user_id]));
 
+    const remindersOptedOut = new Set(
+      (
+        (await sql`
+          SELECT clerk_user_id FROM user_email_prefs WHERE reminders_enabled = false
+        `) as { clerk_user_id: string }[]
+      ).map((r) => r.clerk_user_id)
+    );
+
     let sent = 0;
     const clerk = await clerkClient();
 
     for (const occasion of dueOccasions) {
+      const clerkUserId = ownerById.get(occasion.lovedOneId);
+      if (!clerkUserId || remindersOptedOut.has(clerkUserId)) continue;
+
       // Atomic dedup: only proceed if this is the first time we're logging this
       // occasion for this year — protects against the external scheduler firing
-      // more than once, or retrying after a failure.
+      // more than once, or retrying after a failure. Done after the opt-out check
+      // so an opted-out user isn't silently marked "sent" for the year.
       const [logged] = await sql`
         INSERT INTO reminder_log (loved_one_id, occasion_key, occasion_year)
         VALUES (${occasion.lovedOneId}, ${occasion.occasionKey}, ${occasion.occasionYear})
@@ -71,9 +90,6 @@ async function handleReminderRun(request: Request): Promise<Response> {
       `;
       if (!logged) continue;
 
-      const clerkUserId = ownerById.get(occasion.lovedOneId);
-      if (!clerkUserId) continue;
-
       try {
         const user = await clerk.users.getUser(clerkUserId);
         const primaryEmail =
@@ -81,11 +97,16 @@ async function handleReminderRun(request: Request): Promise<Response> {
           user.emailAddresses[0]?.emailAddress;
         if (!primaryEmail) continue;
 
+        const unsubUrl = unsubscribeUrl(await ensureUnsubToken(sql, clerkUserId), "reminders");
         const { error: sendResultError } = await getResend().emails.send({
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: `${occasion.label} is coming up`,
-          html: renderReminderEmail(occasion.label, occasion.lovedOneId),
+          html: renderReminderEmail(occasion.label, occasion.lovedOneId, unsubUrl),
+          headers: {
+            "List-Unsubscribe": `<${unsubUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
         if (sendResultError) {
           console.error("[send-reminders] Resend returned an error", occasion, sendResultError);
