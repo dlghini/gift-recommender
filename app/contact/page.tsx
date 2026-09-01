@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Gift, Mail } from "lucide-react";
 import { routeMeta } from "@/lib/site";
+import { DoodleIcon } from "@/components/doodle-icon";
 
 export const metadata = routeMeta(
   "/contact",
@@ -47,17 +48,17 @@ export default function ContactPage() {
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-sm text-stone-500">
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <div className="text-2xl mb-2">🐛</div>
+            <DoodleIcon name="bug" className="w-6 h-6 mb-2 mx-auto text-amber-600" />
             <p className="font-medium text-stone-700 mb-1">Found a bug?</p>
             <p className="text-xs text-stone-400">Tell us what happened and we&apos;ll fix it fast.</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <div className="text-2xl mb-2">💡</div>
+            <DoodleIcon name="bulb" className="w-6 h-6 mb-2 mx-auto text-amber-600" />
             <p className="font-medium text-stone-700 mb-1">Feature idea?</p>
             <p className="text-xs text-stone-400">We&apos;re always looking for ways to improve.</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <div className="text-2xl mb-2">🎁</div>
+            <DoodleIcon name="gift" className="w-6 h-6 mb-2 mx-auto text-amber-600" />
             <p className="font-medium text-stone-700 mb-1">Gift win?</p>
             <p className="text-xs text-stone-400">Share the story. We love hearing them.</p>
           </div>

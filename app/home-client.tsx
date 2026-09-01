@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, Sparkles, Gift, Heart, ChevronDown } from "lucide-react";
+import { ExternalLink, ChevronDown } from "lucide-react";
+import { DoodleIcon } from "@/components/doodle-icon";
 import { cn } from "@/lib/utils";
 
 const RAKUTEN_ID = "wa9JRgUhXO8";
@@ -107,7 +108,7 @@ export default function Home() {
       {/* Hero */}
       <div className="max-w-3xl mx-auto px-4 pt-20 pb-16 text-center">
         <div className="flex items-center gap-2 justify-center mb-8">
-          <Gift className="w-5 h-5 text-amber-500" />
+          <DoodleIcon name="gift" className="w-5 h-5 text-amber-600" />
           <span className="font-heading text-xl font-bold text-stone-900 tracking-tight">The Gift Whisperer</span>
         </div>
         <h1 className="font-heading text-5xl text-stone-900 leading-tight mb-4">
@@ -121,7 +122,7 @@ export default function Home() {
           onClick={() => posthog?.capture("cta_clicked", { location: "hero" })}
           className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold h-16 px-12 text-xl rounded-full transition-colors shadow-lg shadow-amber-200"
         >
-          Find the perfect gift ✨
+          Find the perfect gift
         </a>
 
         <div className="mt-5 flex flex-col items-center gap-2 text-sm text-stone-500">
@@ -162,7 +163,7 @@ export default function Home() {
       {/* Loved Ones */}
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <Heart className="w-5 h-5 text-rose-500" />
+          <DoodleIcon name="heart" className="w-5 h-5 text-rose-500" />
           <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">New: Loved Ones</span>
         </div>
         <h2 className="font-heading text-3xl text-stone-900 mb-4">Remember every person, every gift</h2>
@@ -171,12 +172,12 @@ export default function Home() {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
           {[
-            { emoji: "🎁", title: "Save ideas by person", desc: "Every recommendation gets tucked under the right profile instead of one big pile of favorites." },
-            { emoji: "📝", title: "Log what you've given", desc: "Keep a running history for each person so you're never guessing whether you already got them that." },
-            { emoji: "🔔", title: "Get reminded in time", desc: "We'll nudge you two weeks before their birthday, anniversary, or a holiday like Mother's Day." },
+            { icon: "save" as const, title: "Save ideas by person", desc: "Every recommendation gets tucked under the right profile instead of one big pile of favorites." },
+            { icon: "pencil" as const, title: "Log what you've given", desc: "Keep a running history for each person so you're never guessing whether you already got them that." },
+            { icon: "bell" as const, title: "Get reminded in time", desc: "We'll nudge you two weeks before their birthday, anniversary, or a holiday like Mother's Day." },
           ].map((item) => (
             <div key={item.title}>
-              <div className="text-4xl mb-3">{item.emoji}</div>
+              <DoodleIcon name={item.icon} className="w-8 h-8 mx-auto mb-3 text-amber-600" />
               <h3 className="font-heading text-base text-stone-900 mb-1">{item.title}</h3>
               <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
             </div>
@@ -194,7 +195,7 @@ export default function Home() {
       {/* Example gifts */}
       <div className="max-w-2xl mx-auto px-4 pb-16">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <Sparkles className="w-5 h-5 text-amber-500" />
+          <DoodleIcon name="sparkle" className="w-5 h-5 text-amber-600" />
           <span className="text-amber-600 text-base font-semibold uppercase tracking-widest">Example gifts. Yours will be personalized</span>
         </div>
         <div className="flex flex-col gap-4">
@@ -240,17 +241,17 @@ export default function Home() {
       </div>
 
       {/* How it works */}
-      <div className="bg-white py-16">
+      <div className="bg-[#f3f6f1] py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <h2 className="font-heading text-2xl text-stone-900 mb-10">How it works</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
-              { emoji: "🧠", title: "Tell us about them", desc: "Relationship, age, occasion, interests. Takes under a minute." },
-              { emoji: "✨", title: "We pick the gifts", desc: "We think through thousands of ideas and surface 3 picks tailored to them." },
-              { emoji: "🛍️", title: "Buy with one click", desc: "Each gift links directly to the store so you can order instantly." },
+              { icon: "person" as const, title: "Tell us about them", desc: "Relationship, age, occasion, interests. Takes under a minute." },
+              { icon: "sparkle" as const, title: "We pick the gifts", desc: "We think through thousands of ideas and surface 3 picks tailored to them." },
+              { icon: "bag" as const, title: "Buy with one click", desc: "Each gift links directly to the store so you can order instantly." },
             ].map((item) => (
               <div key={item.title}>
-                <div className="text-4xl mb-3">{item.emoji}</div>
+                <DoodleIcon name={item.icon} className="w-8 h-8 mx-auto mb-3 text-amber-600" />
                 <h3 className="font-heading text-base text-stone-900 mb-1">{item.title}</h3>
                 <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
@@ -261,7 +262,7 @@ export default function Home() {
             onClick={() => posthog?.capture("cta_clicked", { location: "how_it_works" })}
             className="mt-12 inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 px-8 text-base rounded-full transition-colors"
           >
-            Try it now, it&apos;s free ✨
+            Try it now, it&apos;s free
           </a>
         </div>
       </div>
