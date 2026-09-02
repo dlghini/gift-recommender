@@ -52,6 +52,7 @@ interface GiftResult {
   type: "product" | "experience";
   store: "amazon" | "etsy" | "viator";
   searchQuery: string;
+  imageQuery?: string;
   imageUrl?: string;
   runId?: string;
 }
@@ -114,7 +115,7 @@ function pickEmoji(tags: string[], type?: "product" | "experience"): string {
 // Renders the gift's real photo when we have one; falls back to an emoji if there's no image
 // (no key set up, lookup miss, or the image URL failed to load and a re-resolve also came up empty).
 function GiftThumb({ gift, size = "lg" }: { gift: GiftResult; size?: "lg" | "sm" }) {
-  const { src, failed, handleError } = useResolvedImage(gift.imageUrl, gift.searchQuery || gift.name, gift.tags);
+  const { src, failed, handleError } = useResolvedImage(gift.imageUrl, gift.imageQuery || gift.searchQuery || gift.name, gift.tags);
   const boxClass = size === "lg" ? "w-14 h-14" : "w-10 h-10";
   const textClass = size === "lg" ? "text-4xl" : "text-2xl";
 

@@ -34,6 +34,7 @@ For each gift provide:
 - price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y". For experiences, give a realistic typical price for that kind of activity.
 - rationale: for the FIRST 3 gifts, a warm, personalized rationale of 2 to 3 sentences explaining why it suits this specific person. For gifts ranked 4th and lower, a single short sentence is enough. Use plain punctuation: no em dashes, use commas or periods instead
 - tags: 2–4 short interest or theme tags
+- imageQuery: 2 to 4 plain words describing what a stock photo of this gift would show, with NO brand names, model numbers, or the word "Mini" and similar. Describe the object or scene: "handheld massage gun", "leather belt bag", "sailboat at sunset", "cast iron skillet", "vinyl record player". This is only used to pull a photo, never shown to the user.
 - affiliateUrl: set to "#"
 - type: either "product" or "experience". Use "experience" for real, in-person bookable tours, classes, activities, workshops, or tastings. Use "product" for physical items.
 - store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift. Viator's catalog is in-person only — do not suggest purely virtual/online-only experiences (e.g. a "virtual cooking class" or "online workshop"). The gift links to a Viator search for the activity type, which shows the recipient options near them, so the pick must be a broad category that exists in most places (cooking class, wine tasting, food tour, walking tour, sailing cruise, pottery class, cocktail making class, kayak tour), never a one-off themed package.
@@ -58,12 +59,13 @@ const GIFT_SCHEMA = {
           price: { type: "string" },
           rationale: { type: "string" },
           tags: { type: "array", items: { type: "string" } },
+          imageQuery: { type: "string" },
           affiliateUrl: { type: "string" },
           type: { type: "string", enum: ["product", "experience"] },
           store: { type: "string", enum: ["amazon", "etsy", "viator"] },
           searchQuery: { type: "string" },
         },
-        required: ["name", "price", "rationale", "tags", "affiliateUrl", "type", "store", "searchQuery"],
+        required: ["name", "price", "rationale", "tags", "imageQuery", "affiliateUrl", "type", "store", "searchQuery"],
         additionalProperties: false,
       },
     },
@@ -85,6 +87,25 @@ const BUDGET_LABELS: Record<string, string> = {
   "100-250": "$100–$250",
   "250+": "$250 or more",
 };
+
+const VIATOR_PID = "P00304135";
+
+// Viator's site search has no "near me" mode, but a text query of "<activity> <city>"
+// does return that city's experiences (and the closest local match when the exact
+// activity isn't offered there). Vercel gives us the visitor's city via a header; if
+// it's missing (local dev, unresolved), fall back to the bare activity search.
+export function buildViatorSearchUrl(activity: string, city?: string): string {
+  const text = city ? `${activity} ${city}` : activity;
+  return `https://www.viator.com/searchResults/all?text=${encodeURIComponent(text)}&pid=${VIATOR_PID}`;
+}
+
+function viewerCity(request: Request): string {
+  try {
+    return decodeURIComponent(request.headers.get("x-vercel-ip-city") ?? "").trim();
+  } catch {
+    return "";
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -181,6 +202,7 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
         price: string;
         rationale: string;
         tags: string[];
+        imageQuery: string;
         affiliateUrl: string;
         type: "product" | "experience";
         store: "amazon" | "etsy" | "viator";
@@ -190,18 +212,22 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
 
     // Enrich only the SHOWN_COUNT we'll display, with a stock photo. The rest of
     // the pool is kept raw for a future re-ranker.
-    // Viator experiences are NOT looked up against a specific product: the
-    // recipient's location is unknown, and a freetext match against Viator's
-    // global catalog was landing people on a random city's listing (e.g. a
-    // "cocktail experience" pick opening a specific Amsterdam bar). Viator gifts
-    // now link to Viator's own search page (see buildBuyUrl on the client), which
-    // geolocates the visitor, exactly like Amazon/Etsy link to a search page.
+    // Viator experiences are NOT looked up against a specific product (a global
+    // freetext match was landing people on a random city's listing). Instead the
+    // link is a Viator search for "<activity> <viewer's city>", which returns that
+    // city's experiences, or the closest local match when the exact activity isn't
+    // offered there.
+    const city = viewerCity(request);
     const shownRaw = data.gifts.slice(0, SHOWN_COUNT);
     const restRaw = data.gifts.slice(SHOWN_COUNT);
 
     const gifts = await Promise.all(
       shownRaw.map(async (gift) => {
-        const imageUrl = await fetchPixabayImage(gift.searchQuery || gift.name, gift.tags);
+        const imageUrl = await fetchPixabayImage(gift.imageQuery || gift.searchQuery || gift.name, gift.tags);
+        if (gift.store === "viator") {
+          const affiliateUrl = buildViatorSearchUrl(gift.searchQuery || gift.name, city);
+          return { ...gift, imageUrl, affiliateUrl };
+        }
         return { ...gift, imageUrl };
       })
     );

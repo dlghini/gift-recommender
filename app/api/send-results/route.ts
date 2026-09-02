@@ -26,6 +26,7 @@ interface GiftResult {
   type: "product" | "experience";
   store: "amazon" | "etsy" | "viator";
   searchQuery: string;
+  imageQuery?: string;
   imageUrl?: string;
 }
 
@@ -119,7 +120,7 @@ export async function POST(request: Request) {
     // (Viator gifts now carry a Pixabay image too, since we no longer look up a specific Viator product.)
     const giftsWithImages = await Promise.all(
       gifts.map(async (gift) => {
-        const imageUrl = await fetchPixabayImage(gift.searchQuery || gift.name, gift.tags);
+        const imageUrl = await fetchPixabayImage(gift.imageQuery || gift.searchQuery || gift.name, gift.tags);
         return { ...gift, imageUrl };
       })
     );
