@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, ChevronDown, ArrowRight } from "lucide-react";
+import { ExternalLink, ChevronDown } from "lucide-react";
 import { DoodleIcon } from "@/components/doodle-icon";
 import { AffiliateDisclosure } from "@/components/affiliate-disclosure";
 import { cn } from "@/lib/utils";
@@ -200,14 +200,14 @@ export default function Home() {
           onClick={() => posthog?.capture("cta_clicked", { location: "home_gifting_style" })}
           className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white px-6 py-5 shadow-sm transition-colors hover:border-amber-300"
         >
-          <span className="text-3xl shrink-0" aria-hidden>🎁</span>
+          <DoodleIcon name="target" className="w-8 h-8 text-amber-600 shrink-0" />
           <span className="flex-1 min-w-0">
             <span className="block font-heading text-lg text-stone-900">What&apos;s your gifting style?</span>
             <span className="block text-stone-500 text-sm mt-0.5">
               A quick six-question quiz. Are you the Overthinker, the Last-Minute Legend, or something else?
             </span>
           </span>
-          <ArrowRight className="w-5 h-5 text-amber-500 shrink-0" />
+          <span className="text-amber-600 text-lg shrink-0" aria-hidden="true">&rarr;</span>
         </a>
       </div>
 
