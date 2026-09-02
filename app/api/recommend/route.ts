@@ -20,26 +20,23 @@ const client = new Anthropic();
 
 // The LLM produces a ranked candidate pool; we show the top SHOWN_COUNT and keep
 // the rest (unenriched) so a future re-ranker has something to re-rank. Logging
-// the full pool now is the one thing we can't backfill later.
-const CANDIDATE_POOL_SIZE = 12;
+// the full pool now is the one thing we can't backfill later. Pool size is a
+// latency lever — every extra candidate is more output tokens on the critical path.
+const CANDIDATE_POOL_SIZE = 8;
 const SHOWN_COUNT = 3;
-
-// Sandbox and production keys only authenticate against their matching host.
-const VIATOR_API_BASE =
-  process.env.NODE_ENV === "production" ? "https://api.viator.com/partner" : "https://api.sandbox.viator.com/partner";
 
 const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend a ranked list of exactly ${CANDIDATE_POOL_SIZE} gifts (best fit first) that are genuinely well-suited to them. Return all ${CANDIDATE_POOL_SIZE}. Vary the list across price points, categories, and a mix of safe and slightly unexpected picks.
 
 Only suggest real products or experiences that actually exist and are widely available for purchase/booking. Stick to well-known brands and real, bookable experience types — do not invent product names or combine brand names with model numbers you are not sure about.
 
 For each gift provide:
-- name: a specific, real product name (e.g. "Kindle Paperwhite" not "e-reader") or a specific experience type (e.g. "Sunset Sailing Cruise" not "boat activity")
-- price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y". For experiences, this is a placeholder — real pricing is fetched separately.
-- rationale: a warm, personalized rationale (2–3 sentences) explaining why this gift suits this specific person. Use plain punctuation: no em dashes, use commas or periods instead
+- name: a specific, real product name (e.g. "Kindle Paperwhite" not "e-reader"). For experiences, use a common, widely-offered activity type ("Sunset Sailing Cruise", "Pasta Making Class", "Wine Tasting Tour"), NOT an invented or niche package name ("Private Music and Cocktail Pairing Experience"). If a person in an average city could not easily book it, it is too specific.
+- price: a realistic price matching the stated budget, formatted as "$X" or "$X–$Y". For experiences, give a realistic typical price for that kind of activity.
+- rationale: for the FIRST 3 gifts, a warm, personalized rationale of 2 to 3 sentences explaining why it suits this specific person. For gifts ranked 4th and lower, a single short sentence is enough. Use plain punctuation: no em dashes, use commas or periods instead
 - tags: 2–4 short interest or theme tags
 - affiliateUrl: set to "#"
 - type: either "product" or "experience". Use "experience" for real, in-person bookable tours, classes, activities, workshops, or tastings. Use "product" for physical items.
-- store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift. Viator's catalog is in-person only — do not suggest purely virtual/online-only experiences (e.g. a "virtual cooking class" or "online workshop") for this store, since there's no real inventory for those and the resulting link will be irrelevant.
+- store: "etsy" for handmade, personalized, custom, artisan, vintage, or unique physical items. "amazon" for mainstream branded products, electronics, books, fitness equipment, and anything mass-produced. "viator" for any "experience"-type gift. Viator's catalog is in-person only — do not suggest purely virtual/online-only experiences (e.g. a "virtual cooking class" or "online workshop"). The gift links to a Viator search for the activity type, which shows the recipient options near them, so the pick must be a broad category that exists in most places (cooking class, wine tasting, food tour, walking tour, sailing cruise, pottery class, cocktail making class, kayak tour), never a one-off themed package.
 - searchQuery: the exact text a shopper would type into the store's own search box so the results page fills with the right item. Write it the way someone searches, not the way a catalog titles a listing. Rules:
     * 2 to 6 words. Lead with the concrete object, then the 1-2 attributes that matter most (material, style, format, "personalized", "for <interest>").
     * If "name" is a specific real product you are confident exists (e.g. "Yeti Rambler", "Lodge Cast Iron Skillet", "Kindle Paperwhite"), the searchQuery should surface THAT product: use the distinctive part of its name. Never pair a brand with a model number you are guessing at.
@@ -80,61 +77,6 @@ const GIFT_PREFERENCE_INSTRUCTIONS: Record<string, string> = {
   gifts: "The user said they're shopping for someone who prefers physical gifts over experiences. Every recommendation must be type \"product\".",
   both: "The user said this person likes both experiences and physical gifts. Roughly a quarter of the recommendations should be type \"experience\", the rest type \"product\".",
 };
-
-interface ViatorProductResult {
-  title: string;
-  productUrl: string;
-  pricing?: { summary?: { fromPrice?: number } };
-  duration?: { fixedDurationInMinutes?: number };
-  images?: { variants?: { width?: number; height?: number; url?: string }[] }[];
-}
-
-// Viator returns several resolutions per image — pick the one closest to our card thumbnail size.
-function pickViatorImageUrl(images?: ViatorProductResult["images"]): string | undefined {
-  const variants = images?.[0]?.variants;
-  if (!variants?.length) return undefined;
-  const target = 200;
-  const best = variants.reduce((closest, v) =>
-    Math.abs((v.width ?? 0) - target) < Math.abs((closest.width ?? 0) - target) ? v : closest
-  );
-  return best.url;
-}
-
-async function fetchViatorListing(
-  searchQuery: string
-): Promise<{ price: string; affiliateUrl: string; imageUrl?: string } | null> {
-  const apiKey = process.env.VIATOR_API_KEY;
-  if (!apiKey) return null;
-  try {
-    const res = await fetch(`${VIATOR_API_BASE}/search/freetext`, {
-      method: "POST",
-      headers: {
-        "exp-api-key": apiKey,
-        "Accept-Language": "en-US",
-        Accept: "application/json;version=2.0",
-        "Content-Type": "application/json;version=2.0",
-      },
-      body: JSON.stringify({
-        searchTerm: searchQuery,
-        searchTypes: [{ searchType: "PRODUCTS", pagination: { start: 1, count: 1 } }],
-        currency: "USD",
-      }),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { products?: { results?: ViatorProductResult[] } };
-    const top = data.products?.results?.[0];
-    if (!top?.productUrl) return null;
-    const fromPrice = top.pricing?.summary?.fromPrice;
-    return {
-      price: fromPrice ? `From $${Math.round(fromPrice)} per person` : "See price on Viator",
-      affiliateUrl: top.productUrl,
-      imageUrl: pickViatorImageUrl(top.images),
-    };
-  } catch (err) {
-    console.error("[viator search]", err);
-    return null;
-  }
-}
 
 const BUDGET_LABELS: Record<string, string> = {
   "under-25": "under $25",
@@ -189,7 +131,9 @@ export async function POST(request: Request) {
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 3500,
+      // Sized for CANDIDATE_POOL_SIZE gifts with headroom for verbose rationales.
+      // Kept tight because output tokens are the main driver of this endpoint's latency.
+      max_tokens: 2600,
       system: [
         {
           type: "text",
@@ -199,6 +143,9 @@ export async function POST(request: Request) {
         },
       ],
       output_config: {
+        // "medium" trims thinking/token spend vs the default "high"; gift ideation
+        // doesn't need deep reasoning and this shaves a few seconds off each call.
+        effort: "medium",
         format: {
           type: "json_schema",
           schema: GIFT_SCHEMA,
@@ -236,24 +183,21 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
       }[];
     };
 
-    // Enrich only the SHOWN_COUNT we'll display (images + real Viator pricing).
-    // The rest of the pool is kept raw for a future re-ranker.
+    // Enrich only the SHOWN_COUNT we'll display, with a stock photo. The rest of
+    // the pool is kept raw for a future re-ranker.
+    // Viator experiences are NOT looked up against a specific product: the
+    // recipient's location is unknown, and a freetext match against Viator's
+    // global catalog was landing people on a random city's listing (e.g. a
+    // "cocktail experience" pick opening a specific Amsterdam bar). Viator gifts
+    // now link to Viator's own search page (see buildBuyUrl on the client), which
+    // geolocates the visitor, exactly like Amazon/Etsy link to a search page.
     const shownRaw = data.gifts.slice(0, SHOWN_COUNT);
     const restRaw = data.gifts.slice(SHOWN_COUNT);
 
     const gifts = await Promise.all(
       shownRaw.map(async (gift) => {
-        const query = gift.searchQuery || gift.name;
-
-        if (gift.store !== "viator") {
-          const imageUrl = await fetchPixabayImage(query, gift.tags);
-          return { ...gift, imageUrl };
-        }
-
-        const listing = await fetchViatorListing(query);
-        const imageUrl = listing?.imageUrl ?? (await fetchPixabayImage(query, gift.tags));
-        if (!listing) return { ...gift, imageUrl };
-        return { ...gift, price: listing.price, affiliateUrl: listing.affiliateUrl, imageUrl };
+        const imageUrl = await fetchPixabayImage(gift.searchQuery || gift.name, gift.tags);
+        return { ...gift, imageUrl };
       })
     );
 

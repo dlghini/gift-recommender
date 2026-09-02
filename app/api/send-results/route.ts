@@ -114,12 +114,11 @@ export async function POST(request: Request) {
       return Response.json({ error: "No gifts to send." }, { status: 400 });
     }
 
-    // Re-resolve non-Viator images fresh at send time rather than trusting whatever URL the client
+    // Re-resolve every gift's image fresh at send time rather than trusting whatever URL the client
     // had — Pixabay's URLs are only valid ~24h, and an email might sit unopened for longer than that.
-    // Viator's own images are left as-is; they're not ours to re-resolve.
+    // (Viator gifts now carry a Pixabay image too, since we no longer look up a specific Viator product.)
     const giftsWithImages = await Promise.all(
       gifts.map(async (gift) => {
-        if (gift.store === "viator") return gift;
         const imageUrl = await fetchPixabayImage(gift.searchQuery || gift.name, gift.tags);
         return { ...gift, imageUrl };
       })
