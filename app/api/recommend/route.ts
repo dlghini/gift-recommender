@@ -130,10 +130,15 @@ export async function POST(request: Request) {
     const interestList = interests.join(", ");
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       // Sized for CANDIDATE_POOL_SIZE gifts with headroom for verbose rationales.
       // Kept tight because output tokens are the main driver of this endpoint's latency.
       max_tokens: 2600,
+      // Sonnet 5 runs adaptive thinking by default; disable it here. Gift ideation
+      // doesn't need a reasoning pass, and the response is schema-constrained JSON
+      // (output_config.format), so there's nowhere for stray reasoning to leak.
+      // This is the latency win — no thinking tokens on the critical path.
+      thinking: { type: "disabled" },
       system: [
         {
           type: "text",
