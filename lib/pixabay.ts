@@ -26,7 +26,9 @@ async function searchPixabay(query: string, apiKey: string): Promise<string | un
   try {
     const res = await fetch(
       `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&safesearch=true&per_page=3`,
-      { cache: "no-store" }
+      // Cap the wait: this runs on the /api/recommend critical path, so a slow or
+      // hanging Pixabay response must not stall the whole recommendation.
+      { cache: "no-store", signal: AbortSignal.timeout(4500) }
     );
     if (res.ok) {
       const data = (await res.json()) as { hits?: { webformatURL?: string }[] };
