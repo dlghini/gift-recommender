@@ -6,7 +6,7 @@ export const dogLovers: GiftGuide = {
   h1: "Gifts for Dog Lovers",
   title: "Gifts for Dog Lovers",
   description:
-    "Gift ideas for dog lovers: custom portraits and keepsakes, practical walking gear, and a few things the dog will approve of. Curated, with a reason for each pick.",
+    "Gift ideas for dog lovers: custom portraits and keepsakes, practical walking gear, and a few things the dog will approve of, each with a reason it fits.",
   intro: [
     "The mistake with dog-lover gifts is slogan merch. A “Dog Mom” mug or a paw-print doormat is fine, but it is not personal, and dog people have three of each already. The gifts that land point at their actual dog: a portrait, an engraved collar, a blanket with the right face on it.",
     "The other reliable category is practical gear the owner has been meaning to buy. A hands-free leash, a slow feeder, a waterproof seat cover. Cheap, used daily, and quietly appreciated.",

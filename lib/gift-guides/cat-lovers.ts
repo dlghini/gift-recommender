@@ -6,7 +6,7 @@ export const catLovers: GiftGuide = {
   h1: "Gifts for Cat Lovers",
   title: "Gifts for Cat Lovers",
   description:
-    "Gift ideas for cat lovers that go past the novelty mug: custom portraits, home upgrades the cat will actually use, and subscription boxes. Curated, with a reason for each.",
+    "Gift ideas for cat lovers that go past the novelty mug: custom portraits, home upgrades the cat will use, and subscription boxes, each with a reason.",
   intro: [
     "Cat people get buried in the same three gifts: a mug with a cat on it, cat socks, and a “crazy cat lady” something. All fine, all owned already. The gifts that work either point at their specific cat or make the house better for it.",
     "The home-improvement category is the strongest one here. A cat tree that fits the room, a water fountain, a self-cleaning litter box, a window perch. These get used every day, and the cat lover was probably not going to splurge on them.",

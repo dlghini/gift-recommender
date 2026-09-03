@@ -310,6 +310,17 @@ First programmatic content: 7 hand-curated Tier-1/Tier-2 gift-guide pages to tes
 - Verified in dev + rendered HTML: all 3 pages + updated index (10 guides) render, no new console errors (only the pre-existing Clerk-telemetry CORS noise), `<title>`/H1/canonical/og:url all use the new slugs and match, BreadcrumbList + ItemList + FAQPage JSON-LD present, affiliate hrefs correct (Amazon tag / Rakuten deeplink / Viator pid) with `rel="sponsored nofollow noopener"`, sitemap.xml lists the 3 new slugs, old `people-who-grew-up-in-the-80s` slug → 404 (never merged, so no redirect needed). `RESEND_API_KEY="" npm run build` clean.
 - **Next**: user merges PR #8, then request-index the 3 URLs in GSC. Pinterest pins ("80s nostalgia gifts", "retro gift ideas", "nostalgic gifts for him") to be added to the Sept queue by the marketing-side instance. Optional follow-ups (not done): add the retro/nostalgia slugs to existing guides' `related` arrays; broaden the `/gifts-for` index meta description.
 
+### Phase 36: Ahrefs audit fixes — orphan archetype pages + meta length — branch `seo/gifting-style-hub-links` (2026-09-03)
+
+Ahrefs Site Audit (Sept 3 crawl, Health Score 90, 31 internal URLs) flagged 6 new errors + warnings. Triaged all:
+- **Orphan pages (6, the real fix):** all six `/gifting-style/<archetype>` pages had **0 href inlinks** — in the sitemap but only reachable by finishing the quiz (client `router.push`). Added a crawlable "The six gifting styles" `<section>` to `app/gifting-style/page.tsx` linking each `/gifting-style/{id}` with name + tagline (server component, `next/link`, sage/clay styling). Resolves all 6.
+- **Meta description too long (2):** `cat-lovers` (171 chars) and `dog-lovers` (162) guide descriptions — trimmed to ~150. **Too short (1):** `/privacy` (105) — padded to 151. Cosmetic (SERP snippet display only), folded in while here.
+- **No action (documented for future sessions):**
+  - *Page has redirected JavaScript (27 URLs):* one JS resource redirects — it's the **Clerk auth loader** (`clerk.thegiftwhisperer.gifts`, on every page via `<ClerkProvider>`). Standard Clerk behavior, async, benign. (Also confirms Clerk **is** live in production.)
+  - *Pages have high AI content levels (1):* it's `/terms` (966 words). Legal boilerplate always reads as templated to any detector; 0 organic traffic, not a Helpful-Content risk. Fine.
+  - *No. of referring domains dropped (1):* one page lost a backlink. Noise at this backlink volume; revisit only if a real link-building push starts.
+  - *Changed pages not submitted to IndexNow / Word count changed / Title tag changed:* Ahrefs upsell + expected churn from shipping the gifting-style pages. Ignore.
+
 ### Phase 35: Viator geo-search + brand-free image query — branch `fix/viator-geo-and-image-query` (2026-09-02)
 
 Two things Daniel caught after PR #28/#29 shipped:

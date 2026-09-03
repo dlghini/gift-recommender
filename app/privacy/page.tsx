@@ -5,7 +5,7 @@ import { routeMeta } from "@/lib/site";
 export const metadata = routeMeta(
   "/privacy",
   "Privacy Policy",
-  "What data The Gift Whisperer collects, how it's used, who processes it, and the choices you have over it."
+  "What data The Gift Whisperer collects when you use the gift finder or a Loved Ones account, how it's used and shared, and the choices you have over it."
 );
 
 export default function PrivacyPage() {
