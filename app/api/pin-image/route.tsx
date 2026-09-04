@@ -35,12 +35,12 @@ export async function GET(request: Request) {
         }}
       >
         <svg
-          width="64"
-          height="64"
+          width="152"
+          height="152"
           viewBox="0 0 24 24"
           fill="none"
           stroke="#91462f"
-          strokeWidth={1.4}
+          strokeWidth={1}
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -50,12 +50,12 @@ export async function GET(request: Request) {
 
         <div
           style={{
-            fontSize: 26,
-            letterSpacing: 7,
+            fontSize: 33,
+            letterSpacing: 9,
             textTransform: "uppercase",
             color: "#91462f",
             fontWeight: 600,
-            marginTop: 34,
+            marginTop: 44,
             display: "flex",
           }}
         >
@@ -65,10 +65,10 @@ export async function GET(request: Request) {
         <div
           style={{
             fontFamily: "Lora",
-            fontSize: 88,
+            fontSize: 142,
             fontWeight: 600,
             color: "#91462f",
-            marginTop: 34,
+            marginTop: 40,
             display: "flex",
           }}
         >
@@ -78,14 +78,14 @@ export async function GET(request: Request) {
         <div
           style={{
             fontFamily: "Lora",
-            fontSize: 66,
+            fontSize: 92,
             fontWeight: 600,
             color: "#2b332d",
             lineHeight: 1.16,
             textAlign: "center",
-            marginTop: 20,
+            marginTop: 32,
             display: "flex",
-            maxWidth: 760,
+            maxWidth: 800,
           }}
         >
           {title}
@@ -96,12 +96,12 @@ export async function GET(request: Request) {
             style={{
               fontFamily: "Lora",
               fontStyle: "italic",
-              fontSize: 30,
+              fontSize: 37,
               color: "#8b9285",
-              marginTop: 28,
+              marginTop: 36,
               textAlign: "center",
               display: "flex",
-              maxWidth: 680,
+              maxWidth: 700,
             }}
           >
             {tagline}
@@ -110,12 +110,12 @@ export async function GET(request: Request) {
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ width: 130, height: 2, background: "#c8a556", marginBottom: 30 }} />
+        <div style={{ width: 140, height: 2, background: "#c8a556", marginBottom: 32 }} />
 
         <div
           style={{
-            fontSize: 26,
-            letterSpacing: 4,
+            fontSize: 34,
+            letterSpacing: 6,
             textTransform: "uppercase",
             color: "#2b332d",
             fontWeight: 600,
@@ -124,7 +124,7 @@ export async function GET(request: Request) {
         >
           {SITE_NAME}
         </div>
-        <div style={{ fontSize: 22, color: "#8b9285", marginTop: 10, display: "flex" }}>
+        <div style={{ fontSize: 28, color: "#8b9285", marginTop: 12, display: "flex" }}>
           thegiftwhisperer.gifts
         </div>
       </div>
