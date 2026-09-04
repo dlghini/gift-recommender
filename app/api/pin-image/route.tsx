@@ -5,9 +5,9 @@ import { SITE_NAME } from "@/lib/site";
 
 // Pinterest pin creative (2:3, Pinterest's recommended ratio). One route,
 // driven entirely by query params, so any guide/variant can be rendered
-// without a new file. Layout mirrors the original pin template (centered,
-// big numeral, italic tagline, generously spaced bullet list) recolored to
-// the site's current sage/clay/Lora system instead of the old cream/gold.
+// without a new file. Layout mirrors the site's original, simplest pin
+// template (icon, eyebrow, big numeral, title, italic tagline, generous
+// open space, footer) recolored to the current sage/clay/Lora system.
 export const runtime = "nodejs";
 
 const loadLora = () => readFile(join(process.cwd(), "assets/Lora.ttf"));
@@ -18,13 +18,6 @@ export async function GET(request: Request) {
   const number = searchParams.get("number") || "15";
   const title = searchParams.get("title") || SITE_NAME;
   const tagline = searchParams.get("tagline") || "";
-  const bullets = (searchParams.get("bullets") || "")
-    .split("|")
-    .map((b) => b.trim())
-    .filter(Boolean)
-    .slice(0, 4);
-  const totalPicks = Number(searchParams.get("total") || "15");
-  const remaining = Math.max(totalPicks - bullets.length, 0);
 
   const lora = await loadLora();
 
@@ -38,16 +31,16 @@ export async function GET(request: Request) {
           flexDirection: "column",
           alignItems: "center",
           background: "#e9eee6",
-          padding: "110px 100px",
+          padding: "115px 90px",
         }}
       >
         <svg
-          width="46"
-          height="46"
+          width="64"
+          height="64"
           viewBox="0 0 24 24"
           fill="none"
           stroke="#91462f"
-          strokeWidth={1.6}
+          strokeWidth={1.4}
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -57,12 +50,12 @@ export async function GET(request: Request) {
 
         <div
           style={{
-            fontSize: 24,
-            letterSpacing: 6,
+            fontSize: 26,
+            letterSpacing: 7,
             textTransform: "uppercase",
             color: "#91462f",
             fontWeight: 600,
-            marginTop: 20,
+            marginTop: 34,
             display: "flex",
           }}
         >
@@ -72,10 +65,10 @@ export async function GET(request: Request) {
         <div
           style={{
             fontFamily: "Lora",
-            fontSize: 68,
+            fontSize: 88,
             fontWeight: 600,
             color: "#91462f",
-            marginTop: 24,
+            marginTop: 34,
             display: "flex",
           }}
         >
@@ -85,14 +78,14 @@ export async function GET(request: Request) {
         <div
           style={{
             fontFamily: "Lora",
-            fontSize: 58,
+            fontSize: 66,
             fontWeight: 600,
             color: "#2b332d",
-            lineHeight: 1.18,
+            lineHeight: 1.16,
             textAlign: "center",
-            marginTop: 14,
+            marginTop: 20,
             display: "flex",
-            maxWidth: 720,
+            maxWidth: 760,
           }}
         >
           {title}
@@ -103,68 +96,25 @@ export async function GET(request: Request) {
             style={{
               fontFamily: "Lora",
               fontStyle: "italic",
-              fontSize: 28,
+              fontSize: 30,
               color: "#8b9285",
-              marginTop: 22,
+              marginTop: 28,
               textAlign: "center",
               display: "flex",
+              maxWidth: 680,
             }}
           >
             {tagline}
           </div>
         ) : null}
 
-        <div style={{ width: 120, height: 2, background: "#c8a97a", marginTop: 40 }} />
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 34,
-            marginTop: 48,
-            alignItems: "flex-start",
-          }}
-        >
-          {bullets.map((b, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div
-                style={{
-                  width: 9,
-                  height: 9,
-                  background: "#c8a97a",
-                  transform: "rotate(45deg)",
-                  flexShrink: 0,
-                }}
-              />
-              <div style={{ fontFamily: "Lora", fontSize: 32, color: "#2b332d", display: "flex" }}>
-                {b}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {remaining > 0 ? (
-          <div
-            style={{
-              fontFamily: "Lora",
-              fontStyle: "italic",
-              fontSize: 24,
-              color: "#8b9285",
-              marginTop: 36,
-              display: "flex",
-            }}
-          >
-            {`+ ${remaining} more, a reason for each`}
-          </div>
-        ) : null}
-
         <div style={{ flex: 1 }} />
 
-        <div style={{ width: 120, height: 2, background: "#cfd7cb", marginBottom: 26 }} />
+        <div style={{ width: 130, height: 2, background: "#c8a556", marginBottom: 30 }} />
 
         <div
           style={{
-            fontSize: 24,
+            fontSize: 26,
             letterSpacing: 4,
             textTransform: "uppercase",
             color: "#2b332d",
@@ -174,7 +124,7 @@ export async function GET(request: Request) {
         >
           {SITE_NAME}
         </div>
-        <div style={{ fontSize: 22, color: "#8b9285", marginTop: 8, display: "flex" }}>
+        <div style={{ fontSize: 22, color: "#8b9285", marginTop: 10, display: "flex" }}>
           thegiftwhisperer.gifts
         </div>
       </div>
