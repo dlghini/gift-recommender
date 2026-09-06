@@ -10,7 +10,11 @@ export default CLERK_ENABLED ? clerkMiddleware() : () => NextResponse.next();
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // /relay is excluded: it's the PostHog reverse-proxy path (see
+    // next.config.ts), high-volume and not Clerk-relevant, and PostHog's
+    // own docs warn a catch-all middleware matcher can intercept and break
+    // proxied ingestion requests before the rewrite ever runs.
+    "/((?!_next|relay|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
   ],
 };
