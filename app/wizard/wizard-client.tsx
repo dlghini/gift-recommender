@@ -30,6 +30,15 @@ function decodeSharePayload(encoded: string): { form: FormState; gifts: GiftResu
   }
 }
 
+// Maps a reminder's occasionKey (lib/reminders.ts: "birthday" | "anniversary" | a
+// holiday key) to one of the wizard's own OCCASIONS labels below. Holiday keys
+// don't have a matching entry, so they fall back to the generic "Holiday" option.
+function occasionLabelForKey(key: string): string {
+  if (key === "birthday") return "Birthday";
+  if (key === "anniversary") return "Anniversary";
+  return "Holiday";
+}
+
 type Step = 1 | 2 | 3 | 4 | "loading" | "results";
 
 interface FormState {
@@ -204,7 +213,11 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   // Set when the wizard is opened from a Loved One profile (?lovedOneId=). We
   // prefill everything the profile already knows and skip those steps.
   const [lovedOne, setLovedOne] = useState<{ name: string } | null>(null);
-  const [prefilledSteps, setPrefilledSteps] = useState<{ s1: boolean; s3: boolean }>({ s1: false, s3: false });
+  const [prefilledSteps, setPrefilledSteps] = useState<{ s1: boolean; s2: boolean; s3: boolean }>({
+    s1: false,
+    s2: false,
+    s3: false,
+  });
   const [loadingLovedOne, setLoadingLovedOne] = useState(
     () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("lovedOneId")
   );
@@ -216,29 +229,41 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const questionMetaRef = useRef<{ step: number; tMs: number; prefilled: boolean }[]>([]);
 
   // Prefill from a Loved One profile and skip the steps it already answers.
-  const applyLovedOne = (lo: {
-    name: string;
-    relationship: string;
-    birthday_year: number | null;
-    interests: unknown;
-    interests_notes: string | null;
-  }) => {
+  // `occasionKey` is only passed when arriving from an occasion-reminder email
+  // (?occasion=birthday etc.) — it isn't part of the saved profile itself.
+  const applyLovedOne = (
+    lo: {
+      name: string;
+      relationship: string;
+      birthday_year: number | null;
+      interests: unknown;
+      interests_notes: string | null;
+    },
+    occasionKey?: string | null
+  ) => {
     const age = ageRangeFromBirthYear(lo.birthday_year);
     const notes = (lo.interests_notes || "").trim();
     const savedInterests: string[] = Array.isArray(lo.interests) ? lo.interests : [];
+    const occasionLabel = occasionKey ? occasionLabelForKey(occasionKey) : "";
     setForm((f) => ({
       ...f,
       relationship: lo.relationship,
       ageRange: age || f.ageRange,
+      occasion: occasionLabel || f.occasion,
       interests: savedInterests.length ? savedInterests : f.interests,
       freetext: notes || f.freetext,
     }));
     setLovedOne({ name: lo.name });
     // Step 1 is relationship + age; relationship always comes from the profile,
-    // so it's only "done" if we also got an age. Step 3 is covered if the
+    // so it's only "done" if we also got an age. Step 2 (occasion) is only
+    // known when we arrived from a reminder email. Step 3 is covered if the
     // profile has interests checked or notes written.
-    setPrefilledSteps({ s1: !!age, s3: savedInterests.length > 0 || !!notes });
-    setStep(age ? 2 : 1);
+    const s3Prefilled = savedInterests.length > 0 || !!notes;
+    setPrefilledSteps({ s1: !!age, s2: !!occasionLabel, s3: s3Prefilled });
+    let target: Step = age ? 2 : 1;
+    if (target === 2 && occasionLabel) target = 3;
+    if (target === 3 && s3Prefilled) target = 4;
+    setStep(target);
   };
 
   const pickLovedOne = (id: string) => {
@@ -271,10 +296,11 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
     }
     const lovedOneId = params.get("lovedOneId");
     if (lovedOneId) {
+      const occasionKey = params.get("occasion");
       fetch(`/api/loved-ones/${lovedOneId}`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.lovedOne) applyLovedOne(data.lovedOne);
+          if (data.lovedOne) applyLovedOne(data.lovedOne, occasionKey);
           setLoadingLovedOne(false);
         })
         .catch(() => setLoadingLovedOne(false));
@@ -375,9 +401,11 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       fetchRecommendations(false);
     } else if (typeof step === "number") {
       posthog?.capture("wizard_step_completed", { step, ...form });
-      const prefilled = (step === 1 && prefilledSteps.s1) || (step === 3 && prefilledSteps.s3);
+      const prefilled =
+        (step === 1 && prefilledSteps.s1) || (step === 2 && prefilledSteps.s2) || (step === 3 && prefilledSteps.s3);
       questionMetaRef.current.push({ step, tMs: Date.now(), prefilled });
       let target = step + 1;
+      if (target === 2 && prefilledSteps.s2) target = 3;
       if (target === 3 && prefilledSteps.s3) target = 4;
       setStep(target as Step);
     }
@@ -388,6 +416,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
     else if (typeof step === "number" && step > 1) {
       let target = step - 1;
       if (target === 3 && prefilledSteps.s3) target = 2;
+      if (target === 2 && prefilledSteps.s2) target = 1;
       setStep(target as Step);
     }
   };
