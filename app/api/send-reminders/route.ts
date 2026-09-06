@@ -14,8 +14,8 @@ function escapeHtml(text: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function renderReminderEmail(label: string, lovedOneId: string, unsubUrl: string): string {
-  const url = `https://www.thegiftwhisperer.gifts/wizard?lovedOneId=${lovedOneId}`;
+function renderReminderEmail(label: string, lovedOneId: string, occasionKey: string, unsubUrl: string): string {
+  const url = `https://www.thegiftwhisperer.gifts/wizard?lovedOneId=${lovedOneId}&occasion=${encodeURIComponent(occasionKey)}`;
   return `
     <div style="font-family:Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#e9eee6;">
       <h1 style="font-family:Georgia,serif;font-size:22px;color:#2f3a33;text-align:center;margin-bottom:4px;">The Gift Whisperer</h1>
@@ -102,7 +102,7 @@ async function handleReminderRun(request: Request): Promise<Response> {
           from: "The Gift Whisperer <hello@thegiftwhisperer.gifts>",
           to: primaryEmail,
           subject: `${occasion.label} is coming up`,
-          html: renderReminderEmail(occasion.label, occasion.lovedOneId, unsubUrl),
+          html: renderReminderEmail(occasion.label, occasion.lovedOneId, occasion.occasionKey, unsubUrl),
           headers: {
             "List-Unsubscribe": `<${unsubUrl}>`,
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
