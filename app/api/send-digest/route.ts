@@ -41,29 +41,37 @@ function renderDigestEmail(blocks: PersonBlock[], unsubUrl: string): string {
 
   const personHtml = blocks
     .map(({ lovedOne, occasions }) => {
-      const occLines = occasions
-        .map(
-          (o) =>
-            `<p style="margin:0 0 4px 0;font-size:14px;color:#2f3a33;">${escapeHtml(
-              o.label
-            )} &middot; <span style="color:#6c756b;">${formatOccasionDate(o.date)}</span></p>`
-        )
+      // Each occasion gets its own row + its own button carrying its own
+      // occasionKey, rather than one button per person guessing which of a
+      // person's several due dates was meant (see Phase 32 on the reminder
+      // email, which this mirrors).
+      const occRows = occasions
+        .map((o, i) => {
+          const wizardUrl = `${SITE}/wizard?lovedOneId=${lovedOne.id}&occasion=${encodeURIComponent(o.occasionKey)}`;
+          const borderTop = i === 0 ? "none" : "1px solid #f0ece5";
+          return `
+            <tr>
+              <td style="padding:7px 0;border-top:${borderTop};font-size:13px;color:#2f3a33;text-align:left;">${escapeHtml(
+                o.label
+              )} <span style="color:#6c756b;">&middot; ${formatOccasionDate(o.date)}</span></td>
+              <td style="padding:7px 0;border-top:${borderTop};text-align:right;white-space:nowrap;">
+                <a href="${wizardUrl}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:11.5px;padding:5px 11px;border-radius:100px;text-decoration:none;">Get ideas &rarr;</a>
+              </td>
+            </tr>`;
+        })
         .join("");
-
-      const wizardUrl = `${SITE}/wizard?lovedOneId=${lovedOne.id}`;
 
       return `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e4d9cf;margin-bottom:14px;">
-          <tr><td style="padding:24px;text-align:center;">
-            <p style="margin:0 0 12px 0;font-family:Georgia,serif;font-size:17px;color:#2f3a33;">${escapeHtml(
+          <tr><td style="padding:20px 20px 16px 20px;">
+            <p style="margin:0 0 8px 0;font-family:Georgia,serif;font-size:15px;color:#2f3a33;text-align:center;">${escapeHtml(
               lovedOne.name
-            )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8f978d;">&middot; ${escapeHtml(
+            )} <span style="font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#8f978d;">&middot; ${escapeHtml(
               lovedOne.relationship
             )}</span></p>
-            ${occLines}
-            <div style="margin-top:18px;">
-              <a href="${wizardUrl}" style="display:inline-block;background:#a8543a;color:#ffffff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:6px;text-decoration:none;">Get gift ideas &rarr;</a>
-            </div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              ${occRows}
+            </table>
           </td></tr>
         </table>`;
     })
