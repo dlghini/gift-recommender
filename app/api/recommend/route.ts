@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { after } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
@@ -237,31 +238,38 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
       ...restRaw.map((g, i) => ({ ...g, shown: false, position: SHOWN_COUNT + i })),
     ];
 
-    // Log session to database — errors here don't affect the user response
-    try {
-      const sql = getDb();
-      await sql`
-        INSERT INTO sessions (
-          relationship, age_range, occasion, interests, freetext, budget, gifts, attempt,
-          run_id, candidates, is_internal, question_meta
-        )
-        VALUES (
-          ${relationship}, ${ageRange}, ${occasion}, ${JSON.stringify(interests)},
-          ${freetext ?? ""}, ${budget}, ${JSON.stringify(gifts)}, ${attempt},
-          ${runId}, ${JSON.stringify(candidates)}, ${isInternal},
-          ${body.questionMeta ? JSON.stringify(body.questionMeta) : null}
-        )
-      `;
-      if (runId) {
-        await logRunEvent(sql, runId, "recommend_generated", {
-          attempt,
-          poolSize: data.gifts.length,
-          isInternal,
-        });
+    // Log session to database. This was previously awaited before responding,
+    // putting a Postgres write of the full (now 8-candidate) JSON payload on
+    // the user's critical path for no benefit — the user's response never
+    // depended on it. after() runs it once the response has already gone out
+    // (Vercel keeps the function alive via waitUntil under the hood); errors
+    // here still don't affect the user response, they just can't anymore either.
+    after(async () => {
+      try {
+        const sql = getDb();
+        await sql`
+          INSERT INTO sessions (
+            relationship, age_range, occasion, interests, freetext, budget, gifts, attempt,
+            run_id, candidates, is_internal, question_meta
+          )
+          VALUES (
+            ${relationship}, ${ageRange}, ${occasion}, ${JSON.stringify(interests)},
+            ${freetext ?? ""}, ${budget}, ${JSON.stringify(gifts)}, ${attempt},
+            ${runId}, ${JSON.stringify(candidates)}, ${isInternal},
+            ${body.questionMeta ? JSON.stringify(body.questionMeta) : null}
+          )
+        `;
+        if (runId) {
+          await logRunEvent(sql, runId, "recommend_generated", {
+            attempt,
+            poolSize: data.gifts.length,
+            isInternal,
+          });
+        }
+      } catch (dbError) {
+        console.error("[session logging]", dbError);
       }
-    } catch (dbError) {
-      console.error("[session logging]", dbError);
-    }
+    });
 
     return Response.json(gifts);
   } catch (error) {
