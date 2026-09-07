@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { applyInternalParam, getIsInternal, runEvent } from "@/lib/wizard-telemetry";
 import { useUser } from "@clerk/nextjs";
+import { useClerkLazy } from "@/components/lazy-clerk-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -159,18 +160,23 @@ function ageRangeFromBirthYear(year: number | null | undefined): string {
   return "60+";
 }
 
-// useUser() throws unless a <ClerkProvider> is actually mounted above it, and
-// that only happens when Clerk keys are configured (see lib/clerk-enabled.ts).
-// Isolating the hook call in its own component — only ever rendered when
-// Clerk is enabled — keeps this file safe to load either way, without
-// conditionally calling a hook inside WizardPageContent itself.
+// useUser() throws unless the real <ClerkProvider> is actually mounted above
+// it, which now only happens once LazyClerkProvider decides it's worth it
+// (an existing session, or someone asked to sign in) — not just because
+// Clerk is configured at all. Isolating the hook call in its own component,
+// only ever rendered once that's true, keeps this file safe to load either
+// way, without conditionally calling a hook inside WizardPageContent itself.
+// A fresh anonymous visitor (the common case, and the one that matters for
+// the Messages-link crash this is meant to help with) never mounts this at
+// all, so the wizard never pays for Clerk's script on their behalf.
 function ClerkAwareWizardPage() {
   const { isSignedIn } = useUser();
   return <WizardPageContent isSignedIn={!!isSignedIn} />;
 }
 
 export default function WizardPage() {
-  return CLERK_ENABLED ? <ClerkAwareWizardPage /> : <WizardPageContent isSignedIn={false} />;
+  const { clerkReady } = useClerkLazy();
+  return CLERK_ENABLED && clerkReady ? <ClerkAwareWizardPage /> : <WizardPageContent isSignedIn={false} />;
 }
 
 function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
