@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { Gift, Heart } from "lucide-react";
 import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { useClerkLazy } from "@/components/lazy-clerk-provider";
 import { LovedOnesNudge } from "@/components/loved-ones-nudge";
 
 export function Nav() {
+  const { clerkReady, requestClerk } = useClerkLazy();
   return (
     <header className="border-b border-stone-100 bg-white/80 backdrop-blur sticky top-0 z-40">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -39,20 +43,32 @@ export function Nav() {
               </span>
             </span>
           </span>
-          {CLERK_ENABLED && (
-            <>
-              <Show when="signed-out">
-                <SignInButton mode="modal">
-                  <button className="text-sm font-medium text-amber-600 hover:text-amber-700">
-                    Sign in
-                  </button>
-                </SignInButton>
-              </Show>
-              <Show when="signed-in">
-                <UserButton />
-              </Show>
-            </>
-          )}
+          {CLERK_ENABLED &&
+            (clerkReady ? (
+              <>
+                <Show when="signed-out">
+                  <SignInButton mode="modal">
+                    <button className="text-sm font-medium text-amber-600 hover:text-amber-700">
+                      Sign in
+                    </button>
+                  </SignInButton>
+                </Show>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
+              </>
+            ) : (
+              // Clerk hasn't loaded yet (anonymous visitor, no prior session) — a
+              // plain button that triggers loading it, instead of paying for
+              // Clerk's script on every page view just to find out someone's
+              // signed out. See components/lazy-clerk-provider.tsx.
+              <button
+                onClick={requestClerk}
+                className="text-sm font-medium text-amber-600 hover:text-amber-700"
+              >
+                Sign in
+              </button>
+            ))}
         </nav>
       </div>
       <LovedOnesNudge />

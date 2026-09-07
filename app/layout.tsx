@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
 import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
-import { ClerkProvider } from "@clerk/nextjs";
+import { LazyClerkProvider } from "@/components/lazy-clerk-provider";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
+import { hasClerkSessionCookie } from "@/lib/has-clerk-session";
 import { JsonLd } from "@/components/json-ld";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 
@@ -86,11 +88,16 @@ const websiteSchema = {
   url: SITE_URL,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Server-side so a returning signed-in visitor's nav renders correctly on
+  // first paint — no flash of "signed out" while a client check catches up.
+  const cookieHeader = (await cookies()).toString();
+  const initialWantsClerk = hasClerkSessionCookie(cookieHeader);
+
   const body = (
     <html
       lang="en"
@@ -109,5 +116,9 @@ export default function RootLayout({
     </html>
   );
 
-  return CLERK_ENABLED ? <ClerkProvider>{body}</ClerkProvider> : body;
+  return CLERK_ENABLED ? (
+    <LazyClerkProvider initialWantsClerk={initialWantsClerk}>{body}</LazyClerkProvider>
+  ) : (
+    body
+  );
 }
