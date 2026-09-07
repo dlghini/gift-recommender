@@ -23,7 +23,12 @@ const client = new Anthropic();
 // the rest (unenriched) so a future re-ranker has something to re-rank. Logging
 // the full pool now is the one thing we can't backfill later. Pool size is a
 // latency lever — every extra candidate is more output tokens on the critical path.
-const CANDIDATE_POOL_SIZE = 8;
+// 4 (not e.g. 5 or 6) also divides evenly by the "both" gift-preference instruction's
+// quarter-experience target below, instead of forcing an inconsistent rounding.
+// Was 8; the extra candidates beyond SHOWN_COUNT aren't consumed by anything yet
+// (no re-ranker built, and the client never even receives them today — see
+// MEMORY.md Phase 41), so this trades pool depth for speed until that changes.
+const CANDIDATE_POOL_SIZE = 4;
 const SHOWN_COUNT = 3;
 
 const SYSTEM_PROMPT = `You are a thoughtful gift recommendation expert. Given details about a gift recipient, recommend a ranked list of exactly ${CANDIDATE_POOL_SIZE} gifts (best fit first) that are genuinely well-suited to them. Return all ${CANDIDATE_POOL_SIZE}. Vary the list across price points, categories, and a mix of safe and slightly unexpected picks.
