@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
+import { PinterestTag } from "@/components/pinterest-tag";
 import { LazyClerkProvider } from "@/components/lazy-clerk-provider";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
 import { hasClerkSessionCookie } from "@/lib/has-clerk-session";
@@ -112,6 +113,7 @@ export default async function RootLayout({
           <Footer />
         </PostHogProvider>
         <Analytics />
+        <PinterestTag />
       </body>
     </html>
   );

@@ -93,6 +93,21 @@
 
 ## Completed Features
 
+### Phase 43: Pinterest conversion tag — branch `feat/pinterest-conversion-tag` (2026-09-08)
+
+Pinterest Ads had zero conversion visibility: a paid "Consideration" campaign (2 promoted pins, dog-lovers + cat-lovers) ran Sept 4–8 for ~$38 / 50 outbound clicks, and PostHog could only see ~6 real cold visitors, all of whom bounced. No Pinterest tag existed on the site, so campaigns could only optimise toward raw clicks. This adds the tag.
+
+- **Pinterest tag ID `2613775431715`** — created via ads.pinterest.com → Conversions → Pinterest tag (was not installed; "Tag manager" was empty). Domain was already claimed (`p:domain_verify` meta in `app/layout.tsx`, pre-existing). Automatic Enhanced Match left on Pinterest's default — the wizard is anonymous so no email is passed through `pintrk('load', …, { em })`.
+- **`lib/pinterest.ts`** (new): `PINTEREST_TAG_ID` constant, `trackPinterest(event, params)` (thin typed wrapper over `window.pintrk('track', …)`, no-ops when the script is blocked / not yet loaded / SSR), `pinterestPageView()` for SPA route changes, and `parsePriceValue()` to pull a number out of a free-form price string (`"$45"`, `"Around $40"`, `"$30–50"` → 45 / 40 / 30; `undefined` when unparseable so callers drop `value` rather than send NaN).
+- **`components/pinterest-tag.tsx`** (new, `"use client"`): base tag bootstrap loaded via `next/script` `strategy="afterInteractive"` (per `node_modules/next/dist/docs/…/script.md` — the documented choice for analytics/tag-manager scripts), plus a `usePathname()` effect firing `pinterestPageView()` on client-side navigations (a `firstRun` ref skips the first, which the inline `pintrk('page')` already covers). Includes the `<noscript>` pixel for parity with Pinterest's official snippet.
+- **`app/layout.tsx`**: `<PinterestTag />` rendered next to `<Analytics />`.
+- **Event mapping in `app/wizard/wizard-client.tsx`** (fired right after the existing `posthog?.capture(...)` at each site):
+  - `wizard_completed` (non-regenerate branch only, so one per genuine run) → `trackPinterest("lead", { lead_type: "wizard_completed" })` — mid-funnel.
+  - `results_emailed` → `trackPinterest("signup", { lead_type: "email_results" })` — real email capture.
+  - `buy_clicked` (in `handleBuyClick`) → `trackPinterest("checkout", { currency: "USD", value: parsePriceValue(gift.price), property: gift.store })` — bottom-funnel. It's an affiliate outbound click, not a confirmed purchase, but it's the closest optimisable signal; `checkout` and `lead` being distinct standard events lets campaigns optimise to either.
+- Verified in the dev server: base script + `s.pinimg.com/ct/core.js` load, `window.pintrk` is a live function (v3.0), page-load `event=init` fires, `trackPinterest('lead'|'checkout', …)` produce correct `ct.pinterest.com/v3/?event=lead|checkout&…&tid=2613775431715` hits with the right `ed` payload, and a client-side route change calls `pintrk('page')` exactly once. No console errors. `npm run build` clean; the only lint findings in touched files are the two pre-existing `set-state-in-effect` warnings in `wizard-client.tsx`, unchanged (just shifted a few lines).
+- Not done: Pinterest **Conversions API** (server-side, `lib/pinterest.ts` has an `event_id` slot ready for dedup if it's added later). Tag won't show as "installed" in Pinterest's UI until the first real hit from production. Separately flagged for the user: the promoted pins land on a gift-guide page with no obvious path into the wizard — likely why cold visitors bounce — worth a landing-page pass.
+
 ### Phase 1: Foundation & Guardrails — COMPLETE
 - Initialized shadcn/ui with Tailwind v4 support
 - Installed button, input, card, progress components

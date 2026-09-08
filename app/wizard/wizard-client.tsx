@@ -18,6 +18,7 @@ import { pickRelationshipEmoji } from "@/components/relationship-emoji";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
 import { INTERESTS } from "@/lib/interests";
 import { useResolvedImage } from "@/lib/use-resolved-image";
+import { trackPinterest, parsePriceValue } from "@/lib/pinterest";
 
 function encodeSharePayload(form: FormState, gifts: GiftResult[]): string {
   return btoa(encodeURIComponent(JSON.stringify({ form, gifts })));
@@ -372,6 +373,9 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       runEvent(runId, "regenerate_clicked", { attempt: nextAttempt });
     } else {
       posthog?.capture("wizard_completed", form);
+      // Pinterest: mid-funnel conversion — one per genuine wizard run
+      // (regenerates are excluded by the branch above).
+      trackPinterest("lead", { lead_type: "wizard_completed" });
     }
     try {
       const res = await fetch("/api/recommend", {
@@ -530,6 +534,7 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
       setEmailStatus("sent");
       posthog?.capture("results_emailed", { gifts: gifts.map((g) => g.name) });
       runEvent(runIdRef.current, "results_emailed", {});
+      trackPinterest("signup", { lead_type: "email_results" });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong. Please try again.";
       setEmailError(msg);
@@ -541,6 +546,13 @@ function WizardPageContent({ isSignedIn }: { isSignedIn: boolean }) {
   const handleBuyClick = (gift: GiftResult) => {
     posthog?.capture("buy_clicked", { gift: gift.name, store: gift.store, price: gift.price, ...form });
     runEvent(gift.runId ?? runIdRef.current, "buy_clicked", { gift: gift.name, store: gift.store });
+    // Pinterest: bottom-funnel conversion. It's an affiliate outbound click, not
+    // a confirmed purchase, but it's the closest optimizable signal we have.
+    trackPinterest("checkout", {
+      currency: "USD",
+      value: parsePriceValue(gift.price),
+      property: gift.store,
+    });
     window.open(buildBuyUrl(gift), "_blank", "noopener,noreferrer");
   };
 
