@@ -93,6 +93,16 @@
 
 ## Completed Features
 
+### Phase 44: Cross-link the gifting-style archetype pages — branch `seo/gifting-style-cross-links` (2026-09-10)
+
+The Ahrefs Site Audit crawl on 2026-09-10 flagged "Page has only one dofollow incoming internal link" on all 6 `/gifting-style/[archetype]` pages (overthinker, last-minute, experience, practical, sentimental, portfolio). Phase 36 (`seo/gifting-style-hub-links`) had taken them from orphaned (0 links) to 1 link each — the single link from the hub's "six gifting styles" list — which cleared the orphan *error* but left them thinly linked. This is also the likely reason GSC still lists the `/gifting-style` pages under "Discovered – currently not indexed" (Google won't spend crawl budget on barely-linked pages).
+
+- **`app/gifting-style/[archetype]/page.tsx`**: replaced the small centered "What's your gifting style?" footer link with a "The other gifting styles" section — a list of the other 5 archetypes (`ARCHETYPE_ORDER.filter(other => other !== id)`), each a `next/link` to `/gifting-style/{other}` styled like the hub's cards (name + tagline), followed by a "Take the gifting style quiz →" link back to the hub. Takes each archetype page from 1 internal dofollow inlink to 6 (hub + 5 siblings).
+- Root-relative hrefs only (resolve to the www host), so no new apex-canonical signals and no interaction with the still-pending homepage canonical validation. Anchor text is the archetype names — descriptive, not keyword-stuffed.
+- No homepage change: the homepage gifting-style card is a single wrapping `<a href="/gifting-style">`, and turning the archetype names inside it into links would mean nesting anchors / restructuring the card. The sibling cross-linking already resolves the "only one inlink" warning decisively, so left the homepage → hub link as-is.
+- Verified in the dev server: on `/gifting-style/overthinker` and `/gifting-style/portfolio` the section renders the correct 5 sibling links, excludes the current archetype, all hrefs root-relative, no console errors. `npm run build` clean, no new lint findings.
+- The other new audit item that day ("Redirect target changed", 1 URL) was noise — Clerk's CDN bumped `clerk-js@6.30.1 → 6.31.0` on the `clerk.` auth subdomain. Site Audit Health Score is now 100, 0 errors.
+
 ### Phase 43: Pinterest conversion tag — branch `feat/pinterest-conversion-tag` (2026-09-08)
 
 Pinterest Ads had zero conversion visibility: a paid "Consideration" campaign (2 promoted pins, dog-lovers + cat-lovers) ran Sept 4–8 for ~$38 / 50 outbound clicks, and PostHog could only see ~6 real cold visitors, all of whom bounced. No Pinterest tag existed on the site, so campaigns could only optimise toward raw clicks. This adds the tag.
