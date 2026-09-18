@@ -105,13 +105,7 @@ export default async function GiftGuidePage({
           Curated by Daniel M. &middot; Updated {formatUpdated(guide.updated)}
         </p>
 
-        <div className="mt-6 space-y-4 text-base leading-relaxed text-stone-600">
-          {guide.intro.map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-        </div>
-
-        <div className="mt-8 rounded-xl border border-amber-200 bg-white p-5">
+        <div className="mt-6 rounded-xl border border-amber-200 bg-white p-5">
           <p className="text-sm text-stone-600">
             Want a shortlist built for one specific person instead of a category?
           </p>
@@ -122,6 +116,12 @@ export default async function GiftGuidePage({
             <Gift className="h-4 w-4" />
             Ask the Gift Whisperer
           </Link>
+        </div>
+
+        <div className="mt-8 space-y-4 text-base leading-relaxed text-stone-600">
+          {guide.intro.map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
         </div>
 
         {guide.sections.map((section) => (

@@ -93,6 +93,13 @@
 
 ## Completed Features
 
+### Phase 45: Move the wizard CTA above the intro on gift-guide pages (2026-09-17)
+
+The Sept 4-8 paid Pinterest campaign (Phase 43) sent 6 real cold visitors to `/gifts-for/dog-lovers` and `/gifts-for/cat-lovers`; all 6 bounced on the first pageview with zero wizard starts. The page already had an "Ask the Gift Whisperer" CTA box linking to `/wizard`, but it sat after three paragraphs of intro copy — confirmed via mobile-viewport screenshot (375x812) that it rendered well below the fold, so a visitor would have to scroll past the whole first screen before ever seeing a path off the page and into the wizard.
+
+- **`app/gifts-for/[slug]/page.tsx`**: moved the existing CTA box (unchanged markup/copy) to sit directly after the H1/byline, before `guide.intro`. Verified in the dev server at mobile viewport: the CTA now renders fully visible on initial load with no scrolling, on both `/gifts-for/dog-lovers` and `/gifts-for/wine-lovers`. Link still correctly points to `/wizard`. No console errors, `npm run build` clean.
+- Scope: only the `/gifts-for/[slug]` template. The `/gifting-style/[archetype]` pages were checked too but are framed as quiz *results* ("You're The Overthinker") rather than cold-landing pages, so the same fix doesn't directly apply there — worth a fresh look if/when Pinterest pins start pointing at archetype pages instead of gift-guide pages.
+
 ### Phase 44: Cross-link the gifting-style archetype pages — branch `seo/gifting-style-cross-links` (2026-09-10)
 
 The Ahrefs Site Audit crawl on 2026-09-10 flagged "Page has only one dofollow incoming internal link" on all 6 `/gifting-style/[archetype]` pages (overthinker, last-minute, experience, practical, sentimental, portfolio). Phase 36 (`seo/gifting-style-hub-links`) had taken them from orphaned (0 links) to 1 link each — the single link from the hub's "six gifting styles" list — which cleared the orphan *error* but left them thinly linked. This is also the likely reason GSC still lists the `/gifting-style` pages under "Discovered – currently not indexed" (Google won't spend crawl budget on barely-linked pages).
