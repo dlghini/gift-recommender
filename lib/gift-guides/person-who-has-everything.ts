@@ -50,6 +50,6 @@ export const personWhoHasEverything: GiftGuide = {
     { q: "What is a good sentimental gift for them?", a: "A photo book about one particular year or trip, a custom star map or coordinates print for a date that matters, or an engraved keepsake box. Personal beats expensive here." },
     { q: "Under $50?", a: "A small-producer pantry set, a serious box of chocolate, a photo book, a custom print, a good candle, or the first months of a tasting subscription." },
   ],
-  related: ["men-who-have-everything", "wine-lovers", "coffee-lovers"],
+  related: ["men-who-have-everything", "women-who-have-everything", "wine-lovers"],
   updated: "2026-08-27",
 };

@@ -50,6 +50,6 @@ export const menWhoHaveEverything: GiftGuide = {
     { q: "What is a safe upgrade gift?", a: "Look at what he uses every day and buy the better version. A dull chef's knife, a fraying wallet, a beat-up multitool, an airport hoodie. He will use the upgrade immediately and would not have bought it himself." },
     { q: "Under $50?", a: "A bottle he would not buy himself, a monthly hot sauce or coffee club, engraved bar glasses, a MasterClass subscription, or a quality everyday item like a good pen or a leather cable roll." },
   ],
-  related: ["person-who-has-everything", "wine-lovers", "coffee-lovers"],
+  related: ["person-who-has-everything", "women-who-have-everything", "wine-lovers"],
   updated: "2026-08-27",
 };

@@ -93,6 +93,15 @@
 
 ## Completed Features
 
+### Phase 46: New gift-guide page — "Gifts for Women Who Have Everything" (2026-09-24)
+
+A full Pinterest board census (all 29 pins, via the board page not the profile "Created" tab) showed "Gifts for Men Who Have Everything" (2.2k impressions, 40 pin clicks) and "Gifts for the Person Who Has Everything" (929 impressions, 21 pin clicks) as by far the top two organic-reach pins on the board, well ahead of every hobby-affinity pin (cat/dog/wine/book/coffee lovers) and the newer gifting-style archetype pins. The site had no gendered-female counterpart to `men-who-have-everything`, so this closes that gap with a genuinely distinct guide (not a find-and-replace of the men's version) before building a matching pin.
+
+- **`lib/gift-guides/women-who-have-everything.ts`** (NEW): slug `women-who-have-everything`, same 3-section/15-pick structure as the other two "has everything" guides (Experiences over objects / Better versions of things she already uses / Consumable, personal, or charitable), but distinct picks: spa/wine-tasting/flower-arranging experiences, silk pillowcase + skincare-tool + robe + jewelry-box + bag upgrades, flower subscription + tea/chocolate + birthstone necklace + membership + donation-and-keepsake. 4 FAQs, intro follows the established "has everything = full house/closet, give experiences/consumables/upgrades instead of more objects" framing from its two siblings.
+- **`lib/gift-guides/index.ts`**: registered in `GIFT_GUIDES`, positioned right after `personWhoHasEverything` (before `retroGifts`).
+- **`lib/gift-guides/person-who-has-everything.ts`** and **`men-who-have-everything.ts`**: `related` arrays updated to cross-link the new guide (swapped out `coffee-lovers` from one slot each to make room, kept `wine-lovers`/`coffee-lovers` as the third sibling on each so the two original guides don't lose a cross-link, just gain one).
+- Next: build a matching Pinterest pin (sage/clay template, title following the "X Ideas That Land" / "X Real Ideas" pattern that correlates with the two top performers) and schedule it once approved.
+
 ### Phase 45: Move the wizard CTA above the intro on gift-guide pages (2026-09-17)
 
 The Sept 4-8 paid Pinterest campaign (Phase 43) sent 6 real cold visitors to `/gifts-for/dog-lovers` and `/gifts-for/cat-lovers`; all 6 bounced on the first pageview with zero wizard starts. The page already had an "Ask the Gift Whisperer" CTA box linking to `/wizard`, but it sat after three paragraphs of intro copy — confirmed via mobile-viewport screenshot (375x812) that it rendered well below the fold, so a visitor would have to scroll past the whole first screen before ever seeing a path off the page and into the wizard.

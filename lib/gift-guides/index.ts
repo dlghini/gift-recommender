@@ -6,6 +6,7 @@ import { catLovers } from "./cat-lovers";
 import { wineLovers } from "./wine-lovers";
 import { menWhoHaveEverything } from "./men-who-have-everything";
 import { personWhoHasEverything } from "./person-who-has-everything";
+import { womenWhoHaveEverything } from "./women-who-have-everything";
 import { retroGifts } from "./retro-gifts";
 import { nostalgiaGifts80s } from "./80s-nostalgia-gifts";
 import { nostalgiaGifts90s } from "./90s-nostalgia-gifts";
@@ -19,6 +20,7 @@ export const GIFT_GUIDES: GiftGuide[] = [
   catLovers,
   menWhoHaveEverything,
   personWhoHasEverything,
+  womenWhoHaveEverything,
   retroGifts,
   nostalgiaGifts80s,
   nostalgiaGifts90s,
