@@ -100,7 +100,7 @@ function ExampleThumb({ gift }: { gift: (typeof EXAMPLE_GIFTS)[number] }) {
   return <div className="text-4xl shrink-0">{pickEmoji(gift.tags)}</div>;
 }
 
-export default function Home() {
+export default function Home({ guides }: { guides: { slug: string; label: string }[] }) {
   const posthog = usePostHog();
   const [accountNoteOpen, setAccountNoteOpen] = useState(false);
 
@@ -286,6 +286,32 @@ export default function Home() {
           </a>
         </div>
       </div>
+
+      {/* Gift guides: deliberately quiet text links (also gives crawlers a direct path to each guide) */}
+      <nav aria-label="Gift guides" className="max-w-2xl mx-auto px-4 py-10 text-center">
+        <p className="text-xs uppercase tracking-wide text-stone-400 mb-3">Gift guides</p>
+        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-sm text-stone-500">
+          {guides.map((g) => (
+            <li key={g.slug}>
+              <a
+                href={`/gifts-for/${g.slug}`}
+                onClick={() => posthog?.capture("cta_clicked", { location: "home_gift_guides", guide: g.slug })}
+                className="hover:text-stone-800 hover:underline underline-offset-2 transition-colors"
+              >
+                {g.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a
+              href="/gifts-for"
+              className="text-amber-700 hover:text-amber-800 hover:underline underline-offset-2 transition-colors"
+            >
+              All guides &rarr;
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 }

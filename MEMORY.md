@@ -93,6 +93,14 @@
 
 ## Completed Features
 
+### Phase 48: Quiet "Gift guides" link strip on the homepage (2026-09-29)
+
+GSC URL Inspection showed the new guides were unknown to Google, and a code check showed the homepage (the strongest indexed page) linked to no guide at all; only the sitewide footer linked the `/gifts-for` hub. Added a deliberately unobtrusive strip at the very bottom of the homepage: a tiny uppercase "Gift guides" label over a wrapped row of muted stone-500 text links (one per guide, plus an amber "All guides →" link to the hub). No cards, buttons, or icons.
+
+- **`app/page.tsx`**: server wrapper now builds `guides` (`slug` + a short capitalized label derived from each guide's `keyword`, e.g. "Dad who has everything") from `GIFT_GUIDES` and passes it to `HomeClient`. Done server-side so the full guide content isn't bundled into the client component.
+- **`app/home-client.tsx`**: `Home` now takes a `guides` prop and renders a `<nav aria-label="Gift guides">` after "How it works". Uses plain `<a href>` (consistent with the rest of that file, no prefetch cost), each click fires `cta_clicked` with `location: "home_gift_guides"` and the guide slug.
+- Verified: `npm run build` clean; all 11 guide links plus `/gifts-for` appear in the server-rendered homepage HTML (crawlable without JS); visual check on desktop looked quiet and in keeping with the page. Mobile could not be verified precisely (headless Chrome clips narrow viewports for the existing sections too); the row uses `flex-wrap`.
+
 ### Phase 47: Four more "who has everything" gift guides (2026-09-29)
 
 The 12 gifting-style quiz pins (9/19+) were performing poorly (1-9 impressions each), while the "has everything" pins remained the only real organic performers, so this extends that proven angle into relationship-specific variants that stay distinct from the existing person/men/women guides.

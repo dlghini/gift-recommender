@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeClient from "./home-client";
+import { GIFT_GUIDES } from "@/lib/gift-guides";
 
 // Thin server wrapper so the (client) landing page can still declare route
 // metadata — notably a self-referencing canonical. Without it Google had no
@@ -10,5 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <HomeClient />;
+  const guides = GIFT_GUIDES.map((g) => {
+    const label = g.keyword.replace(/^gifts for (the )?/i, "");
+    return { slug: g.slug, label: label.charAt(0).toUpperCase() + label.slice(1) };
+  });
+  return <HomeClient guides={guides} />;
 }
