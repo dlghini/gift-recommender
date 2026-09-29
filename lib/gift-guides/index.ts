@@ -7,6 +7,10 @@ import { wineLovers } from "./wine-lovers";
 import { menWhoHaveEverything } from "./men-who-have-everything";
 import { personWhoHasEverything } from "./person-who-has-everything";
 import { womenWhoHaveEverything } from "./women-who-have-everything";
+import { dadWhoHasEverything } from "./dad-who-has-everything";
+import { momWhoHasEverything } from "./mom-who-has-everything";
+import { grandparentsWhoHaveEverything } from "./grandparents-who-have-everything";
+import { husbandWhoHasEverything } from "./husband-who-has-everything";
 import { retroGifts } from "./retro-gifts";
 import { nostalgiaGifts80s } from "./80s-nostalgia-gifts";
 import { nostalgiaGifts90s } from "./90s-nostalgia-gifts";
@@ -21,6 +25,10 @@ export const GIFT_GUIDES: GiftGuide[] = [
   menWhoHaveEverything,
   personWhoHasEverything,
   womenWhoHaveEverything,
+  dadWhoHasEverything,
+  momWhoHasEverything,
+  grandparentsWhoHaveEverything,
+  husbandWhoHasEverything,
   retroGifts,
   nostalgiaGifts80s,
   nostalgiaGifts90s,

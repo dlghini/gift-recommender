@@ -93,6 +93,17 @@
 
 ## Completed Features
 
+### Phase 47: Four more "who has everything" gift guides (2026-09-29)
+
+The 12 gifting-style quiz pins (9/19+) were performing poorly (1-9 impressions each), while the "has everything" pins remained the only real organic performers, so this extends that proven angle into relationship-specific variants that stay distinct from the existing person/men/women guides.
+
+- **NEW guides** (each `lib/gift-guides/<slug>.ts`, same 3 sections x 5 picks = 15, 4 FAQs, `updated: 2026-09-29`): `dad-who-has-everything` (time with you / better versions of what he uses / personal from his kids), `mom-who-has-everything` (time set aside for her / small comforts / from the family), `grandparents-who-have-everything` (outings with the grandkids / made by the family / everyday comforts), `husband-who-has-everything` (time for the two of you / better daily versions / personal from you). Picks deliberately avoid repeating the men/women guides' picks (e.g. no spa day, whiskey tasting, dopp kit).
+- **`lib/gift-guides/index.ts`**: all four registered right after `womenWhoHaveEverything`. Sitemap and `/gifts-for` index pick them up automatically.
+- **`related` arrays** rewired: men -> person, women, dad; women -> person, men, mom; person -> men, women, grandparents (dropped `wine-lovers`/`coffee-lovers` from those slots). New guides cross-link to each other and to the umbrella guides.
+- Verified: `npm run build` clean; all four `/gifts-for/<slug>` routes return 200 on a local prod server and appear on the `/gifts-for` index.
+- Four matching pins built with the corrected "gift guide" template (3-line balanced headlines, same as the live "person" pin), scheduled 10/2-10/5 at 12:00 PM. See the `pinterest_pin_queue.md` memory for titles and details.
+- SEO note (2026-09-29): 7 guides now target the "has everything" phrase family (person/men/women/dad/mom/husband/grandparents), so keyword cannibalization is the real risk, not a spam filter. Check Search Console indexing on the existing three before adding more variants.
+
 ### Phase 46: New gift-guide page — "Gifts for Women Who Have Everything" (2026-09-24)
 
 A full Pinterest board census (all 29 pins, via the board page not the profile "Created" tab) showed "Gifts for Men Who Have Everything" (2.2k impressions, 40 pin clicks) and "Gifts for the Person Who Has Everything" (929 impressions, 21 pin clicks) as by far the top two organic-reach pins on the board, well ahead of every hobby-affinity pin (cat/dog/wine/book/coffee lovers) and the newer gifting-style archetype pins. The site had no gendered-female counterpart to `men-who-have-everything`, so this closes that gap with a genuinely distinct guide (not a find-and-replace of the men's version) before building a matching pin.
@@ -100,7 +111,7 @@ A full Pinterest board census (all 29 pins, via the board page not the profile "
 - **`lib/gift-guides/women-who-have-everything.ts`** (NEW): slug `women-who-have-everything`, same 3-section/15-pick structure as the other two "has everything" guides (Experiences over objects / Better versions of things she already uses / Consumable, personal, or charitable), but distinct picks: spa/wine-tasting/flower-arranging experiences, silk pillowcase + skincare-tool + robe + jewelry-box + bag upgrades, flower subscription + tea/chocolate + birthstone necklace + membership + donation-and-keepsake. 4 FAQs, intro follows the established "has everything = full house/closet, give experiences/consumables/upgrades instead of more objects" framing from its two siblings.
 - **`lib/gift-guides/index.ts`**: registered in `GIFT_GUIDES`, positioned right after `personWhoHasEverything` (before `retroGifts`).
 - **`lib/gift-guides/person-who-has-everything.ts`** and **`men-who-have-everything.ts`**: `related` arrays updated to cross-link the new guide (swapped out `coffee-lovers` from one slot each to make room, kept `wine-lovers`/`coffee-lovers` as the third sibling on each so the two original guides don't lose a cross-link, just gain one).
-- Next: build a matching Pinterest pin (sage/clay template, title following the "X Ideas That Land" / "X Real Ideas" pattern that correlates with the two top performers) and schedule it once approved.
+- Matching Pinterest pin built and scheduled (Thu 10/1/2026, 12:00 PM, board "Gift Guides", title "Gifts for Women Who Have Everything: 15 Ideas That Land"). Also corrected a template mixup in the process: the real "gift guide" pin design (used by the two top performers) includes a large "15" numeral between the eyebrow and headline, which had been dropped in an earlier, different pin template used only for the gifting-style quiz pins — confirmed by opening the actual live pin rather than guessing. See `pinterest_pin_queue.md` memory for the corrected template detail.
 
 ### Phase 45: Move the wizard CTA above the intro on gift-guide pages (2026-09-17)
 

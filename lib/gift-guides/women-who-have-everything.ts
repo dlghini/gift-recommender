@@ -50,6 +50,6 @@ export const womenWhoHaveEverything: GiftGuide = {
     { q: "What's a good sentimental gift for her?", a: "A personalized birthstone or initial necklace, an engraved jewelry box, or a membership somewhere she'd actually return to. Personal and useful beats expensive and generic." },
     { q: "Under $50?", a: "A silk pillowcase set, a serious tea or chocolate box, a personalized necklace, the first month of a flower subscription, or a proper jewelry cleaning kit." },
   ],
-  related: ["person-who-has-everything", "men-who-have-everything", "coffee-lovers"],
+  related: ["person-who-has-everything", "men-who-have-everything", "mom-who-has-everything"],
   updated: "2026-09-24",
 };
