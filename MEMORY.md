@@ -93,6 +93,14 @@
 
 ## Completed Features
 
+### Phase 49: Founder headshot hosted at `/daniel-maghini.jpg` (2026-10-13)
+
+Daniel needed a public headshot URL to include with a CEO Blog Nation (MentionMatch) submission, and the photo only existed locally. Added the file as a static asset so the URL lives on the brand's own domain and can be reused (About page, bylines, press kits).
+
+- **`public/daniel-maghini.jpg`**: 614x812 JPEG, ~157 KB, converted from the supplied .webp with `sips`; no GPS or location metadata. Served at `https://www.thegiftwhisperer.gifts/daniel-maghini.jpg`. `proxy.ts` matcher already excludes `.jpg`, so Clerk middleware does not touch it.
+- No component references it yet; it is not linked from any page or the sitemap.
+- Verified: `npm run build` clean.
+
 ### Phase 48: Quiet "Gift guides" link strip on the homepage (2026-09-29)
 
 GSC URL Inspection showed the new guides were unknown to Google, and a code check showed the homepage (the strongest indexed page) linked to no guide at all; only the sitewide footer linked the `/gifts-for` hub. Added a deliberately unobtrusive strip at the very bottom of the homepage: a tiny uppercase "Gift guides" label over a wrapped row of muted stone-500 text links (one per guide, plus an amber "All guides →" link to the hub). No cards, buttons, or icons.
