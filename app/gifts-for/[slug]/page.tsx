@@ -5,6 +5,7 @@ import { Gift } from "lucide-react";
 import { routeMeta, SITE_URL } from "@/lib/site";
 import { JsonLd } from "@/components/json-ld";
 import { PickCard } from "@/components/gift-guide/pick-card";
+import { PinterestSaveButton } from "@/components/gift-guide/pinterest-save-button";
 import { getGuide, allGuideSlugs, GIFT_GUIDES } from "@/lib/gift-guides";
 
 // All guides are known at build time; anything else 404s.
@@ -104,6 +105,14 @@ export default async function GiftGuidePage({
         <p className="mt-2 text-sm text-stone-400">
           Curated by Daniel M. &middot; Updated {formatUpdated(guide.updated)}
         </p>
+        <div className="mt-4">
+          <PinterestSaveButton
+            slug={guide.slug}
+            title={guide.h1}
+            description={guide.description}
+            location="top"
+          />
+        </div>
 
         <div className="mt-6 rounded-xl border border-amber-200 bg-white p-5">
           <p className="text-sm text-stone-600">
@@ -145,6 +154,19 @@ export default async function GiftGuidePage({
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="mt-12 flex flex-col items-start gap-3 rounded-xl border border-stone-200 bg-white p-5">
+          <p className="text-sm text-stone-600">
+            Planning ahead? Keep this guide handy for when you need it.
+          </p>
+          <PinterestSaveButton
+            slug={guide.slug}
+            title={guide.h1}
+            description={guide.description}
+            location="bottom"
+            label="Save this guide to Pinterest"
+          />
         </section>
 
         {related.length > 0 && (
