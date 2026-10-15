@@ -93,6 +93,16 @@
 
 ## Completed Features
 
+### Phase 50: "Save to Pinterest" button on gift-guide pages — branch `feature/guide-pinterest-save` (2026-10-15)
+
+Pinterest analytics (9/15-10/15) showed ~170 outbound clicks a month but effectively zero outside saves (the 7 saves were the account's own recipient-board saves), so guide visitors had no easy way to save a guide. Added a quiet Save link on every guide.
+
+- **`app/gifts-for/[slug]/pin.png/route.tsx`**: route handler returning a 1000x1500 (2:3) `ImageResponse` per guide (sage ground, clay eyebrow, Lora headline = `guide.h1`, "N ideas, picked by hand", site URL). `generateStaticParams` over `allGuideSlugs()` + `dynamicParams = false`, so unknown slugs 404. The `.png` folder name keeps the `proxy.ts` matcher (which excludes `.png`) from running Clerk middleware on Pinterest's fetch. Cache-Control `public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400`.
+- **`components/gift-guide/pinterest-save-button.tsx`**: client component, a plain `<a>` to `https://www.pinterest.com/pin/create/button/?url=&media=&description=` (canonical www URL + the guide's `pin.png`), `target=_blank`, no third-party script. Styled with `buttonVariants({ variant: "outline" })`. Fires PostHog `guide_save_clicked` `{ guide, location: "top" | "bottom" }`.
+- **`app/gifts-for/[slug]/page.tsx`**: button under the byline (`top`) and a small "Planning ahead?" card after the FAQ (`bottom`).
+- Behavior note: a Save creates a NEW pin on the visitor's board pointing at the guide; it does not add a save to the existing pin. Reach from it scales with guide traffic (small at first).
+- Verified: `tsc --noEmit` clean, `npm run build` clean; dev server showed both buttons, correct hrefs, tall pin image renders for the shortest and longest guide titles, bad slug 404s, no console/network errors on the guide page.
+
 ### Phase 49: Founder headshot hosted at `/daniel-maghini.jpg` (2026-10-13)
 
 Daniel needed a public headshot URL to include with a CEO Blog Nation (MentionMatch) submission, and the photo only existed locally. Added the file as a static asset so the URL lives on the brand's own domain and can be reused (About page, bylines, press kits).
