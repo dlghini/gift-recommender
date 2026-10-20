@@ -107,7 +107,7 @@ Pinterest analytics (9/15-10/15) showed ~170 outbound clicks a month but effecti
 
 Daniel needed a public headshot URL to include with a CEO Blog Nation (MentionMatch) submission, and the photo only existed locally. Added the file as a static asset so the URL lives on the brand's own domain and can be reused (About page, bylines, press kits).
 
-- **`public/daniel-maghini.jpg`**: 614x812 JPEG, ~157 KB, converted from the supplied .webp with `sips`; no GPS or location metadata. Served at `https://www.thegiftwhisperer.gifts/daniel-maghini.jpg`. `proxy.ts` matcher already excludes `.jpg`, so Clerk middleware does not touch it.
+- **`public/daniel-maghini.jpg`**: **replaced 2026-10-20** with a higher-resolution photo, 985x1596 JPEG, ~408 KB, converted from the supplied .webp with `sips` (the original 614x812 / ~157 KB version was too small for ValiantCEO's "HQ photo" requirement). Same filename, so every link already sent still works. No GPS or location metadata. Served at `https://www.thegiftwhisperer.gifts/daniel-maghini.jpg`. `proxy.ts` matcher already excludes `.jpg`, so Clerk middleware does not touch it.
 - No component references it yet; it is not linked from any page or the sitemap.
 - Verified: `npm run build` clean.
 
