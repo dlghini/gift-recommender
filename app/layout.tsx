@@ -11,6 +11,7 @@ import { LazyClerkProvider } from "@/components/lazy-clerk-provider";
 import { CLERK_ENABLED } from "@/lib/clerk-enabled";
 import { hasClerkSessionCookie } from "@/lib/has-clerk-session";
 import { JsonLd } from "@/components/json-ld";
+import { organizationSchema } from "@/lib/schema";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 
 const geistSans = Geist({
@@ -70,16 +71,6 @@ export const metadata: Metadata = {
     "impact-site-verification": "62509d58-8ed2-4dfa-b534-6c9ef7074147",
     "p:domain_verify": "76475a487dfa715c99122cad2510ebdd",
   },
-};
-
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: SITE_NAME,
-  url: SITE_URL,
-  description: SITE_DESCRIPTION,
-  founder: { "@type": "Person", name: "Daniel M." },
-  email: "dan.maghini@gmail.com",
 };
 
 const websiteSchema = {

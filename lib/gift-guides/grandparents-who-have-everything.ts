@@ -51,5 +51,6 @@ export const grandparentsWhoHaveEverything: GiftGuide = {
     { q: "Under $50?", a: "A handprint keepsake kit, large-print playing cards, a reading lamp, a photo blanket on sale, or a fruit and cookie box." },
   ],
   related: ["mom-who-has-everything", "dad-who-has-everything", "person-who-has-everything"],
+  published: "2026-09-29",
   updated: "2026-09-29",
 };

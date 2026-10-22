@@ -51,5 +51,6 @@ export const momWhoHasEverything: GiftGuide = {
     { q: "Under $50?", a: "A good hand cream set, lined slippers, an “open when” letters box, a birth flower print, or a heated neck massager on sale." },
   ],
   related: ["women-who-have-everything", "grandparents-who-have-everything", "person-who-has-everything"],
+  published: "2026-09-29",
   updated: "2026-09-29",
 };

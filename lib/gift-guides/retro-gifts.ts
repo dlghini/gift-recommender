@@ -51,5 +51,6 @@ export const retroGifts: GiftGuide = {
     { q: "Any retro gifts under $30?", a: "A retro candy box, one vinyl reissue, a classic lava lamp, a reissued card or board game, or a framed reproduction poster print." },
   ],
   related: ["80s-nostalgia-gifts", "90s-nostalgia-gifts", "person-who-has-everything"],
+  published: "2026-08-28",
   updated: "2026-08-28",
 };

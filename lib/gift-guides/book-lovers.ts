@@ -51,5 +51,6 @@ export const bookLovers: GiftGuide = {
     { q: "How much should I spend on a gift for a book lover?", a: "Most picks here sit between $15 and $50, which covers keepsakes, reading accessories, and a short subscription. A Kindle or a longer membership runs $120 to $180 if you want the gift to be the main event." },
   ],
   related: ["coffee-lovers", "wine-lovers", "person-who-has-everything"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

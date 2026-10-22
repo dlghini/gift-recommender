@@ -51,5 +51,6 @@ export const husbandWhoHasEverything: GiftGuide = {
     { q: "Under $50?", a: "A valet tray, a safety razor set, a “reasons I love you” deck, a star map print, or engraved cufflinks." },
   ],
   related: ["men-who-have-everything", "dad-who-has-everything", "person-who-has-everything"],
+  published: "2026-09-29",
   updated: "2026-09-29",
 };

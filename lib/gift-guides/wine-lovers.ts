@@ -51,5 +51,6 @@ export const wineLovers: GiftGuide = {
     { q: "Glasses: how many, and which?", a: "A pair of universal glasses is safer than a set of six region-specific ones. Thin, light, and one shape that works for red, white, and sparkling. Zalto and Gabriel-Glas are the enthusiast picks." },
   ],
   related: ["coffee-lovers", "person-who-has-everything", "men-who-have-everything"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

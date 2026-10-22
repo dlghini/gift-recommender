@@ -93,6 +93,18 @@
 
 ## Completed Features
 
+### Phase 51: Article + fuller Organization structured data — branch `feature/article-org-schema` (2026-10-22)
+
+Ahrefs Site Audit (10/22 crawl, health 100, 0 errors) added new AI-discoverability notices: "Article page missing Article schema" (15 guides), "Organization schema missing or incomplete" (1). Both fixed. Two other new notices deliberately left alone (see below).
+
+- **`lib/schema.ts`** (new): `organizationSchema` and `articleSchema(guide)`. Organization has `@id` (`/#organization`), `logo` (ImageObject, `/logo.png`), `sameAs` (Pinterest), and a full founder Person (`@id` `/#founder`, "Daniel Maghini", `/about`, headshot, jobTitle, LinkedIn `sameAs`). Article has `headline`, `description`, `image` (the guide's `pin.png`), `datePublished`, `dateModified`, `inLanguage`, and inline `author` (Person) / `publisher` (Organization + logo) with the same `@id`s. Author and publisher are inlined, not bare `@id` references, so validators that don't join separate JSON-LD blocks still see them.
+- **`app/layout.tsx`**: the old inline `organizationSchema` was removed; imports it from `lib/schema.ts`. The founder previously read "Daniel M." with no links.
+- **`app/gifts-for/[slug]/page.tsx`**: renders `articleSchema(guide)` alongside the existing BreadcrumbList / ItemList / FAQPage blocks. The visible byline still says "Curated by Daniel M." (only the schema uses the full name).
+- **`lib/gift-guides/types.ts` + all 15 guide files**: new required `published` ISO date, set from each guide file's first git commit (2026-08-27 through 2026-09-29). `updated` is unchanged and feeds `dateModified`. **New guides must set both fields.**
+- **`app/logo.png/route.tsx`** (new): static (`force-static`) 512x512 `ImageResponse`, "TGW" in Lora clay on the sage ground, same cache headers as `pin.png`. No other logo asset existed (only a 16/32px `favicon.ico`). The `.png` folder name keeps `proxy.ts` Clerk middleware off it.
+- **Left alone on purpose:** (1) "Changed pages not submitted to IndexNow" (15): we don't use IndexNow; it only notifies Bing/Yandex, not Google. (2) "FAQ page missing FAQPage schema" (1) flags `/wizard`, which Ahrefs' classifier mislabels as an FAQ page; it is an interactive question flow with no visible FAQ, and adding FAQPage markup would violate Google's guidelines.
+- Verified: `npm run build` clean; dev server on `/gifts-for/cat-lovers` shows the Organization and Article JSON-LD with correct values; `/logo.png` renders 512x512 with the lettering uncut. Ahrefs needs its next crawl to clear the two schema notices.
+
 ### Phase 50: "Save to Pinterest" button on gift-guide pages — branch `feature/guide-pinterest-save` (2026-10-15)
 
 Pinterest analytics (9/15-10/15) showed ~170 outbound clicks a month but effectively zero outside saves (the 7 saves were the account's own recipient-board saves), so guide visitors had no easy way to save a guide. Added a quiet Save link on every guide.
