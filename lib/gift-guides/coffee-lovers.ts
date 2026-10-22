@@ -51,5 +51,6 @@ export const coffeeLovers: GiftGuide = {
     { q: "Beans or gear?", a: "If they already brew, beans, because they run out and gear does not. If they are just getting into it, one good piece of gear, usually a burr grinder or a pour-over set, moves the cup more than anything else." },
   ],
   related: ["book-lovers", "wine-lovers", "person-who-has-everything"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

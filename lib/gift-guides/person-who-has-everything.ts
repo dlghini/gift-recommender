@@ -51,5 +51,6 @@ export const personWhoHasEverything: GiftGuide = {
     { q: "Under $50?", a: "A small-producer pantry set, a serious box of chocolate, a photo book, a custom print, a good candle, or the first months of a tasting subscription." },
   ],
   related: ["men-who-have-everything", "women-who-have-everything", "grandparents-who-have-everything"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

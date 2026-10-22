@@ -51,5 +51,6 @@ export const catLovers: GiftGuide = {
     { q: "What about a gift for the cat itself?", a: "A puzzle feeder, a few wand toys, and silvervine or high-quality catnip. A personalized ceramic bowl is more for the owner, but the cat still benefits." },
   ],
   related: ["dog-lovers", "person-who-has-everything", "book-lovers"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

@@ -51,5 +51,6 @@ export const menWhoHaveEverything: GiftGuide = {
     { q: "Under $50?", a: "A bottle he would not buy himself, a monthly hot sauce or coffee club, engraved bar glasses, a MasterClass subscription, or a quality everyday item like a good pen or a leather cable roll." },
   ],
   related: ["person-who-has-everything", "women-who-have-everything", "dad-who-has-everything"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

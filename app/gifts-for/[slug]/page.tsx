@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Gift } from "lucide-react";
 import { routeMeta, SITE_URL } from "@/lib/site";
 import { JsonLd } from "@/components/json-ld";
+import { articleSchema } from "@/lib/schema";
 import { PickCard } from "@/components/gift-guide/pick-card";
 import { PinterestSaveButton } from "@/components/gift-guide/pinterest-save-button";
 import { getGuide, allGuideSlugs, GIFT_GUIDES } from "@/lib/gift-guides";
@@ -88,6 +89,7 @@ export default async function GiftGuidePage({
 
   return (
     <div className="min-h-screen bg-amber-50">
+      <JsonLd data={articleSchema(guide)} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={itemListSchema} />
       <JsonLd data={faqSchema} />

@@ -51,5 +51,6 @@ export const dogLovers: GiftGuide = {
     { q: "What about a gift for the dog itself?", a: "Durable chew and puzzle toys, a lick mat, and a well-fitted personalized collar cover it. Skip plush toys for a dog you know to be a shredder." },
   ],
   related: ["cat-lovers", "person-who-has-everything", "book-lovers"],
+  published: "2026-08-27",
   updated: "2026-08-27",
 };

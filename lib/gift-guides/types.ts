@@ -33,6 +33,8 @@ export interface GiftGuide {
   faq: { q: string; a: string }[];
   /** Sibling guide slugs to cross-link. */
   related: string[];
+  /** ISO date the guide first went live (from git history); feeds Article schema. */
+  published: string;
   /** ISO date, shown in the byline. */
   updated: string;
 }

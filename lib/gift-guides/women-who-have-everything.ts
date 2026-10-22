@@ -51,5 +51,6 @@ export const womenWhoHaveEverything: GiftGuide = {
     { q: "Under $50?", a: "A silk pillowcase set, a serious tea or chocolate box, a personalized necklace, the first month of a flower subscription, or a proper jewelry cleaning kit." },
   ],
   related: ["person-who-has-everything", "men-who-have-everything", "mom-who-has-everything"],
+  published: "2026-09-24",
   updated: "2026-09-24",
 };

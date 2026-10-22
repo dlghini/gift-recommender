@@ -51,5 +51,6 @@ export const nostalgiaGifts80s: GiftGuide = {
     { q: "Any 80s nostalgia gifts under $30?", a: "A retro candy box, one vinyl reissue, a reissued card or board game, a framed poster print, or a set of the trading cards they collected." },
   ],
   related: ["90s-nostalgia-gifts", "retro-gifts", "person-who-has-everything"],
+  published: "2026-08-28",
   updated: "2026-08-28",
 };
