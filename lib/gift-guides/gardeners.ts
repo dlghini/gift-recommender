@@ -10,7 +10,7 @@ export const gardeners: GiftGuide = {
   intro: [
     "A gardener's tool shed is a record of every bad purchase they have made. Cheap pruners that jam, gloves that split in a month, a trowel that bent on the first rock. The best thing you can give one is a single tool built properly, because they know the difference and will not spend the money on it themselves.",
     "After that, think about what the garden is doing right now. A vegetable gardener wants seeds and a way to save their knees. Someone with a cutting garden wants a good book and a pair of snips. Someone with a few houseplants wants a nice pot and a grow light. And almost every gardener, at some point, wants hand salve.",
-    "Each pick links to a store search instead of one listing, so it survives a sellout. Prices are estimates. If you are not sure what kind of gardener they are, tell the Whisperer about them and get a shorter list.",
+    "The links open store searches, not single listings, which helps when a seed variety or a tool is out of stock. Prices are rough. If you cannot tell whether they grow tomatoes or dahlias, the Whisperer can sort that out with a few questions.",
   ],
   sections: [
     {

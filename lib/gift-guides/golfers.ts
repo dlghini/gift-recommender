@@ -10,7 +10,7 @@ export const golfers: GiftGuide = {
   intro: [
     "Golfers are easy to buy for badly. The shelves are full of novelty tees and logo towels, and most of it ends up in a drawer. The gifts that land are the ones tied to how they actually play: the ball they use, a way to get better without leaving the house, or a round somewhere they have wanted to play.",
     "Start with the swing, not the stuff. A golfer who plays twice a week wants consumables and small upgrades, like balls, a rangefinder, a good glove. A golfer who plays twice a month and complains about it wants a way to practice. A golfer who has everything wants the round itself, or something on the wall that reminds them of one.",
-    "Each pick below links to a store search rather than one listing, so it holds up when something sells out. Prices are estimates. If you do not know their handicap or what is in the bag, tell the Whisperer about them and get a shorter list.",
+    "Links go to a store search, so a sold-out club or a retired ball model does not leave you on a dead page. Prices are rough. No idea what their handicap is or what is in the bag? The Whisperer can narrow this down from a few questions about them.",
   ],
   sections: [
     {
