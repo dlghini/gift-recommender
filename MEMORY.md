@@ -93,6 +93,17 @@
 
 ## Completed Features
 
+### Phase 52: Guide batch 1 of the hobby rollout, golfers + gardeners — branch `feature/guides-golfers-gardeners` (2026-10-26)
+
+Rollout rule agreed with Daniel: add hobby guides **two at a time** and gate the next pair on the previous pair indexing (GSC URL Inspection), to stay clear of scaled-content/thin-affiliate signals. Queue after this pair, from the Aug Ahrefs pass (all KD 0–4): runners (5.7K), then tea, bird, bourbon lovers; also travel lovers (TP 17K) and cooking lovers (TP 12K).
+
+- **`lib/gift-guides/golfers.ts`**, **`gardeners.ts`** (new): same shape as the other 15 guides (3 sections x 5 picks across amazon/etsy/viator, 4 FAQs, `related`, `published`/`updated` = 2026-10-26). Registered at the end of `GIFT_GUIDES` in `index.ts`, so they flow automatically to `/gifts-for`, the sitemap, the homepage "Gift guides" link row, ItemList/Article schema, and a generated `pin.png`.
+- Cross-links: `dad-who-has-everything` now also relates to `golfers`; `grandparents-who-have-everything` to `gardeners`.
+- `lib/gift-emoji.ts`: added `Golf`, `Flowers`, `Plants` tags (the `/gifts-for` index card emoji comes from the first pick's tags).
+- **Homepage guide links already existed** (quiet text-link nav at the bottom of `app/home-client.tsx`, data-driven from `GIFT_GUIDES`, live in prod with all 15 guides). Nothing was rebuilt for the homepage.
+- GSC check 10/26: homepage indexed (www); dog/coffee/person-who-has-everything guides indexed; 12 "Discovered, not indexed" are all utility pages (quiz hub + 6 archetypes, privacy, terms, disclosure, how-we-choose, portfolio, loved-ones), none are guides. Last crawled N/A, flat since 8/29, not a penalty.
+- Verified: `npm run build` clean (17 pin.png paths); `/gifts-for/golfers` and `/gifts-for` render in dev, no console errors. Requires after merge: request indexing for both new URLs in GSC.
+
 ### Phase 51: Article + fuller Organization structured data — branch `feature/article-org-schema` (2026-10-22)
 
 Ahrefs Site Audit (10/22 crawl, health 100, 0 errors) added new AI-discoverability notices: "Article page missing Article schema" (15 guides), "Organization schema missing or incomplete" (1). Both fixed. Two other new notices deliberately left alone (see below).

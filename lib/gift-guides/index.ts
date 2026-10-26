@@ -14,6 +14,8 @@ import { husbandWhoHasEverything } from "./husband-who-has-everything";
 import { retroGifts } from "./retro-gifts";
 import { nostalgiaGifts80s } from "./80s-nostalgia-gifts";
 import { nostalgiaGifts90s } from "./90s-nostalgia-gifts";
+import { golfers } from "./golfers";
+import { gardeners } from "./gardeners";
 
 // Order here is the order they appear on the /gifts-for index.
 export const GIFT_GUIDES: GiftGuide[] = [
@@ -32,6 +34,8 @@ export const GIFT_GUIDES: GiftGuide[] = [
   retroGifts,
   nostalgiaGifts80s,
   nostalgiaGifts90s,
+  golfers,
+  gardeners,
 ];
 
 const BY_SLUG = new Map(GIFT_GUIDES.map((g) => [g.slug, g]));

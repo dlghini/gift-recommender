@@ -50,7 +50,7 @@ export const grandparentsWhoHaveEverything: GiftGuide = {
     { q: "What's a good sentimental gift for grandparents?", a: "A digital frame the family can send photos to, a print with every grandchild's name, or a grandchild's drawing turned into a plush. Personal and specific to your family, not something anyone else can buy." },
     { q: "Under $50?", a: "A handprint keepsake kit, large-print playing cards, a reading lamp, a photo blanket on sale, or a fruit and cookie box." },
   ],
-  related: ["mom-who-has-everything", "dad-who-has-everything", "person-who-has-everything"],
+  related: ["mom-who-has-everything", "dad-who-has-everything", "person-who-has-everything", "gardeners"],
   published: "2026-09-29",
   updated: "2026-09-29",
 };
