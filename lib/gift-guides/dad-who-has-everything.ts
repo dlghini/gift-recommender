@@ -50,7 +50,7 @@ export const dadWhoHasEverything: GiftGuide = {
     { q: "What's a good sentimental gift for dad?", a: "A “tell me your story” journal, a photo book about one specific year, or a blueprint print of his first car. Personal and specific beats expensive and generic." },
     { q: "Under $50?", a: "Merino socks, a rechargeable headlamp, a story journal, a car blueprint print, a jerky box, or a good thermos. Any of them gets used the same week." },
   ],
-  related: ["men-who-have-everything", "husband-who-has-everything", "person-who-has-everything"],
+  related: ["men-who-have-everything", "husband-who-has-everything", "person-who-has-everything", "golfers"],
   published: "2026-09-29",
   updated: "2026-09-29",
 };

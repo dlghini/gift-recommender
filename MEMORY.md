@@ -93,6 +93,17 @@
 
 ## Completed Features
 
+### Phase 52: Guide batch 1 of the hobby rollout, golfers + gardeners — branch `feature/guides-golfers-gardeners` (2026-10-26)
+
+Rollout rule agreed with Daniel: add hobby guides **two at a time** and gate the next pair on the previous pair indexing (GSC URL Inspection), to stay clear of scaled-content/thin-affiliate signals. Queue after this pair, from the Aug Ahrefs pass (all KD 0–4): runners (5.7K), then tea, bird, bourbon lovers; also travel lovers (TP 17K) and cooking lovers (TP 12K).
+
+- **`lib/gift-guides/golfers.ts`**, **`gardeners.ts`** (new): same shape as the other 15 guides (3 sections x 5 picks across amazon/etsy/viator, 4 FAQs, `related`, `published`/`updated` = 2026-10-26). Registered at the end of `GIFT_GUIDES` in `index.ts`, so they flow automatically to `/gifts-for`, the sitemap, the homepage "Gift guides" link row, ItemList/Article schema, and a generated `pin.png`.
+- Cross-links: `dad-who-has-everything` now also relates to `golfers`; `grandparents-who-have-everything` to `gardeners`.
+- `lib/gift-emoji.ts`: added `Golf`, `Flowers`, `Plants` tags (the `/gifts-for` index card emoji comes from the first pick's tags).
+- **Homepage guide links already existed** (quiet text-link nav at the bottom of `app/home-client.tsx`, data-driven from `GIFT_GUIDES`, live in prod with all 15 guides). Nothing was rebuilt for the homepage.
+- GSC check 10/26: homepage indexed (www); dog/coffee/person-who-has-everything guides indexed; 12 "Discovered, not indexed" are all utility pages (quiz hub + 6 archetypes, privacy, terms, disclosure, how-we-choose, portfolio, loved-ones), none are guides. Last crawled N/A, flat since 8/29, not a penalty.
+- Verified: `npm run build` clean (17 pin.png paths); `/gifts-for/golfers` and `/gifts-for` render in dev, no console errors. Requires after merge: request indexing for both new URLs in GSC.
+
 ### Phase 51: Article + fuller Organization structured data — branch `feature/article-org-schema` (2026-10-22)
 
 Ahrefs Site Audit (10/22 crawl, health 100, 0 errors) added new AI-discoverability notices: "Article page missing Article schema" (15 guides), "Organization schema missing or incomplete" (1). Both fixed. Two other new notices deliberately left alone (see below).
@@ -691,6 +702,7 @@ Follow-up same day: reminder copy on all four Loved Ones surfaces (hero disclosu
     - **SeatGeek** — real rate 0.5%–1% per ticket sale, hosted on Impact (`app.impact.com/advertiser-advertiser-info/SeatGeek.brand`). Not yet applied — not requested by user.
     - **StubHub** — ✅ application submitted (2026-08-26), status **requested**. Important distinction: the only StubHub program inside the existing Impact account is "StubHub International," which explicitly **excludes US & Canada events** — useless for this site's audience. The real US/Canada program (4% standard, 0.8% on MLB tickets specifically, computed on ticket price + fees minus discounts) lives on a **different network entirely — Partnerize**, not Impact. User created a new Partnerize account via StubHub's dedicated signup link (`join.partnerize.com/stubhub/en`) — account creation was left to the user (Claude does not create accounts). Applied via Partnerize's "Join campaigns" flow to the **"StubHub NORAM"** campaign specifically (there was also a non-US "viagogo" brand listed in the same account with 2 eligible campaigns — correctly not applied to, since it's StubHub's international/European sibling brand, not needed here).
     - **Takeaway for future affiliate research in this project**: always verify commission rates against the network's own brand page (Impact `advertiser-advertiser-info` pages, Partnerize `join-campaigns` brand details) rather than trusting SEO aggregator sites — this is now the second time (after MasterClass) they've been unreliable, and this time one was factually wrong rather than just inconsistent.
+29. **"We asked AI for 10,000 gift recommendations" data study** — scoped 2026-10-26, not started; gate: golfers/gardeners indexed first. Link-bait for press/HARO plus an answer to the "affiliate aggregator" objection. Plan: ~3,400 synthetic personas (relationship 15 x age band 7 x budget tier 4 x occasion 8 x 1-2 of ~40 interests) run through the real `/api/recommend` prompt (`claude-sonnet-5`) via an offline script (bypasses the Upstash rate limit), 3 picks each = ~10K recs; est. $20-50 (Batch API halves it; confirm pricing). Angles: hallucination rate on a ~300-product verified sample (manual spot-check of 100-150, Amazon blocks scraping), concentration (do the top 50 items make up N% of recs), bias by recipient, budget behavior, experience-vs-product and store split. Deliverables: methodology page + `/research/...` page with charts, downloadable dataset, pitchable stat lines, short Pinterest/Reddit versions. Must be labeled as measuring Claude on synthetic personas, not real shoppers. Needs an outreach plan before publishing; holiday press queries peak mid-Nov to early Dec.
 
 ## Traffic Snapshot (PostHog, pulled 2026-08-26, last 180 days)
 
