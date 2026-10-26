@@ -102,7 +102,7 @@ Rollout rule agreed with Daniel: add hobby guides **two at a time** and gate the
 - `lib/gift-emoji.ts`: added `Golf`, `Flowers`, `Plants` tags (the `/gifts-for` index card emoji comes from the first pick's tags).
 - **Homepage guide links already existed** (quiet text-link nav at the bottom of `app/home-client.tsx`, data-driven from `GIFT_GUIDES`, live in prod with all 15 guides). Nothing was rebuilt for the homepage.
 - GSC check 10/26: homepage indexed (www); dog/coffee/person-who-has-everything guides indexed; 12 "Discovered, not indexed" are all utility pages (quiz hub + 6 archetypes, privacy, terms, disclosure, how-we-choose, portfolio, loved-ones), none are guides. Last crawled N/A, flat since 8/29, not a penalty.
-- Verified: `npm run build` clean (17 pin.png paths); `/gifts-for/golfers` and `/gifts-for` render in dev, no console errors. Requires after merge: request indexing for both new URLs in GSC.
+- Verified: `npm run build` clean (17 pin.png paths); `/gifts-for/golfers` and `/gifts-for` render in dev, no console errors. Merged as PR #47 and live 10/26 (squash 167c5cd); intro boilerplate paragraph reworded so it isn't shared with the other guides. Done in GSC 10/26: Request Indexing for both URLs ("Indexing requested") and sitemap resubmitted (now 34 pages). Next pair (runners + one of tea/bird/bourbon) waits until both show "URL is on Google".
 
 ### Phase 51: Article + fuller Organization structured data — branch `feature/article-org-schema` (2026-10-22)
 
