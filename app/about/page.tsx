@@ -110,6 +110,34 @@ export default function AboutPage() {
           </p>
         </div>
 
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
+          <span className="text-amber-600 text-xs font-semibold uppercase tracking-widest">Featured in</span>
+          <ul className="mt-3 space-y-3">
+            <li className="text-stone-500 text-sm leading-relaxed">
+              <a
+                href="https://qz.com/millennials-are-having-their-midlife-career-crisis"
+                target="_blank"
+                rel="noopener"
+                className="text-amber-600 hover:text-amber-700 underline underline-offset-2"
+              >
+                Millennials are having their midlife career crisis
+              </a>
+              <span className="block text-stone-400 text-xs mt-0.5">Quartz, quoted</span>
+            </li>
+            <li className="text-stone-500 text-sm leading-relaxed">
+              <a
+                href="https://leadersperception.com/daniel-maghini-built-the-gift-whisperer-around-specific-gift-questions/"
+                target="_blank"
+                rel="noopener"
+                className="text-amber-600 hover:text-amber-700 underline underline-offset-2"
+              >
+                Daniel Maghini built The Gift Whisperer around specific gift questions
+              </a>
+              <span className="block text-stone-400 text-xs mt-0.5">Leaders Perception, interview, October 2026</span>
+            </li>
+          </ul>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm p-6 flex items-start gap-4">
           <ShieldCheck className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
