@@ -93,6 +93,10 @@
 
 ## Completed Features
 
+### Phase 53: "Featured in" block on `/about` — branch `feature/about-featured-in` (2026-10-31)
+- `app/about/page.tsx`: new white card between "Who's behind this" and "A note on honesty" with a "Featured in" label and two outbound links, each with a small grey source line. (1) Quartz, "Millennials are having their midlife career crisis" (`qz.com`, Daniel quoted, link to TGW is followed). (2) Leaders Perception interview, "Daniel Maghini built The Gift Whisperer around specific gift questions" (October 2026; its link back to TGW is nofollow). Both open in a new tab with `rel="noopener"`.
+- Purpose: give crawlers and visitors a path from the site to its third-party mentions. Add new press here as it lands. No other files touched.
+
 ### Phase 52: Guide batch 1 of the hobby rollout, golfers + gardeners — branch `feature/guides-golfers-gardeners` (2026-10-26)
 
 Rollout rule agreed with Daniel: add hobby guides **two at a time** and gate the next pair on the previous pair indexing (GSC URL Inspection), to stay clear of scaled-content/thin-affiliate signals. Queue after this pair, from the Aug Ahrefs pass (all KD 0–4): runners (5.7K), then tea, bird, bourbon lovers; also travel lovers (TP 17K) and cooking lovers (TP 12K).
