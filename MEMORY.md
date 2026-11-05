@@ -93,6 +93,10 @@
 
 ## Completed Features
 
+### Phase 54: Longer meta descriptions on gifting-style result pages — branch `fix/gifting-style-meta-description` (2026-11-05)
+- `app/gifting-style/[archetype]/page.tsx`: the description template changed from "{tagline} Take the gifting style quiz and find your own." to "{tagline} Take the gifting style quiz to find out which kind of gift giver you are." Ahrefs Site Audit (11/5) flagged `/gifting-style/experience` as "Meta description too short" at 94 characters. The six archetype descriptions are now 121 to 144 characters, all inside Google's roughly 155-character display limit.
+- Other 11/5 Ahrefs flags were checked and left alone on purpose: the Clerk script 307 on `/loved-ones` (normal), the "FAQ page" tag on `/wizard` (false positive, no FAQ content, so no FAQPage schema), the apex http-to-https-to-www chain (standard Vercel), and IndexNow (not set up, Bing/Yandex only).
+
 ### Phase 53: "Featured in" block on `/about` — branch `feature/about-featured-in` (2026-10-31)
 - `app/about/page.tsx`: new white card between "Who's behind this" and "A note on honesty" with a "Featured in" label and two outbound links, each with a small grey source line. (1) Quartz, "Millennials are having their midlife career crisis" (`qz.com`, Daniel quoted, link to TGW is followed). (2) Leaders Perception interview, "Daniel Maghini built The Gift Whisperer around specific gift questions" (October 2026; its link back to TGW is nofollow). Both open in a new tab with `rel="noopener"`.
 - Purpose: give crawlers and visitors a path from the site to its third-party mentions. Add new press here as it lands. No other files touched.
