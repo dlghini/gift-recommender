@@ -323,11 +323,6 @@ export default function AiGiftStudyPage() {
               cocktail classes labeled as mocktail or teen-friendly versions. A wine tasting tour was the
               most common experience overall, and it was never suggested to anyone under 18.
             </p>
-            <p className="text-sm text-stone-500">
-              One caveat. The 18 to 30 age band includes people who can&apos;t legally drink in the US,
-              and the data can&apos;t tell us how many of the 50 wine tastings in that band went to 18 to
-              20 year olds.
-            </p>
           </div>
         </section>
 
@@ -375,7 +370,7 @@ export default function AiGiftStudyPage() {
             <p>
               <span className="font-medium text-stone-800">The run.</span> On November 11, 2026, each
               shopper went through the same instructions, response format and AI model the live
-              recommender uses (Anthropic&apos;s Claude Sonnet), one request each. The AI returns a ranked
+              recommender uses, one request each. The AI returns a ranked
               list. We analyzed the top three, which is what a visitor sees. That is {n(d.recommendations)}{" "}
               picks, because one shopper got a single gift back.
             </p>
@@ -390,8 +385,8 @@ export default function AiGiftStudyPage() {
               search words.
             </p>
             <p>
-              <span className="font-medium text-stone-800">Name checks.</span> A second AI model (Claude
-              Haiku) searched the web for each product name and judged whether a product with that name is
+              <span className="font-medium text-stone-800">Name checks.</span> A second AI model
+              searched the web for each product name and judged whether a product with that name is
               sold: exact match, generic category, discontinued, near miss (a real product under a
               noticeably different name), or not found. We calibrated it against 38 names we checked by
               hand. It flagged all 6 names we knew were wrong, and 1 of the 31 good names. The{" "}
