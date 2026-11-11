@@ -93,6 +93,14 @@
 
 ## Completed Features
 
+### Phase 56: Contextual internal links in guides + title tuning — branch `feature/guide-internal-links-titles` (2026-11-11)
+- Origin: the Reddit-SEO exercise (memory-folder `reddit_seo_findings.md`), changes 1 and 2 of the ranked list. A link audit found gardeners, golfers, dog-lovers, cat-lovers and secret-santa had only one inbound guide link each (excluding the homepage strip and `/gifts-for` hub).
+- Guide copy can now hold internal links written as `[anchor text](/gifts-for/slug)`. `lib/gift-guides/rich-text.ts` parses them (root-relative paths only) and `plainText()` strips them; `components/gift-guide/rich-text.tsx` renders them as amber underlined `Link`s in intro paragraphs and FAQ answers; FAQPage JSON-LD uses the plain text. Only FAQ answers carry links so far (28 links across 18 guides); no guide intro has one.
+- New inbound links: golfers from dad/husband/men; gardeners from grandparents/mom/women/guides; dog and cat lovers from person/mom/dad and each other; secret-santa from person/book/coffee and white-elephant; white-elephant from wine and secret-santa; 80s/90s/retro cross-link; retro's old plain-text "linked below" sentence is now real links.
+- Title tuning (small, based on 4 and 2 impressions): grandparents guide `title` is now "Best Gifts for Grandparents Who Have Everything" (H1 unchanged) and its description opens with "Unique gift ideas for grandparents who have everything"; golfers gets a "What are good stocking stuffers for golfers?" FAQ and the description mentions stocking stuffers. Page `<title>` is `title` plus " · The Gift Whisperer".
+- Not done: the "best gifts for grandkids who have everything" query (a different recipient, would need its own guide); optional tests (quick-picks block, alt text, email capture) and the monthly GSC routine wait for Daniel's go.
+- `npm run build` passes; local `next start` confirmed links render, no raw markup leaks, FAQ schema is plain text.
+
 ### Phase 55: Boyfriend, white elephant and Secret Santa guides — branch `feature/boyfriend-white-elephant-secret-santa-guides` (2026-11-11)
 - Three new data-file guides in `lib/gift-guides/` (`boyfriend.ts`, `white-elephant.ts`, `secret-santa.ts`), registered at the end of `GIFT_GUIDES` in `index.ts`. Each has 15 picks in 3 sections, 4 FAQs, and 3 related slugs; the three live at `/gifts-for/boyfriend`, `/gifts-for/white-elephant`, `/gifts-for/secret-santa`. No em dashes, no mention of AI.
 - Why these: Pinterest Trends (11/11) showed "gifts for boyfriend" at about 2.4x "gifts for dad" in holiday search interest, plus white elephant and Secret Santa searches, and the site had no guide for any of them. Pins for these are the next Pinterest batch (see the memory-folder `pinterest_pin_queue.md`).

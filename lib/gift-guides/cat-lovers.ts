@@ -45,7 +45,7 @@ export const catLovers: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get a cat lover who has enough cat mugs?", a: "Something for the home rather than the mug shelf: a modern cat tree, a water fountain, a window perch, or a custom portrait. Or a subscription box, which keeps arriving after the gift is opened." },
+    { q: "What do you get a cat lover who has enough cat mugs?", a: "Something for the home rather than the mug shelf: a modern cat tree, a water fountain, a window perch, or a custom portrait. Or a subscription box, which keeps arriving after the gift is opened. For someone with a dog instead, see [gifts for dog lovers](/gifts-for/dog-lovers)." },
     { q: "Is a cat tree a good gift?", a: "Yes, if you pick one that fits the room. Modern sisal-and-wood models look intentional rather than like carpeted furniture, and any cat under about 12 pounds will use it daily." },
     { q: "What is a good gift for someone with an indoor-only cat?", a: "Enrichment. A puzzle feeder, wand toys, a window perch, and a water fountain all address the boredom and low water intake that indoor cats deal with." },
     { q: "What about a gift for the cat itself?", a: "A puzzle feeder, a few wand toys, and silvervine or high-quality catnip. A personalized ceramic bowl is more for the owner, but the cat still benefits." },

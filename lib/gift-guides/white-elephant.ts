@@ -48,7 +48,7 @@ export const whiteElephant: GiftGuide = {
     { q: "How much should a white elephant gift cost?", a: "Follow the group's limit. Many exchanges set it between $20 and $40, and some go lower. Spending a little under the limit is fine, but going over can make the gift stand out for the wrong reason." },
     { q: "What makes a good white elephant gift?", a: "A gift that someone will want to steal. Useful items like speakers, blankets, and drinkware tend to move around the circle, and funny gifts keep the room laughing. Avoid anything too personal or anything that only suits one kind of person." },
     { q: "How does a white elephant gift exchange work?", a: "Everyone brings one wrapped gift and draws a number. The first person opens a gift. After that, each person either opens a new one or steals an opened gift from someone else. Most groups limit how many times a single gift can be stolen, so agree on that rule before you start." },
-    { q: "Is white elephant the same as Secret Santa?", a: "No. In Secret Santa you buy for one specific person you drew, so you can match the gift to them. In white elephant you buy for no one in particular, and the gifts are won or stolen during the game." },
+    { q: "Is white elephant the same as Secret Santa?", a: "No. In [Secret Santa](/gifts-for/secret-santa) you buy for one specific person you drew, so you can match the gift to them. In white elephant you buy for no one in particular, and the gifts are won or stolen during the game." },
   ],
   related: ["secret-santa", "person-who-has-everything", "coffee-lovers"],
   published: "2026-11-11",

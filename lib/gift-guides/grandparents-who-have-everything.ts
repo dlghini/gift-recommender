@@ -4,9 +4,9 @@ export const grandparentsWhoHaveEverything: GiftGuide = {
   slug: "grandparents-who-have-everything",
   keyword: "gifts for grandparents who have everything",
   h1: "Gifts for Grandparents Who Have Everything",
-  title: "Gifts for Grandparents Who Have Everything",
+  title: "Best Gifts for Grandparents Who Have Everything",
   description:
-    "Gift ideas for grandparents who've stopped collecting stuff: outings with the grandkids, photos and keepsakes from the family, and comforts for everyday.",
+    "Unique gift ideas for grandparents who have everything: outings with the grandkids, photos and keepsakes from the family, and comforts for everyday.",
   intro: [
     "Grandparents who “have everything” usually downsized on purpose. The house is full of things they've kept for decades, and the last thing they want is more to dust or to pass on.",
     "What they do want is time with the grandkids and proof they're on everyone's mind. So the gifts that land are outings you do together, photos and keepsakes with the family in them, and a few comforts that make ordinary days easier. Skip anything that needs a shelf.",
@@ -45,7 +45,7 @@ export const grandparentsWhoHaveEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get grandparents who have everything?", a: "Something that doesn't take up space. An outing with the grandkids, a photo or keepsake with the family in it, or a small comfort that makes an ordinary day easier, like a heated blanket, a bird feeder camera, or a good reading light." },
+    { q: "What do you get grandparents who have everything?", a: "Something that doesn't take up space. An outing with the grandkids, a photo or keepsake with the family in it, or a small comfort that makes an ordinary day easier, like a heated blanket, a bird feeder camera, or a good reading light. If they spend their summers in the yard, see [gifts for gardeners](/gifts-for/gardeners)." },
     { q: "They say they don't want anything. What now?", a: "Believe them about stuff, and offer time. A day out with the grandkids or a framed family photo reads as “I'm thinking of you,” which is the actual thing they're asking for." },
     { q: "What's a good sentimental gift for grandparents?", a: "A digital frame the family can send photos to, a print with every grandchild's name, or a grandchild's drawing turned into a plush. Personal and specific to your family, not something anyone else can buy." },
     { q: "Under $50?", a: "A handprint keepsake kit, large-print playing cards, a reading lamp, a photo blanket on sale, or a fruit and cookie box." },

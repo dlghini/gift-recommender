@@ -6,7 +6,7 @@ export const golfers: GiftGuide = {
   h1: "Gifts for Golfers",
   title: "Gifts for Golfers",
   description:
-    "Gift ideas for golfers: gear they will actually use on the course, ways to practice at home, and keepsakes worth keeping. Curated, with a reason for each pick.",
+    "Gift ideas and stocking stuffers for golfers: gear they will actually use on the course, ways to practice at home, and keepsakes worth keeping. Each pick has a reason.",
   intro: [
     "Golfers are easy to buy for badly. The shelves are full of novelty tees and logo towels, and most of it ends up in a drawer. The gifts that land are the ones tied to how they actually play: the ball they use, a way to get better without leaving the house, or a round somewhere they have wanted to play.",
     "Start with the swing, not the stuff. A golfer who plays twice a week wants consumables and small upgrades, like balls, a rangefinder, a good glove. A golfer who plays twice a month and complains about it wants a way to practice. A golfer who has everything wants the round itself, or something on the wall that reminds them of one.",
@@ -45,9 +45,10 @@ export const golfers: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get a golfer who already has everything?", a: "The round itself. A lesson, a course tour, or a gift card for a range they like. Or something engraved: ball markers with their initials, head covers with a name stitched on. Gear is usually settled, so the gifts that work go around it." },
+    { q: "What do you get a golfer who already has everything?", a: "The round itself. A lesson, a course tour, or a gift card for a range they like. Or something engraved: ball markers with their initials, head covers with a name stitched on. Gear is usually settled, so the gifts that work go around it. If you are buying for a dad who plays, [gifts for a dad who has everything](/gifts-for/dad-who-has-everything) adds ideas that are not golf." },
     { q: "Are golf balls a good gift?", a: "Yes, if you get the model they already play. A dozen Pro V1s disappear fast, which is the point. If you do not know what is in the bag, ask someone they play with, or pick a different gift." },
     { q: "What is a good golf gift under $30?", a: "A premium glove, a cooling towel, personalized ball markers, a swing trainer aid, or a putting alignment mirror. All of these are useful and none of them will feel like filler." },
+    { q: "What are good stocking stuffers for golfers?", a: "Small things that fit in a stocking and get used on the course: a golf glove, a cooling towel, personalized ball markers, a sleeve of balls, or a pack of tees with a divot tool. Most run $10 to $30." },
     { q: "What should I get a beginner golfer?", a: "A lesson, a good glove, a dozen cheap balls, and a putting mat. Skip the expensive gear until they know how often they will actually play." },
   ],
   related: ["dad-who-has-everything", "men-who-have-everything", "wine-lovers"],

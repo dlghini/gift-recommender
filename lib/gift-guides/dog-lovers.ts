@@ -45,7 +45,7 @@ export const dogLovers: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get someone who loves dogs but does not have one?", a: "A custom illustration of a dog they have loved before, breed-specific decor, a coffee-table dog book, or a donation to a rescue in their name. Skip anything that assumes a dog is in the house right now, like leashes or food toys." },
+    { q: "What do you get someone who loves dogs but does not have one?", a: "A custom illustration of a dog they have loved before, breed-specific decor, a coffee-table dog book, or a donation to a rescue in their name. Skip anything that assumes a dog is in the house right now, like leashes or food toys. For someone with a cat instead, see [gifts for cat lovers](/gifts-for/cat-lovers)." },
     { q: "Is a custom pet portrait a safe gift?", a: "It is one of the most reliable gifts for a dog person, as long as you can get a clear, well-lit photo of the dog. Order a few weeks ahead, since hand-made portraits take time." },
     { q: "What is a good gift for a new dog owner?", a: "Practical things they may not have bought yet: a slow feeder, a hands-free leash, a car seat cover, a portable water bottle, and a puzzle toy or two. A subscription box also softens the first few months." },
     { q: "What about a gift for the dog itself?", a: "Durable chew and puzzle toys, a lick mat, and a well-fitted personalized collar cover it. Skip plush toys for a dog you know to be a shredder." },

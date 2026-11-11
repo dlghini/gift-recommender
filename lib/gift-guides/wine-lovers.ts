@@ -47,7 +47,7 @@ export const wineLovers: GiftGuide = {
   faq: [
     { q: "What do you get a wine lover who has a full cellar?", a: "Skip bottles unless you know exactly what they collect. A Coravin, an aroma training kit, a winery tour, or a blending class are all things a serious collector often does not have. A gift card to a shop with rare allocations also works." },
     { q: "Is buying wine a bad idea if I do not know wine?", a: "One well-chosen bottle is fine if you ask a shop for a $40 to $80 recommendation in the style they drink, red or white. A mixed case you picked blind is riskier. A club membership takes the choice off you entirely." },
-    { q: "What is a good wine gift under $30?", a: "A tasting journal, a scratch-off discovery poster, a marble chiller, a single universal glass, or a reference book. The first month of a wine club also fits if you split it." },
+    { q: "What is a good wine gift under $30?", a: "A tasting journal, a scratch-off discovery poster, a marble chiller, a single universal glass, or a reference book. The first month of a wine club also fits if you split it. Bringing a bottle to a gift swap? Check [white elephant gifts](/gifts-for/white-elephant) first, since some groups do not allow alcohol." },
     { q: "Glasses: how many, and which?", a: "A pair of universal glasses is safer than a set of six region-specific ones. Thin, light, and one shape that works for red, white, and sparkling. Zalto and Gabriel-Glas are the enthusiast picks." },
   ],
   related: ["coffee-lovers", "person-who-has-everything", "men-who-have-everything"],

@@ -45,7 +45,7 @@ export const nostalgiaGifts90s: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What is a good 90s nostalgia gift?", a: "The specific thing they owned or wanted: a reissued console or Tamagotchi, a vinyl copy of the album they played on repeat, a proper 90s snack box, or the movie they wore out on VHS." },
+    { q: "What is a good 90s nostalgia gift?", a: "The specific thing they owned or wanted: a reissued console or Tamagotchi, a vinyl copy of the album they played on repeat, a proper 90s snack box, or the movie they wore out on VHS. For a different decade, see [80s nostalgia gifts](/gifts-for/80s-nostalgia-gifts) or [retro gifts](/gifts-for/retro-gifts)." },
     { q: "What is a good 90s gift for a 30th or 40th birthday?", a: "Add something tied to the year: a front page from their birth date, a star map of the night they were born, a birth-year drink, or tickets to a 90s act on a reunion tour." },
     { q: "What should I avoid?", a: "“90s kid” slogan mugs and T-shirts, inflatable furniture, and anything that assumes they kept a VCR or a dial-up modem. Nostalgia lands; a punchline doesn't." },
     { q: "Any 90s nostalgia gifts under $30?", a: "A 90s snack box, a single vinyl reissue, a reissued handheld toy, a framed poster print, or a pack of the trading cards or Pogs they collected." },

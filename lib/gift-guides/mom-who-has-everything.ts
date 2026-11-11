@@ -45,7 +45,7 @@ export const momWhoHasEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get a mom who has everything?", a: "Something that gives her a break instead of another thing to keep. A booked afternoon like tea or a cooking class, a small daily comfort like a heated throw or good slippers, or something made from the family, like a portrait or a recipe board in her handwriting." },
+    { q: "What do you get a mom who has everything?", a: "Something that gives her a break instead of another thing to keep. A booked afternoon like tea or a cooking class, a small daily comfort like a heated throw or good slippers, or something made from the family, like a portrait or a recipe board in her handwriting. If she is happiest in the garden, see [gifts for gardeners](/gifts-for/gardeners). If a pet is her favorite family member, try [gifts for dog lovers](/gifts-for/dog-lovers) or [gifts for cat lovers](/gifts-for/cat-lovers)." },
     { q: "She says she doesn't want anything. What now?", a: "Believe her about objects, and give time or a keepsake instead. A day out you plan and pay for, or something the family made together, works far better than a gift card she has to schedule herself." },
     { q: "What's a good sentimental gift for mom?", a: "A family portrait illustration, a birth flower print with one bloom per kid, or a cutting board engraved with her own recipe. Specific to her and made from the people she cares about." },
     { q: "Under $50?", a: "A good hand cream set, lined slippers, an “open when” letters box, a birth flower print, or a heated neck massager on sale." },
