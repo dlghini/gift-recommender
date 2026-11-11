@@ -103,6 +103,8 @@ if (MODE === "calibrate") {
   todo = all.filter((p) => [...BAD, ...GOOD].some((k) => lc(p.name).includes(k)));
   // one product per label key so each hand label is tested once
   const seen = new Set(); todo = todo.filter((p) => { const k = [...BAD, ...GOOD].find((x) => lc(p.name).includes(x)); if (seen.has(k)) return false; seen.add(k); p.label = BAD.includes(k) ? "bad" : "good"; return true; });
+} else if (MODE === "names") {
+  todo = JSON.parse(fs.readFileSync(args.names, "utf8"));
 } else {
   const spec = all.filter(isSpecific);
   const gen = all.filter((p) => !isSpecific(p));

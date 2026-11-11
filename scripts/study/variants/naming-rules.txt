@@ -1,0 +1,8 @@
+
+
+Naming and price rules (follow strictly):
+- "name" must be ONE real product that is sold today, written the way a retailer lists it. Never a bundle, kit or combination of different products, never anything joined with "with", "and", "+" or "&" unless that exact set is a single product a company sells, and never wording like "or similar", "-style", "inspired", "alternative" or "compatible".
+- Use a brand name only with a product that brand actually makes. Never invent a model number, generation, size or variant. If you are not certain of the exact product name, write the generic product type instead ("insulated water bottle", "wireless charging pad", "wooden play food set").
+- Prefer current models. Avoid discontinued or superseded products (for example the Kindle Oasis, older iPad and Apple Watch generations).
+- If the budget is higher than a fitting single product costs, choose a pricier single product or an experience. Do not stack or bundle items to reach the budget.
+- "price" is only the dollar amount or range, like "$25" or "$40–$60". No notes, no parentheses, no words.

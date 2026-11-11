@@ -25,7 +25,10 @@ const block = src.slice(start, end).replace(/: Record<string, string>/g, "");
 const defs = new Function(
   `${block}; return { CANDIDATE_POOL_SIZE, SYSTEM_PROMPT, GIFT_SCHEMA, GIFT_PREFERENCE_INSTRUCTIONS, BUDGET_LABELS };`
 )();
-const { CANDIDATE_POOL_SIZE, SYSTEM_PROMPT, GIFT_SCHEMA, GIFT_PREFERENCE_INSTRUCTIONS, BUDGET_LABELS } = defs;
+const { CANDIDATE_POOL_SIZE, GIFT_SCHEMA, GIFT_PREFERENCE_INSTRUCTIONS, BUDGET_LABELS } = defs;
+// Optional experiment: append extra rules to the production system prompt (--extra path/to/file.txt).
+const EXTRA = args.extra ? fs.readFileSync(args.extra, "utf8") : "";
+const SYSTEM_PROMPT = defs.SYSTEM_PROMPT + EXTRA;
 const MODEL = /model:\s*"([^"]+)"/.exec(src)?.[1];
 if (!MODEL) throw new Error("model not found in route.ts");
 
@@ -68,7 +71,7 @@ fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const done = new Set();
 if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l) { const r = JSON.parse(l); if (r.ok) done.add(r.id); }
 const todo = generatePersonas(N, SEED).filter((p) => !done.has(p.id));
-console.log(`model=${MODEL} personas=${N} already=${done.size} todo=${todo.length}`);
+console.log(`extra=${args.extra ?? "none"} model=${MODEL} personas=${N} already=${done.size} todo=${todo.length}`);
 
 let i = 0, finished = 0, consecutiveFails = 0;
 async function worker() {
