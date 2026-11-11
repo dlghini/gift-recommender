@@ -50,7 +50,7 @@ export const husbandWhoHasEverything: GiftGuide = {
     { q: "What's a romantic gift for him?", a: "A star map of a date that matters, a custom vinyl record of your songs, or a deck of small notes on why you love him. Specific to the two of you and cheap to make good." },
     { q: "Under $50?", a: "A valet tray, a safety razor set, a “reasons I love you” deck, a star map print, or engraved cufflinks." },
   ],
-  related: ["men-who-have-everything", "dad-who-has-everything", "person-who-has-everything"],
+  related: ["men-who-have-everything", "boyfriend", "dad-who-has-everything"],
   published: "2026-09-29",
   updated: "2026-09-29",
 };

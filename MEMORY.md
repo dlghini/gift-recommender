@@ -93,6 +93,13 @@
 
 ## Completed Features
 
+### Phase 55: Boyfriend, white elephant and Secret Santa guides — branch `feature/boyfriend-white-elephant-secret-santa-guides` (2026-11-11)
+- Three new data-file guides in `lib/gift-guides/` (`boyfriend.ts`, `white-elephant.ts`, `secret-santa.ts`), registered at the end of `GIFT_GUIDES` in `index.ts`. Each has 15 picks in 3 sections, 4 FAQs, and 3 related slugs; the three live at `/gifts-for/boyfriend`, `/gifts-for/white-elephant`, `/gifts-for/secret-santa`. No em dashes, no mention of AI.
+- Why these: Pinterest Trends (11/11) showed "gifts for boyfriend" at about 2.4x "gifts for dad" in holiday search interest, plus white elephant and Secret Santa searches, and the site had no guide for any of them. Pins for these are the next Pinterest batch (see the memory-folder `pinterest_pin_queue.md`).
+- Verified price counts (low end of each pick's range): boyfriend 11 of 15 start under $50 and 6 under $30; white elephant 15 under $50 and 11 under $30; Secret Santa all 15 under $30. Pins quote these numbers, so recheck if prices change.
+- Cross-links added: boyfriend now appears in the related lists of the husband and men guides; white-elephant in the person guide. The two party guides link to each other.
+- `npm run build` passes (first run hit a transient Google Fonts error, second run clean). Not clicked through in a browser.
+
 ### Phase 54: Longer meta descriptions on gifting-style result pages — branch `fix/gifting-style-meta-description` (2026-11-05)
 - `app/gifting-style/[archetype]/page.tsx`: the description template changed from "{tagline} Take the gifting style quiz and find your own." to "{tagline} Take the gifting style quiz to find out which kind of gift giver you are." Ahrefs Site Audit (11/5) flagged `/gifting-style/experience` as "Meta description too short" at 94 characters. The six archetype descriptions are now 121 to 144 characters, all inside Google's roughly 155-character display limit.
 - Other 11/5 Ahrefs flags were checked and left alone on purpose: the Clerk script 307 on `/loved-ones` (normal), the "FAQ page" tag on `/wizard` (false positive, no FAQ content, so no FAQPage schema), the apex http-to-https-to-www chain (standard Vercel), and IndexNow (not set up, Bing/Yandex only).
