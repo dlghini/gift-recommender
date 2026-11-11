@@ -66,18 +66,26 @@ async function runOne(p) {
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const done = new Set();
-if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l) done.add(JSON.parse(l).id);
+if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l) { const r = JSON.parse(l); if (r.ok) done.add(r.id); }
 const todo = generatePersonas(N, SEED).filter((p) => !done.has(p.id));
 console.log(`model=${MODEL} personas=${N} already=${done.size} todo=${todo.length}`);
 
-let i = 0, finished = 0;
+let i = 0, finished = 0, consecutiveFails = 0;
 async function worker() {
   while (i < todo.length) {
     const p = todo[i++];
+    if (consecutiveFails >= 5) return; // e.g. out of credits: stop instead of burning through the list
     const rec = await runOne(p);
+    if (!rec.ok) {
+      // Failed rows are not saved, so a rerun retries them.
+      consecutiveFails++;
+      console.error(`FAILED ${p.id}: ${rec.error}`);
+      continue;
+    }
+    consecutiveFails = 0;
     fs.appendFileSync(OUT, JSON.stringify(rec) + "\n");
     if (++finished % 10 === 0) console.log(`${finished}/${todo.length}`);
   }
 }
 await Promise.all(Array.from({ length: CONCURRENCY }, worker));
-console.log("done");
+console.log(consecutiveFails >= 5 ? "STOPPED after repeated failures (see above); rerun to resume" : "done");
