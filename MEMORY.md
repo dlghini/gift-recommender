@@ -93,6 +93,12 @@
 
 ## Completed Features
 
+### Phase 60 (experiment, not shipped): naming-rules prompt test on 400 personas — branch `experiment/naming-prompt` (2026-11-11)
+- Tooling: `run.mjs --extra <file>` appends extra rules to the production system prompt; `scripts/study/variants/naming-rules.txt` is variant A (one real product per name, no bundles/"or similar"/invented model numbers, use a generic type when unsure, prefer current models, price as amount only, don't stack items to reach budget); `compare-prep.mjs` and `compare.py` compare baseline vs variant on the same personas (first 400 of the seed-1 set) with names cleaned by `lib/gift-format.ts` (from PR #56) and verified by `verify.mjs --mode names`.
+- Variant A vs baseline (690 product picks each, 12 variant names still unverified): wrong-name share 9.7% -> 6.6% (borderline significant, p about 0.04); exact-name share 48% -> 67%; bundle-ish names 25% -> 12%; BUT budget fidelity got worse: price in band 93.2% -> 89.9% and "$250+" picks reaching $250 75% -> 64% (the "don't bundle to reach budget" line pushes toward cheaper single items); discontinued 3.2% -> 4.4% (noise level); distinct names 71% -> 63% of picks (slightly less variety); experience share unchanged (42%).
+- Verdict: not shippable as is. Next try, variant B: keep the naming rules, drop the budget-stacking bullet, add "every price must fall inside the stated budget; for '$250 or more' choose items that cost at least $250".
+- Credits ran out during verification (12 names left); resume with the same command after a top-up.
+
 ### Phase 58: 10K study, full run complete + first analysis — branch `feature/study-analysis` (2026-11-11)
 - Full run finished: 3,400 personas (seed 1) on `claude-sonnet-5`, all valid JSON, 10,198 top-3 recommendations (3,397 personas returned 4 gifts, 2 returned 5, 1 returned 1; the schema doesn't fix the count). Actual cost about $28.6. Raw data is local only: `scripts/study/out/full3400.jsonl` (gitignored).
 - `scripts/study/run.mjs` hardened after a credits stall: failed calls are no longer saved, resume skips only successful rows, and the run stops after 5 consecutive failures. `scripts/study/analyze.py` reproduces every number below (`python3 scripts/study/analyze.py scripts/study/out/full3400.jsonl`).
