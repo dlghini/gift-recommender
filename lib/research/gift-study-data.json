@@ -1,0 +1,333 @@
+{
+ "personas": 3400,
+ "recommendations": 10198,
+ "productPicks": 5809,
+ "experiencePicks": 4389,
+ "typeSplit": {
+  "product": 57.0,
+  "experience": 43.0
+ },
+ "storeSplit": {
+  "amazon": 42.4,
+  "viator": 43.0,
+  "etsy": 14.5
+ },
+ "bothExperienceShare": 30.8,
+ "bothPicks": 3411,
+ "prefCompliance": {
+  "gifts": {
+   "picks": 3448,
+   "wrong": 0
+  },
+  "experiences": {
+   "picks": 3339,
+   "wrong": 0
+  }
+ },
+ "topProducts": [
+  {
+   "name": "Kindle Paperwhite",
+   "picks": 185,
+   "share": 3.2
+  },
+  {
+   "name": "Personalized Wooden Cutting Board",
+   "picks": 89,
+   "share": 1.5
+  },
+  {
+   "name": "Personalized Leather Bookmark",
+   "picks": 81,
+   "share": 1.4
+  },
+  {
+   "name": "JBL Clip 4 Portable Bluetooth Speaker",
+   "picks": 47,
+   "share": 0.8
+  },
+  {
+   "name": "Resistance Bands Set",
+   "picks": 45,
+   "share": 0.8
+  },
+  {
+   "name": "Personalized Leather Jewelry Box",
+   "picks": 44,
+   "share": 0.8
+  },
+  {
+   "name": "Adjustable Dumbbell Set",
+   "picks": 43,
+   "share": 0.7
+  },
+  {
+   "name": "Hydro Flask Wide Mouth Water Bottle",
+   "picks": 42,
+   "share": 0.7
+  },
+  {
+   "name": "Kindle Oasis",
+   "picks": 40,
+   "share": 0.7
+  },
+  {
+   "name": "Theragun Mini Percussion Massager",
+   "picks": 39,
+   "share": 0.7
+  }
+ ],
+ "topExperiences": [
+  {
+   "name": "Wine Tasting Tour",
+   "picks": 290,
+   "share": 6.6
+  },
+  {
+   "name": "Pasta Making Class",
+   "picks": 179,
+   "share": 4.1
+  },
+  {
+   "name": "Sunset Sailing Cruise",
+   "picks": 142,
+   "share": 3.2
+  },
+  {
+   "name": "Escape Room Challenge",
+   "picks": 120,
+   "share": 2.7
+  },
+  {
+   "name": "Escape Room Experience",
+   "picks": 111,
+   "share": 2.5
+  },
+  {
+   "name": "Pottery Wheel Throwing Class",
+   "picks": 110,
+   "share": 2.5
+  },
+  {
+   "name": "Hot Air Balloon Ride",
+   "picks": 105,
+   "share": 2.4
+  },
+  {
+   "name": "Food Walking Tour",
+   "picks": 101,
+   "share": 2.3
+  },
+  {
+   "name": "Guided Kayak Tour",
+   "picks": 99,
+   "share": 2.3
+  },
+  {
+   "name": "Cocktail Making Class",
+   "picks": 88,
+   "share": 2.0
+  }
+ ],
+ "distinctProducts": 2576,
+ "distinctExperiences": 1164,
+ "productTop10Share": 11.3,
+ "productTop50Share": 25.2,
+ "experienceTop10Share": 30.6,
+ "kindleReaders": {
+  "personas": 536,
+  "share": 43.3
+ },
+ "topProductByInterest": {
+  "Art": {
+   "personas": 517,
+   "name": "Wacom Intuos Drawing Tablet",
+   "share": 3.9
+  },
+  "Cooking": {
+   "personas": 508,
+   "name": "Personalized Wooden Cutting Board",
+   "share": 17.5
+  },
+  "Fashion": {
+   "personas": 494,
+   "name": "Personalized Leather Jewelry Box",
+   "share": 8.9
+  },
+  "Fitness": {
+   "personas": 471,
+   "name": "Resistance Bands Set",
+   "share": 9.6
+  },
+  "Gaming": {
+   "personas": 537,
+   "name": "Nintendo Switch OLED",
+   "share": 5.8
+  },
+  "Music": {
+   "personas": 495,
+   "name": "JBL Clip 4 Portable Bluetooth Speaker",
+   "share": 6.9
+  },
+  "Outdoors": {
+   "personas": 545,
+   "name": "Hydro Flask Wide Mouth Water Bottle",
+   "share": 5.9
+  },
+  "Reading": {
+   "personas": 536,
+   "name": "Kindle Paperwhite",
+   "share": 32.1
+  },
+  "Tech": {
+   "personas": 506,
+   "name": "Kindle Paperwhite",
+   "share": 5.1
+  },
+  "Travel": {
+   "personas": 524,
+   "name": "Scratch-Off World Travel Map Poster",
+   "share": 5.0
+  }
+ },
+ "budget": [
+  {
+   "budget": "Under $25",
+   "picks": 2079,
+   "inBand": 100.0,
+   "median": 20.0
+  },
+  {
+   "budget": "$25 to $50",
+   "picks": 2055,
+   "inBand": 98.7,
+   "median": 37.5
+  },
+  {
+   "budget": "$50 to $100",
+   "picks": 1951,
+   "inBand": 97.5,
+   "median": 70.0
+  },
+  {
+   "budget": "$100 to $250",
+   "picks": 2079,
+   "inBand": 91.7,
+   "median": 130.0
+  },
+  {
+   "budget": "$250 or more",
+   "picks": 2034,
+   "inBand": 78.5,
+   "median": 275.0
+  }
+ ],
+ "budget250ReachShare": 77.4,
+ "personalizedByRelationship": [
+  {
+   "label": "Partner",
+   "share": 27.5,
+   "picks": 988
+  },
+  {
+   "label": "Parent",
+   "share": 23.8,
+   "picks": 432
+  },
+  {
+   "label": "Child",
+   "share": 18.9,
+   "picks": 1092
+  },
+  {
+   "label": "Friend",
+   "share": 20.3,
+   "picks": 1209
+  },
+  {
+   "label": "Sibling",
+   "share": 20.1,
+   "picks": 1279
+  },
+  {
+   "label": "Colleague",
+   "share": 16.4,
+   "picks": 809
+  }
+ ],
+ "personalizedByOccasion": [
+  {
+   "label": "Anniversary",
+   "share": 35.6,
+   "picks": 174
+  },
+  {
+   "label": "Baby Shower",
+   "share": 27.1,
+   "picks": 656
+  },
+  {
+   "label": "Graduation",
+   "share": 23.8,
+   "picks": 889
+  },
+  {
+   "label": "Birthday",
+   "share": 19.6,
+   "picks": 1375
+  },
+  {
+   "label": "Holiday",
+   "share": 17.9,
+   "picks": 1329
+  },
+  {
+   "label": "Just Because",
+   "share": 18.5,
+   "picks": 1386
+  }
+ ],
+ "etsyByOccasion": [
+  {
+   "label": "Anniversary",
+   "share": 19.8
+  },
+  {
+   "label": "Baby Shower",
+   "share": 23.7
+  },
+  {
+   "label": "Graduation",
+   "share": 15.4
+  },
+  {
+   "label": "Birthday",
+   "share": 13.6
+  },
+  {
+   "label": "Holiday",
+   "share": 11.9
+  },
+  {
+   "label": "Just Because",
+   "share": 12.8
+  }
+ ],
+ "minors": {
+  "picks": 2301,
+  "alcoholRelated": 2
+ },
+ "wineTastingUnder18": 0,
+ "names": {
+  "checked": 844,
+  "specificChecked": 644,
+  "genericChecked": 200,
+  "genericPool": 1932,
+  "estimatedMismatchShare": 10.8,
+  "nothingCloseNames": 7,
+  "nothingCloseShare": 0.8,
+  "specificMismatchShareByPick": 6.7,
+  "specificDiscontinuedShareByPick": 6.7,
+  "specificMismatchShareDistinct": 20.3
+ },
+ "generatedOn": "2026-11-11"
+}
