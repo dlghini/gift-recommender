@@ -13,7 +13,8 @@ const variant = read(variantPath).filter((r) => Number(r.id.slice(1)) <= N);
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
 
 const prior = new Map();
-for (const r of read("scripts/study/out/verify_full.jsonl")) prior.set(r.key, r);
+for (const f of ["verify_full", "verify_compare", "verify_compareB"])
+  if (fs.existsSync(`scripts/study/out/${f}.jsonl`)) for (const r of read(`scripts/study/out/${f}.jsonl`)) prior.set(r.key, r);
 
 const names = new Map();
 for (const [label, rows] of [["baseline", base], ["variant", variant]])

@@ -12,7 +12,7 @@ def clean(names):
     out = subprocess.run(["node", "--input-type=module", "-e", js], input=json.dumps(names), capture_output=True, text=True).stdout
     return json.loads(out)
 verd = {}
-for p in ("scripts/study/out/verify_full.jsonl", "scripts/study/out/verify_compare.jsonl"):
+for p in ("scripts/study/out/verify_full.jsonl", "scripts/study/out/verify_compare.jsonl", "scripts/study/out/verify_compareB.jsonl"):
     for r in rd(p):
         if r.get("ok"): verd[r["key"]] = r["verdict"]
 
