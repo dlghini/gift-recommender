@@ -93,6 +93,12 @@
 
 ## Completed Features
 
+### Phase 59: Clean commentary out of gift prices and hedges out of names — branch `fix/gift-name-price-formatting` (2026-11-11)
+- Why: the 10K study found the model sometimes writes commentary into the price ("$40-$60, bundle with other gifts to reach budget", 139 of 10,198 shown picks) and hedges into the name ("... (or similar percussion massager)", "Lululemon-Style ..."), which show on the page as defects. See Phase 58.
+- `lib/gift-format.ts`: `cleanPrice` keeps only the price or range (plus a leading "From" and a trailing "per person" or "for two", which change the meaning), normalizes hyphens to en dashes, and falls back to the original if no `$` amount is found. `cleanName` removes parentheticals that contain a hedge word, a trailing "or similar ...", and a leading "X-Style" word; other parentheticals (platform lists etc.) and "-Style" inside a name ("Varsity-Style Jacket") are kept; it never returns a name under 3 characters.
+- `app/api/recommend/route.ts`: the whole candidate pool goes through `cleanGift` right after parsing, so shown gifts and logged candidates are both cleaned. No prompt change (prompt changes are being tested separately, see the study notes).
+- Checked against all 13,599 pool recs from the study: after cleaning, no price contains words other than the allowed suffixes; 29 names changed (all hedges), 1,096 prices changed (mostly hyphen to en dash and dropped commentary). Unit cases in the PR description. `npm run build` passes.
+
 ### Phase 58: 10K study, full run complete + first analysis — branch `feature/study-analysis` (2026-11-11)
 - Full run finished: 3,400 personas (seed 1) on `claude-sonnet-5`, all valid JSON, 10,198 top-3 recommendations (3,397 personas returned 4 gifts, 2 returned 5, 1 returned 1; the schema doesn't fix the count). Actual cost about $28.6. Raw data is local only: `scripts/study/out/full3400.jsonl` (gitignored).
 - `scripts/study/run.mjs` hardened after a credits stall: failed calls are no longer saved, resume skips only successful rows, and the run stops after 5 consecutive failures. `scripts/study/analyze.py` reproduces every number below (`python3 scripts/study/analyze.py scripts/study/out/full3400.jsonl`).

@@ -4,6 +4,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getDb } from "@/lib/db";
 import { fetchPixabayImage } from "@/lib/pixabay";
+import { cleanGift } from "@/lib/gift-format";
 import { logRunEvent, isValidRunId } from "@/lib/run-events";
 
 const redis =
@@ -224,8 +225,10 @@ ${GIFT_PREFERENCE_INSTRUCTIONS[giftPreference] ?? GIFT_PREFERENCE_INSTRUCTIONS.b
     // city's experiences, or the closest local match when the exact activity isn't
     // offered there.
     const city = viewerCity(request);
-    const shownRaw = data.gifts.slice(0, SHOWN_COUNT);
-    const restRaw = data.gifts.slice(SHOWN_COUNT);
+    // Trim commentary out of price strings and hedges out of names (lib/gift-format.ts).
+    const cleaned = data.gifts.map(cleanGift);
+    const shownRaw = cleaned.slice(0, SHOWN_COUNT);
+    const restRaw = cleaned.slice(SHOWN_COUNT);
 
     const gifts = await Promise.all(
       shownRaw.map(async (gift) => {
