@@ -25,6 +25,9 @@ export function Footer() {
             <Link href="/how-we-choose" className="hover:text-stone-700 transition-colors">
               How we choose
             </Link>
+            <Link href="/research/ai-gift-recommendations" className="hover:text-stone-700 transition-colors">
+              Research
+            </Link>
             <Link href="/privacy" className="hover:text-stone-700 transition-colors">
               Privacy Policy
             </Link>

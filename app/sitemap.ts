@@ -30,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { path: "/about", changeFrequency: "monthly", priority: 0.5 },
     { path: "/how-we-choose", changeFrequency: "monthly", priority: 0.4 },
+    { path: "/research/ai-gift-recommendations", changeFrequency: "monthly", priority: 0.6 },
     { path: "/disclosure", changeFrequency: "yearly", priority: 0.3 },
     { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
     { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
