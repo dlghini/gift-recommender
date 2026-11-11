@@ -47,7 +47,7 @@ export const coffeeLovers: GiftGuide = {
   faq: [
     { q: "What do you get a coffee lover who already has an espresso machine?", a: "Go around the machine. Fresh single-origin beans on a subscription, a proper burr grinder if they are still using a blade one, a cupping class, or a hand-thrown mug worth reaching for. The machine is settled; the beans and the grind are where the cup still improves." },
     { q: "Is a mug too boring a gift for a coffee lover?", a: "A generic mug, yes. A hand-thrown ceramic one they would actually choose, or an insulated travel mug that keeps coffee hot for hours without a metallic taste, is a mug they will use every day. The line is between a freebie and something made." },
-    { q: "What is a good coffee gift under $30?", a: "A specialty coffee subscription's first month, a single-origin sampler, a reusable metal filter, a bag of beans from a roaster they have not tried, or an engraved wooden scoop. Plenty lands well below $30." },
+    { q: "What is a good coffee gift under $30?", a: "A specialty coffee subscription's first month, a single-origin sampler, a reusable metal filter, a bag of beans from a roaster they have not tried, or an engraved wooden scoop. Plenty lands well below $30. Most of these also work for an office swap, and [Secret Santa gifts](/gifts-for/secret-santa) has more picks in that range." },
     { q: "Beans or gear?", a: "If they already brew, beans, because they run out and gear does not. If they are just getting into it, one good piece of gear, usually a burr grinder or a pour-over set, moves the cup more than anything else." },
   ],
   related: ["book-lovers", "wine-lovers", "person-who-has-everything"],

@@ -45,7 +45,7 @@ export const gardeners: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get a gardener who has everything?", a: "Better versions of what they use. Felco pruners, a hori hori, a real kneeler. Or an experience: a garden tour or a flower workshop. Gardeners tend to own plenty, but few buy the good tool because the cheap one still works." },
+    { q: "What do you get a gardener who has everything?", a: "Better versions of what they use. Felco pruners, a hori hori, a real kneeler. Or an experience: a garden tour or a flower workshop. Gardeners tend to own plenty, but few buy the good tool because the cheap one still works. For an older gardener, see [gifts for grandparents who have everything](/gifts-for/grandparents-who-have-everything)." },
     { q: "What is a good gardening gift under $30?", a: "Goatskin gloves, a hori hori knife, a set of handmade plant markers, an heirloom seed collection, or a jar of hand salve. All of these get used and none feel like filler." },
     { q: "What do you get someone who gardens in small spaces or pots?", a: "Terracotta pots, a grow light, a good pair of snips, and some herb seeds. Skip big tools they do not have room to store." },
     { q: "Can I give a gardener plants as a gift?", a: "Yes, but know their zone and their light first. A plant that dies is worse than no plant. Seeds, bulbs, and tools are safer." },

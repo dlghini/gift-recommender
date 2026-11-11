@@ -46,7 +46,7 @@ export const retroGifts: GiftGuide = {
   ],
   faq: [
     { q: "What counts as a retro gift?", a: "Something tied to the era someone actually grew up in: a reissue of the toy or console they had, a clean pressing of the album they wore out, the decade's candy in a box, a framed poster, or an experience like a tribute show or a roller-disco night." },
-    { q: "What is a good retro gift for someone who grew up in the 80s or 90s?", a: "Aim at that specific decade. See the 80s nostalgia gifts and 90s nostalgia gifts guides linked below for full lists. In short: the reissued console, the vinyl, the snack box, and the movie they can quote." },
+    { q: "What is a good retro gift for someone who grew up in the 80s or 90s?", a: "Aim at that specific decade. See our [80s nostalgia gifts](/gifts-for/80s-nostalgia-gifts) and [90s nostalgia gifts](/gifts-for/90s-nostalgia-gifts) guides for full lists. In short: the reissued console, the vinyl, the snack box, and the movie they can quote." },
     { q: "Are “decade in a box” gift sets worth it?", a: "Usually not. They tend to be filler around one or two real items. You do better choosing those one or two things yourself, like a proper retro candy assortment and a single vinyl reissue." },
     { q: "Any retro gifts under $30?", a: "A retro candy box, one vinyl reissue, a classic lava lamp, a reissued card or board game, or a framed reproduction poster print." },
   ],

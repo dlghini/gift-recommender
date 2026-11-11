@@ -45,9 +45,9 @@ export const husbandWhoHasEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get a husband who has everything?", a: "Something built around the two of you, or a better version of something he already uses. A booked evening like a balloon ride or a cooking class, an upgrade like good headphones or a valet tray, or a personal piece like a star map of the night you met." },
+    { q: "What do you get a husband who has everything?", a: "Something built around the two of you, or a better version of something he already uses. A booked evening like a balloon ride or a cooking class, an upgrade like good headphones or a valet tray, or a personal piece like a star map of the night you met. If he spends his weekends on the course, see [gifts for golfers](/gifts-for/golfers)." },
     { q: "He says he doesn't want anything. What now?", a: "Notice what he mentions in passing and buy that, or plan a night out he doesn't have to organize. Doing nothing usually reads as forgetting." },
-    { q: "What's a romantic gift for him?", a: "A star map of a date that matters, a custom vinyl record of your songs, or a deck of small notes on why you love him. Specific to the two of you and cheap to make good." },
+    { q: "What's a romantic gift for him?", a: "A star map of a date that matters, a custom vinyl record of your songs, or a deck of small notes on why you love him. Specific to the two of you and cheap to make good. Not married yet? [Gifts for your boyfriend](/gifts-for/boyfriend) fits that stage." },
     { q: "Under $50?", a: "A valet tray, a safety razor set, a “reasons I love you” deck, a star map print, or engraved cufflinks." },
   ],
   related: ["men-who-have-everything", "boyfriend", "dad-who-has-everything"],

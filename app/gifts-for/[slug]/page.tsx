@@ -7,6 +7,8 @@ import { JsonLd } from "@/components/json-ld";
 import { articleSchema } from "@/lib/schema";
 import { PickCard } from "@/components/gift-guide/pick-card";
 import { PinterestSaveButton } from "@/components/gift-guide/pinterest-save-button";
+import { RichText } from "@/components/gift-guide/rich-text";
+import { plainText } from "@/lib/gift-guides/rich-text";
 import { getGuide, allGuideSlugs, GIFT_GUIDES } from "@/lib/gift-guides";
 
 // All guides are known at build time; anything else 404s.
@@ -83,7 +85,7 @@ export default async function GiftGuidePage({
     mainEntity: guide.faq.map((f) => ({
       "@type": "Question",
       name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
+      acceptedAnswer: { "@type": "Answer", text: plainText(f.a) },
     })),
   };
 
@@ -131,7 +133,9 @@ export default async function GiftGuidePage({
 
         <div className="mt-8 space-y-4 text-base leading-relaxed text-stone-600">
           {guide.intro.map((para, i) => (
-            <p key={i}>{para}</p>
+            <p key={i}>
+              <RichText text={para} />
+            </p>
           ))}
         </div>
 
@@ -152,7 +156,9 @@ export default async function GiftGuidePage({
             {guide.faq.map((f) => (
               <div key={f.q} className="p-5">
                 <h3 className="font-heading text-base font-medium text-stone-900">{f.q}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-stone-600">{f.a}</p>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                  <RichText text={f.a} />
+                </p>
               </div>
             ))}
           </div>

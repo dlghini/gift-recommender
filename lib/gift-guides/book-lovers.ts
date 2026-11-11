@@ -48,7 +48,7 @@ export const bookLovers: GiftGuide = {
     { q: "What do you get a book lover who already has everything?", a: "Move away from objects. An audiobook or Book of the Month membership keeps giving after the wrapping is gone, and a literary walking tour is something they almost certainly do not own. A gift card to their favorite independent bookstore also works, because for them the fun is the browsing." },
     { q: "What is a good gift for someone who only reads ebooks?", a: "Skip physical books. A Kindle Paperwhite upgrade, an audiobook membership, a warm clip-on light for older Kindles that lack a backlight, or bookish decor and candles that celebrate reading without adding to a shelf." },
     { q: "Are book-themed candles and decor a safe gift, or too generic?", a: "They land when they are specific. A candle named after an actual book, or a print of a favorite opening line, feels personal. A mug that just says “Book Nerd” does not. Aim for the specific end." },
-    { q: "How much should I spend on a gift for a book lover?", a: "Most picks here sit between $15 and $50, which covers keepsakes, reading accessories, and a short subscription. A Kindle or a longer membership runs $120 to $180 if you want the gift to be the main event." },
+    { q: "How much should I spend on a gift for a book lover?", a: "Most picks here sit between $15 and $50, which covers keepsakes, reading accessories, and a short subscription. A Kindle or a longer membership runs $120 to $180 if you want the gift to be the main event. For an exchange with a set limit, see [Secret Santa gifts](/gifts-for/secret-santa)." },
   ],
   related: ["coffee-lovers", "wine-lovers", "person-who-has-everything"],
   published: "2026-08-27",

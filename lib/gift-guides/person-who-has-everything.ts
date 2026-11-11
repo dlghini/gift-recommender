@@ -45,7 +45,7 @@ export const personWhoHasEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you buy for someone who has everything?", a: "Something that is not an object to keep. An experience like a dinner, a class, or a weekend away. A consumable good enough to enjoy and finish. A personal keepsake tied to one memory. Or a donation in their name to a cause they care about." },
+    { q: "What do you buy for someone who has everything?", a: "Something that is not an object to keep. An experience like a dinner, a class, or a weekend away. A consumable good enough to enjoy and finish. A personal keepsake tied to one memory. Or a donation in their name to a cause they care about. If you know they love a pet, see [gifts for dog lovers](/gifts-for/dog-lovers) or [gifts for cat lovers](/gifts-for/cat-lovers). For a gift exchange at work, see [Secret Santa gifts](/gifts-for/secret-santa)." },
     { q: "They say “don't get me anything.” Should I listen?", a: "Half listen. Skip the stuff, but a small consumable, a shared experience, or a donation with a handwritten card almost always lands well. Doing nothing usually reads as forgetting." },
     { q: "What is a good sentimental gift for them?", a: "A photo book about one particular year or trip, a custom star map or coordinates print for a date that matters, or an engraved keepsake box. Personal beats expensive here." },
     { q: "Under $50?", a: "A small-producer pantry set, a serious box of chocolate, a photo book, a custom print, a good candle, or the first months of a tasting subscription." },

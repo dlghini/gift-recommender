@@ -45,7 +45,7 @@ export const dadWhoHasEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you get a dad who has everything?", a: "Something that doesn't add to the garage. Time with you, like a fishing trip or a round of golf. A better version of a thing he uses daily, like a thermos, a thermometer, or a decent pair of socks. Or something personal from his kids, like a photo book or a print of his first car." },
+    { q: "What do you get a dad who has everything?", a: "Something that doesn't add to the garage. Time with you, like a fishing trip or a round of golf. A better version of a thing he uses daily, like a thermos, a thermometer, or a decent pair of socks. Or something personal from his kids, like a photo book or a print of his first car. If he is happiest on the course, see [gifts for golfers](/gifts-for/golfers). If his best friend has four legs, try [gifts for dog lovers](/gifts-for/dog-lovers)." },
     { q: "He says he doesn't want anything. Should I listen?", a: "Half listen. Skip the stuff, but a shared afternoon or a small keepsake with a handwritten note almost always lands. Doing nothing usually reads as forgetting." },
     { q: "What's a good sentimental gift for dad?", a: "A “tell me your story” journal, a photo book about one specific year, or a blueprint print of his first car. Personal and specific beats expensive and generic." },
     { q: "Under $50?", a: "Merino socks, a rechargeable headlamp, a story journal, a car blueprint print, a jerky box, or a good thermos. Any of them gets used the same week." },

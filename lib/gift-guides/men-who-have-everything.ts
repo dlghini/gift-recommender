@@ -45,7 +45,7 @@ export const menWhoHaveEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you actually get a man who has everything?", a: "Something he cannot keep on a shelf. An experience like a driving day or a tasting, a consumable like a rare bottle or a steak box, or an upgrade to something he uses daily but has not bothered to replace: his wallet, his pocketknife, his kitchen knife." },
+    { q: "What do you actually get a man who has everything?", a: "Something he cannot keep on a shelf. An experience like a driving day or a tasting, a consumable like a rare bottle or a steak box, or an upgrade to something he uses daily but has not bothered to replace: his wallet, his pocketknife, his kitchen knife. If he lives on the golf course, see [gifts for golfers](/gifts-for/golfers)." },
     { q: "He says he does not want anything. What now?", a: "Take him at his word about objects and give an experience, a consumable, or a donation in his name paired with a small engraved keepsake. Or ask what class or trip he keeps talking about and cover part of it." },
     { q: "What is a safe upgrade gift?", a: "Look at what he uses every day and buy the better version. A dull chef's knife, a fraying wallet, a beat-up multitool, an airport hoodie. He will use the upgrade immediately and would not have bought it himself." },
     { q: "Under $50?", a: "A bottle he would not buy himself, a monthly hot sauce or coffee club, engraved bar glasses, a MasterClass subscription, or a quality everyday item like a good pen or a leather cable roll." },

@@ -45,7 +45,7 @@ export const womenWhoHaveEverything: GiftGuide = {
     },
   ],
   faq: [
-    { q: "What do you actually get a woman who has everything?", a: "Something that doesn't need a shelf. An experience like a spa day or a tasting class, a consumable like fine tea or a flower subscription, or an upgrade to something she uses daily but hasn't replaced: her pillowcase, her robe, her everyday bag." },
+    { q: "What do you actually get a woman who has everything?", a: "Something that doesn't need a shelf. An experience like a spa day or a tasting class, a consumable like fine tea or a flower subscription, or an upgrade to something she uses daily but hasn't replaced: her pillowcase, her robe, her everyday bag. If she is happiest outside with her plants, see [gifts for gardeners](/gifts-for/gardeners)." },
     { q: "She says she doesn't want anything. What now?", a: "Take her at her word about objects and give an experience, a consumable, or a donation in her name paired with a small engraved keepsake. Doing nothing usually reads as forgetting." },
     { q: "What's a good sentimental gift for her?", a: "A personalized birthstone or initial necklace, an engraved jewelry box, or a membership somewhere she'd actually return to. Personal and useful beats expensive and generic." },
     { q: "Under $50?", a: "A silk pillowcase set, a serious tea or chocolate box, a personalized necklace, the first month of a flower subscription, or a proper jewelry cleaning kit." },

@@ -48,7 +48,7 @@ export const secretSanta: GiftGuide = {
     { q: "How much should a Secret Santa gift cost?", a: "Follow the limit your group set. Office exchanges often land between $15 and $30. It is better to spend a little under and add a thoughtful note than to go over and make others feel awkward." },
     { q: "What are good Secret Santa gifts for coworkers?", a: "Pick something nearly anyone would use: a candle, chocolate, a mug set, a desk plant, or a good notebook. Skip anything personal, like clothing sizes or fragrances, and be careful with alcohol unless your workplace allows it." },
     { q: "What should I get a Secret Santa I barely know?", a: "Choose a safe category from the first section and add one small personal touch, like a handwritten note. If you can learn one fact about them, like a favorite drink or a hobby, use it to narrow the list." },
-    { q: "Is Secret Santa the same as white elephant?", a: "No. In Secret Santa you buy for one specific person you drew, so you can match the gift to them. White elephant is a game where everyone brings a gift and people open or steal them, so the gift is not for anyone in particular." },
+    { q: "Is Secret Santa the same as white elephant?", a: "No. In Secret Santa you buy for one specific person you drew, so you can match the gift to them. [White elephant](/gifts-for/white-elephant) is a game where everyone brings a gift and people open or steal them, so the gift is not for anyone in particular." },
   ],
   related: ["white-elephant", "person-who-has-everything", "coffee-lovers"],
   published: "2026-11-11",
