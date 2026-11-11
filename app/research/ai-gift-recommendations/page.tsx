@@ -407,8 +407,8 @@ export default function AiGiftStudyPage() {
         <section className="mt-14" id="data">
           <h2 className="font-heading text-2xl text-stone-900">The data</h2>
           <p className="mt-4 text-base leading-relaxed text-stone-600">
-            Every pick from the study, one row each. Use it however you like. A link back to this page is
-            appreciated.
+            Every pick from the study, one row each. You are free to quote, chart and cite any of it
+            with a link back to this page. Please don&apos;t republish the full file.
           </p>
           <Card className="mt-5 gap-3 px-5 py-5 ring-stone-200">
             <a
