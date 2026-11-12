@@ -14,7 +14,7 @@ const PUBLISHED = "2026-11-11";
 
 const TITLE = "We Asked an AI for 10,198 Gift Ideas";
 const DESCRIPTION =
-  "3,400 made-up shoppers, three gift picks each. What an AI recommends when you ask it thousands of times: the repeats, the budget gaps, who gets personalized gifts, and how often a product name is slightly off.";
+  "3,400 made-up shoppers, three gift picks each. What an AI recommends when asked thousands of times: the repeats, budget gaps and who gets personalized gifts.";
 
 export const metadata = routeMeta(PATH, TITLE, DESCRIPTION);
 
@@ -51,6 +51,8 @@ export default function AiGiftStudyPage() {
     description:
       "The top three gift picks an AI recommender returned for each of 3,400 synthetic shoppers (10,198 picks), with the shopper's relationship, age band, occasion, budget, interests and gift preference, and a name check for each product.",
     url,
+    license: `${url}#data`,
+    isAccessibleForFree: true,
     dateCreated: PUBLISHED,
     creator: { "@type": "Person", "@id": FOUNDER_ID, name: FOUNDER_NAME },
     publisher: { "@type": "Organization", "@id": ORGANIZATION_ID, name: "The Gift Whisperer" },

@@ -6,7 +6,7 @@ export const secretSanta: GiftGuide = {
   h1: "Secret Santa Gifts",
   title: "Secret Santa Gifts",
   description:
-    "Secret Santa gift ideas for coworkers and friends you do not know well: safe picks, desk picks, and small personal ones, mostly under $30. Each includes a reason.",
+    "Secret Santa ideas for coworkers and friends you do not know well: safe picks, desk picks, and small personal ones, mostly under $30. Each has a reason.",
   intro: [
     "Secret Santa gives you one name and a budget, which is harder than it sounds when the name is a coworker you have only seen on calls. The goal is a gift that is good for nearly anyone, a little more thoughtful than a gift card, and clearly within the limit.",
     "That points to a few safe categories. Comforts like candles, chocolate, and warm socks work for most people. Desk items get used right away at the office. And small personal gifts show that you paid some attention, like an ornament with their name or a puzzle for the holidays.",

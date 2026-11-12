@@ -6,7 +6,7 @@ export const whiteElephant: GiftGuide = {
   h1: "White Elephant Gifts",
   title: "White Elephant Gifts",
   description:
-    "White elephant gift ideas that get stolen, get a laugh, or both: useful picks, funny picks, and snacks and drinks, most under $30. Each comes with a reason it works.",
+    "White elephant gift ideas that get stolen, get a laugh, or both: useful picks, funny picks, and snacks, most under $30. Each has a reason it works.",
   intro: [
     "A white elephant gift has a different job than a normal one. You are buying for a room of people you may barely know, and the gift only works if somebody wants to steal it. A thoughtful gift that nobody fights over leaves you with a quiet, awkward unwrapping.",
     "Most groups set a limit somewhere around $20 to $40, so the picks here sit in that range. Three types tend to do well: something useful enough that people will fight over it, something funny enough to carry the whole room, and something to eat or drink, which almost everyone is happy to take home.",
