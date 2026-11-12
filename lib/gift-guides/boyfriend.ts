@@ -6,7 +6,7 @@ export const boyfriend: GiftGuide = {
   h1: "Gifts for Your Boyfriend",
   title: "Gifts for Your Boyfriend",
   description:
-    "Gift ideas for your boyfriend that go past another hoodie: dates he will remember, things he will use every day, and personal gifts. Each pick comes with a reason.",
+    "Gift ideas for your boyfriend that go past another hoodie: dates he will remember, daily-use gifts, and personal ones. Each pick has a reason.",
   intro: [
     "Shopping for a boyfriend is harder than it looks. Whatever you buy has to say something about the two of you without being too much, and it still has to be something he will actually use. A gift that misses on either side ends up in a drawer.",
     "The easy way through is to split the list three ways. Plan a night out he would not book for himself. Replace something he uses every day and has stopped noticing. And add one small thing that is clearly about you two, which does more than a pricey gift that could have come from anyone.",

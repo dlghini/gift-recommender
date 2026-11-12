@@ -6,7 +6,7 @@ export const golfers: GiftGuide = {
   h1: "Gifts for Golfers",
   title: "Gifts for Golfers",
   description:
-    "Gift ideas and stocking stuffers for golfers: gear they will actually use on the course, ways to practice at home, and keepsakes worth keeping. Each pick has a reason.",
+    "Gift ideas and stocking stuffers for golfers: gear they will use on the course, ways to practice at home, and keepsakes. Each pick has a reason.",
   intro: [
     "Golfers are easy to buy for badly. The shelves are full of novelty tees and logo towels, and most of it ends up in a drawer. The gifts that land are the ones tied to how they actually play: the ball they use, a way to get better without leaving the house, or a round somewhere they have wanted to play.",
     "Start with the swing, not the stuff. A golfer who plays twice a week wants consumables and small upgrades, like balls, a rangefinder, a good glove. A golfer who plays twice a month and complains about it wants a way to practice. A golfer who has everything wants the round itself, or something on the wall that reminds them of one.",
