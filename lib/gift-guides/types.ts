@@ -7,6 +7,8 @@ export interface GiftPick {
   price: string;
   /** One or two sentences on why it fits this recipient. */
   why: string;
+  /** Optional one-line "who it suits", shown as "Best for: ..." under the blurb. */
+  bestFor?: string;
   /** 1–3 interest/theme tags (drive the emoji fallback). */
   tags: string[];
   store: Store;

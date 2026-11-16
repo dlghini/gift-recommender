@@ -67,6 +67,11 @@ export function PickCard({ pick }: { pick: GiftPick }) {
           <span className="text-sm font-medium text-stone-500">{pick.price}</span>
         </div>
         <p className="mt-1 text-sm leading-relaxed text-stone-600">{pick.why}</p>
+        {pick.bestFor && (
+          <p className="mt-1 text-sm leading-relaxed text-stone-500">
+            <span className="font-medium text-stone-700">Best for:</span> {pick.bestFor}
+          </p>
+        )}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {pick.tags.map((tag) => (
             <span
