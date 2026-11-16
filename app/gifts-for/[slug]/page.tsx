@@ -32,6 +32,14 @@ export async function generateMetadata({
   return routeMeta(`/gifts-for/${guide.slug}`, guide.title, guide.description);
 }
 
+function anchorId(heading: string): string {
+  return heading
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function formatUpdated(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
     year: "numeric",
@@ -139,8 +147,34 @@ export default async function GiftGuidePage({
           ))}
         </div>
 
+        {guide.sections.length >= 4 && (
+          <nav aria-label="In this guide" className="mt-8 rounded-xl border border-stone-200 bg-white p-5">
+            <p className="text-sm font-medium text-stone-900">In this guide</p>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              {guide.sections.map((section) => (
+                <li key={section.heading}>
+                  <a
+                    href={`#${anchorId(section.heading)}`}
+                    className="text-amber-700 underline underline-offset-2 hover:text-amber-800"
+                  >
+                    {section.heading}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href="#common-questions"
+                  className="text-amber-700 underline underline-offset-2 hover:text-amber-800"
+                >
+                  Common questions
+                </a>
+              </li>
+            </ul>
+          </nav>
+        )}
+
         {guide.sections.map((section) => (
-          <section key={section.heading} className="mt-12">
+          <section key={section.heading} id={anchorId(section.heading)} className="mt-12 scroll-mt-6">
             <h2 className="font-heading text-2xl text-stone-900">{section.heading}</h2>
             <div className="mt-4 space-y-4">
               {section.picks.map((pick) => (
@@ -150,7 +184,7 @@ export default async function GiftGuidePage({
           </section>
         ))}
 
-        <section className="mt-12">
+        <section id="common-questions" className="mt-12 scroll-mt-6">
           <h2 className="font-heading text-2xl text-stone-900">Common questions</h2>
           <div className="mt-4 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
             {guide.faq.map((f) => (
