@@ -3,12 +3,12 @@ import type { GiftGuide } from "./types";
 export const retroGifts: GiftGuide = {
   slug: "retro-gifts",
   keyword: "retro gifts",
-  h1: "Retro Gifts",
-  title: "Retro Gifts",
+  h1: "Retro and Nostalgic Gifts",
+  title: "15 Retro and Nostalgic Gift Ideas",
   description:
-    "Retro and nostalgia gift ideas: reissued toys and games, vinyl, retro candy, and experiences pitched to the decade someone actually grew up in.",
+    "15 retro and nostalgic gift ideas: reissued toys and games, vinyl, retro candy, and experiences pitched to the decade someone actually grew up in.",
   intro: [
-    "A retro gift lands when it is specific to the person's own era, not just old in general. Someone who grew up in the 70s, the 80s, or the 90s each has a different set of things that make them stop and say they had one of those. The trick is aiming at the right one.",
+    "A retro or nostalgic gift lands when it is specific to the person's own era, not just old in general. Someone who grew up in the 70s, the 80s, or the 90s each has a different set of things that make them stop and say they had one of those. The trick is aiming at the right one.",
     "Precision beats theme. A generic “retro” hamper reads as filler. One well-chosen thing they actually remember, wrapped on its own, does more than a basket of decade-branded odds and ends.",
     "Every pick links to a store search rather than one listing, and prices are estimates. For a list built around one decade, see the 80s and 90s guides linked at the end. For one built around a specific person, tell the Whisperer about them.",
   ],
@@ -49,8 +49,9 @@ export const retroGifts: GiftGuide = {
     { q: "What is a good retro gift for someone who grew up in the 80s or 90s?", a: "Aim at that specific decade. See our [80s nostalgia gifts](/gifts-for/80s-nostalgia-gifts) and [90s nostalgia gifts](/gifts-for/90s-nostalgia-gifts) guides for full lists. In short: the reissued console, the vinyl, the snack box, and the movie they can quote." },
     { q: "Are “decade in a box” gift sets worth it?", a: "Usually not. They tend to be filler around one or two real items. You do better choosing those one or two things yourself, like a proper retro candy assortment and a single vinyl reissue." },
     { q: "Any retro gifts under $30?", a: "A retro candy box, one vinyl reissue, a classic lava lamp, a reissued card or board game, or a framed reproduction poster print." },
+    { q: "What is a good nostalgic gift?", a: "The specific thing they owned or loved at one age: the toy, the record, the movie, the candy. One real item they remember beats a themed basket. For a list by decade, see [80s nostalgia gifts](/gifts-for/80s-nostalgia-gifts) and [90s nostalgia gifts](/gifts-for/90s-nostalgia-gifts)." },
   ],
   related: ["80s-nostalgia-gifts", "90s-nostalgia-gifts", "person-who-has-everything"],
   published: "2026-08-28",
-  updated: "2026-08-28",
+  updated: "2026-11-20",
 };

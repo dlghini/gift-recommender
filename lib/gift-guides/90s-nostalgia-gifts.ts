@@ -3,10 +3,10 @@ import type { GiftGuide } from "./types";
 export const nostalgiaGifts90s: GiftGuide = {
   slug: "90s-nostalgia-gifts",
   keyword: "90s nostalgia gifts",
-  h1: "90s Nostalgia Gifts",
-  title: "90s Nostalgia Gifts",
+  h1: "90s Nostalgia Gifts for Adults",
+  title: "15 90s Nostalgia Gifts for Adults",
   description:
-    "90s nostalgia gifts for someone who grew up in the decade: reissued handhelds, the albums and movies they wore out, a proper 90s snack box, and days out.",
+    "15 90s nostalgia gifts for adults who grew up in the decade: reissued consoles and toys, the albums and movies they wore out, a 90s snack box, and days out.",
   intro: [
     "People who grew up in the 1990s are hitting the milestone birthdays now, and most of them will tell you they don't want anything. What they mean is they don't want more stuff. A nostalgia gift they actually owned or begged for in 1996 is a different matter.",
     "The good version of a 90s gift is specific. Slogan T-shirts and “90s kid” mugs are a punchline. The console they saved up for, the album they taped off the radio, or the snacks that got confiscated at school are a real gift.",
@@ -49,8 +49,9 @@ export const nostalgiaGifts90s: GiftGuide = {
     { q: "What is a good 90s gift for a 30th or 40th birthday?", a: "Add something tied to the year: a front page from their birth date, a star map of the night they were born, a birth-year drink, or tickets to a 90s act on a reunion tour." },
     { q: "What should I avoid?", a: "“90s kid” slogan mugs and T-shirts, inflatable furniture, and anything that assumes they kept a VCR or a dial-up modem. Nostalgia lands; a punchline doesn't." },
     { q: "Any 90s nostalgia gifts under $30?", a: "A 90s snack box, a single vinyl reissue, a reissued handheld toy, a framed poster print, or a pack of the trading cards or Pogs they collected." },
+    { q: "What goes in a 90s gift box?", a: "Build it around one real item, like a Tamagotchi or a vinyl reissue, then add a 90s snack and candy assortment and a reproduction front page from their birth year. Pre-made decade boxes tend to be mostly filler. A box with three things they remember beats a bigger one with ten they don't." },
   ],
   related: ["80s-nostalgia-gifts", "retro-gifts", "person-who-has-everything"],
   published: "2026-08-28",
-  updated: "2026-08-28",
+  updated: "2026-11-20",
 };
