@@ -72,15 +72,6 @@ export default function DisclosurePage() {
           </section>
 
           <section>
-            <h2 className="font-heading text-xl text-stone-800 mb-3">Memolio</h2>
-            <p>
-              The illustrated life-story book on our grandparents guide links to Memolio through
-              their creator programme. If you buy after clicking through, we earn 20% of the order
-              value, and you get a small discount applied automatically at checkout.
-            </p>
-          </section>
-
-          <section>
             <h2 className="font-heading text-xl text-stone-800 mb-3">Our recommendations are independent</h2>
             <p>
               Affiliate relationships do not influence which gifts we recommend. Our suggestions
