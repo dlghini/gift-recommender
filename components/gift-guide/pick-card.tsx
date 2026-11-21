@@ -10,6 +10,7 @@ const STORE_LABEL: Record<GiftPick["store"], string> = {
   amazon: "Amazon",
   etsy: "Etsy",
   viator: "Viator",
+  memolio: "Memolio",
 };
 
 // These pages are static, so there's no image URL baked in. Resolve one on mount

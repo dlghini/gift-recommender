@@ -5,10 +5,12 @@ const RAKUTEN_ID = "wa9JRgUhXO8";
 const ETSY_MID = "54027";
 const VIATOR_PID = "P00304135";
 const AMAZON_TAG = "giftwhisper0e-20";
+const MEMOLIO_URL = "https://memolio.io/?ref=GIFTWHISPERER-5";
 
-export type Store = "amazon" | "etsy" | "viator";
+export type Store = "amazon" | "etsy" | "viator" | "memolio";
 
 export function buildAffiliateUrl(store: Store, searchQuery: string): string {
+  if (store === "memolio") return MEMOLIO_URL;
   const q = encodeURIComponent(searchQuery);
   if (store === "viator") {
     return `https://www.viator.com/searchResults/all?text=${q}&pid=${VIATOR_PID}`;
