@@ -23,7 +23,7 @@ Fit = how well our format works (curated picks, Amazon/Etsy/Viator links). Publi
 | 7 | 15 Gifts for Sister | gifts for sister (6.6K, 0) | sister gifts 3.0K, christmas 1.2K, birthday 600 | Oct | KD 0. |
 | 8 | 15 Gifts for Brother | gifts for brother (6.2K, 0) | christmas 1.0K, brother gifts 600 | Oct | KD 0. |
 | 9 | 15 Gifts for Girlfriend | gifts for girlfriend (9.4K, 9) | gift ideas 4.1K, christmas 3.2K, girlfriend gifts 800 | Oct, Jan (Valentine's) | Mirror of the boyfriend guide. KD 9 is harder. |
-| 10 | 20 Housewarming Gifts | housewarming gifts (82K, 4) | housewarming gift ideas 13K | Anytime (evergreen) | Largest volume found. Verify the SERP; KD 4 on 82K looks low. |
+| 10 | BUILT 11/24: 20 Housewarming Gifts and Gift Ideas | housewarming gifts (82K, 4) | housewarming gift ideas 13K | Anytime (evergreen) | See the housewarming section below: volume is real, KD 4 is misleading for a DR 0.8 site. |
 | 11 | 15 Gifts for Teen Girls | gifts for teen girls (8.5K, 1) | n/a | Oct | Pair with teen boys. |
 | 12 | 15 Gifts for New Moms | gifts for new moms (5.2K, 3) | n/a | Anytime | |
 | 13 | 15 Gifts for Couples | gifts for couples (5.5K, 5) | christmas 600 | Oct, Jan | |
@@ -53,3 +53,15 @@ Skip: personalized gifts (43K but KD 66), hostess gifts (2.9K but KD 28), "gifts
 
 ## Plant lovers (built 2026-11-24)
 gifts for plant lovers 3.5K (KD 0), plant gifts 1.6K (KD 7), plant lover gifts 450, plant gift ideas 350, best gifts for plant lovers 300. Mom/dad/lady variants under 100. Guide title: "15 Plant Gifts and Gifts for Plant Lovers".
+
+## Housewarming research (2026-11-24, built same day)
+- Head term "housewarming gifts": US 82K, global 146K, KD 4 ("~5 referring domains to rank"), traffic potential 20K. Family: housewarming gift ideas 13K, house warming gifts 8.8K, housewarming gift 6.5K, best housewarming gifts 5.5K, good 4.2K, for men 1.4K, useful 1.1K, for couples 1.1K, unique 800, personalized 700, traditional 450, symbolic 450, practical 400, funny 350, "under $50" 150, "for couples who have everything" 150. After the head term, the next-largest variant is 15x smaller, so most of the volume sits in the head and "ideas".
+- **KD 4 is misleading for us.** The top 10 for the head term is Amazon (DR 96), Wirecutter (DR 94, 286 backlinks), Mark and Graham (DR 72), Nordstrom (DR 86), Eater (DR 90), Pinterest (DR 97), West Elm (DR 82), Anthropologie (DR 83), Tiffany (DR 80). Most have 0 to 16 backlinks, which is why KD is low, but all sit on DR 72 to 97 domains. The only small-site article on the "ideas" SERP is thediyplaybook.com (DR 67, 18 backlinks, ranks about #6, est. 5K visits). Google also shows an AI Overview, shopping and People Also Ask above the organic results. KD counts backlinks to pages, not domain strength, so a DR 0.8 site should not expect a top-10 for the head term soon.
+- **Why we built it anyway:** the long tail ("for men", "for couples", "useful", "traditional", "under $50") is where a small site can appear; the topic is evergreen; Pinterest ranks on this SERP (a "homemade housewarming gifts" board is #8), and Pinterest is our proven traffic source, so it suits a pin lane.
+- Built as 20 picks in 4 sections named for the searches ("Useful housewarming gifts", "for couples", "for men", "Small and traditional"). Gate: re-pull GSC around 2027-01-05; impressions on housewarming queries and position better than 50 on at least one variant ("housewarming gifts for men", "useful housewarming gifts", "traditional housewarming gifts"). If the head term stays beyond page 5, keep it as a long-tail and Pinterest asset, do not write more housewarming guides.
+
+## Dad guide retitle (done 2026-11-24)
+Retitled to "20 Gifts for the Dad Who Wants Nothing" (H1 "Gifts for the Dad Who Wants Nothing (or Has Everything)"; description and FAQ carry "has everything"; slug unchanged). This resets the January gate baseline for that page: judge by position from the deploy date.
+
+## Pinterest idea: "wants nothing" angle
+"gifts for dad who wants nothing" is 11K (KD 0) vs "has everything" 1.2K, so pin titles and descriptions for the dad guide should say "wants nothing" ("20 gifts for the dad who wants nothing"). Pinterest wording is not in Ahrefs; test it as one new pin per season. Timing: Pinterest pins need 4 to 6 weeks lead, so queue Father's Day pins for April to May 2027 (peak June). The standing Pinterest rule applies: no new pins until the ~12/4 check of the 11/25 to 11/27 pins.

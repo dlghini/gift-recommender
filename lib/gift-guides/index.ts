@@ -17,6 +17,7 @@ import { nostalgiaGifts90s } from "./90s-nostalgia-gifts";
 import { golfers } from "./golfers";
 import { gardeners } from "./gardeners";
 import { plantLovers } from "./plant-lovers";
+import { housewarming } from "./housewarming";
 import { boyfriend } from "./boyfriend";
 import { whiteElephant } from "./white-elephant";
 import { secretSanta } from "./secret-santa";
@@ -41,6 +42,7 @@ export const GIFT_GUIDES: GiftGuide[] = [
   golfers,
   gardeners,
   plantLovers,
+  housewarming,
   boyfriend,
   whiteElephant,
   secretSanta,
