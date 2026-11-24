@@ -4,7 +4,7 @@ export const secretSanta: GiftGuide = {
   slug: "secret-santa",
   keyword: "secret santa gifts",
   h1: "Secret Santa Gifts",
-  title: "Secret Santa Gifts",
+  title: "15 Secret Santa Gift Ideas",
   description:
     "Secret Santa ideas for coworkers and friends you do not know well: safe picks, desk picks, and small personal ones, mostly under $30. Each has a reason.",
   intro: [

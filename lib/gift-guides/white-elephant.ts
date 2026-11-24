@@ -4,7 +4,7 @@ export const whiteElephant: GiftGuide = {
   slug: "white-elephant",
   keyword: "white elephant gifts",
   h1: "White Elephant Gifts",
-  title: "15 Good White Elephant Gifts",
+  title: "15 Good White Elephant Gift Ideas",
   description:
     "White elephant gift ideas that get stolen, get a laugh, or both: useful picks, funny picks, and snacks, most under $30. Each has a reason it works.",
   intro: [

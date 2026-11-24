@@ -4,7 +4,7 @@ export const coffeeLovers: GiftGuide = {
   slug: "coffee-lovers",
   keyword: "gifts for coffee lovers",
   h1: "Gifts for Coffee Lovers",
-  title: "Gifts for Coffee Lovers",
+  title: "15 Coffee Gifts for Coffee Lovers",
   description:
     "Gift ideas for coffee lovers: brewing gear that changes the cup, ritual upgrades, and single-origin subscriptions. Curated, with a reason for each pick.",
   intro: [

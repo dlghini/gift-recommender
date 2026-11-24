@@ -4,7 +4,7 @@ export const gardeners: GiftGuide = {
   slug: "gardeners",
   keyword: "gifts for gardeners",
   h1: "Gifts for Gardeners",
-  title: "Gifts for Gardeners",
+  title: "15 Gardening Gifts for Gardeners",
   description:
     "Gift ideas for gardeners: tools that last decades, things for the plant obsessed, and a few keepsakes. Curated, with a reason for each pick.",
   intro: [
@@ -50,7 +50,7 @@ export const gardeners: GiftGuide = {
     { q: "What do you get someone who gardens in small spaces or pots?", a: "Terracotta pots, a grow light, a good pair of snips, and some herb seeds. Skip big tools they do not have room to store." },
     { q: "Can I give a gardener plants as a gift?", a: "Yes, but know their zone and their light first. A plant that dies is worse than no plant. Seeds, bulbs, and tools are safer." },
   ],
-  related: ["coffee-lovers", "grandparents-who-have-everything", "person-who-has-everything"],
+  related: ["plant-lovers", "coffee-lovers", "grandparents-who-have-everything", "person-who-has-everything"],
   published: "2026-10-26",
   updated: "2026-10-26",
 };
