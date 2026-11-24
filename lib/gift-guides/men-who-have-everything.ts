@@ -4,9 +4,9 @@ export const menWhoHaveEverything: GiftGuide = {
   slug: "men-who-have-everything",
   keyword: "gifts for men who have everything",
   h1: "Gifts for Men Who Have Everything",
-  title: "Gifts for Men Who Have Everything",
+  title: "15 Unique Gifts for Men Who Have Everything",
   description:
-    "Gift ideas for the man who buys his own gear the moment he wants it: experiences, consumables, and upgrades to the things he already uses daily.",
+    "Unique gift ideas for the man who buys his own gear the moment he wants it: experiences, consumables, and upgrades to what he already uses daily.",
   intro: [
     "“He has everything” usually means he buys his own gear the moment he wants it, so the shelf is full and the wish list is empty. The way through is to give something that is not an object to keep: an experience, something consumable, or an upgrade to a thing he uses every day but never replaces.",
     "The upgrade angle is the most reliable. Most men who “have everything” still cook with a dull knife, carry a fraying wallet, and travel in a worn-out hoodie. Buy the better version of one of those and it gets used the same week.",
