@@ -4,7 +4,7 @@ export const golfers: GiftGuide = {
   slug: "golfers",
   keyword: "gifts for golfers",
   h1: "Gifts for Golfers",
-  title: "15 Golf Gift Ideas for Golfers",
+  title: "15 Golf Gifts and Gift Ideas for Golfers",
   description:
     "Gift ideas and stocking stuffers for golfers: gear they will use on the course, ways to practice at home, and keepsakes. Each pick has a reason.",
   intro: [
