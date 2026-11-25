@@ -178,7 +178,7 @@ export default async function GiftGuidePage({
             <h2 className="font-heading text-2xl text-stone-900">{section.heading}</h2>
             <div className="mt-4 space-y-4">
               {section.picks.map((pick) => (
-                <PickCard key={pick.name} pick={pick} />
+                <PickCard key={pick.name} pick={pick} slug={guide.slug} />
               ))}
             </div>
           </section>
