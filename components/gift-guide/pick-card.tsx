@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePostHog } from "posthog-js/react";
 import { cn } from "@/lib/utils";
 import { buildAffiliateUrl } from "@/lib/affiliate";
 import { pickEmoji } from "@/lib/gift-emoji";
@@ -56,8 +57,16 @@ function PickImage({ pick }: { pick: GiftPick }) {
   );
 }
 
-export function PickCard({ pick }: { pick: GiftPick }) {
+export function PickCard({ pick, slug }: { pick: GiftPick; slug: string }) {
   const href = buildAffiliateUrl(pick.store, pick.searchQuery);
+  const posthog = usePostHog();
+
+  // PostHog's autocapture only hears `click`, so these name the event ourselves
+  // and also catch the other ways of opening a link. A context menu (right-click,
+  // or long-press on Android) doesn't prove the link was opened, so it's a
+  // separate event. iOS Safari's long-press fires nothing we can listen for.
+  const track = (event: string, extra?: Record<string, string>) =>
+    posthog?.capture(event, { guide: slug, gift: pick.name, store: pick.store, ...extra });
 
   return (
     <div className="flex gap-4 rounded-xl border border-stone-200 bg-white p-4">
@@ -87,6 +96,12 @@ export function PickCard({ pick }: { pick: GiftPick }) {
           href={href}
           target="_blank"
           rel="sponsored nofollow noopener"
+          onClick={() => track("guide_buy_clicked", { method: "click" })}
+          onAuxClick={(e) => {
+            // button 1 is the middle button; right-clicks also land here.
+            if (e.button === 1) track("guide_buy_clicked", { method: "middle_click" });
+          }}
+          onContextMenu={() => track("guide_buy_menu_opened")}
           className={cn(
             "mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-500 px-4 py-1.5",
             "text-sm font-medium text-white transition-colors hover:bg-amber-600"
