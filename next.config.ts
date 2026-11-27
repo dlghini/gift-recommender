@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdn.pixabay.com" },
     ],
   },
+  // The font files never change under the same name, so browsers can keep them.
+  async headers() {
+    return [
+      {
+        source: "/fonts/:file*.woff2",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+    ];
+  },
   // PostHog reverse proxy: routes analytics traffic through our own domain
   // under /relay (a name PostHog's own guide says to keep deliberately
   // un-analytics-sounding, so ad/tracker blocklists don't pattern-match it

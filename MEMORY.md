@@ -54,8 +54,9 @@
 
 ## Fonts
 
-- **Heading**: Lora (serif) via `--font-lora` / `font-heading` Tailwind class
-- **Body**: Geist Sans via `--font-geist-sans` / `font-sans`
+- Self-hosted from `public/fonts/`, declared in `app/fonts.css` (Phase 73). No `next/font/google`.
+- **Heading**: Source Serif 4 via `--font-serif` / `font-heading`
+- **Body**: renders in the browser default serif (Times). `--font-sans: var(--font-sans)` in `app/globals.css` refers to itself, so Geist has not applied since Phase 1. Not changed; changing it would restyle the whole site.
 
 ## Design System
 
@@ -99,6 +100,12 @@
 - **Nostalgia pass (lighter):** `90s-nostalgia-gifts`, `80s-nostalgia-gifts`, `retro-gifts` got count-and-audience titles and descriptions ("15 90s Nostalgia Gifts for Adults", "15 80s Nostalgia Gifts for Adults", "15 Retro and Nostalgic Gift Ideas"), one new FAQ each aimed at a real query (what goes in a 90s gift box / a good gift for someone who loves 80s music / what is a good nostalgic gift), and `updated` 2026-11-20. Picks were not changed (all three still have exactly 15). Slugs unchanged.
 - **Numeric gate (check about 2027-01-02, six weeks after deploy plus indexing; judge by POSITION, not impressions, because gift-search impressions fall after Christmas):** (a) Wine: impression-weighted average position of the wine query cluster below 50, and at least one wine query in the top 30, means the rewrite worked, so extend the same treatment to the next guides with impressions (book lovers, 90s); still above 70 means stop spending effort on head-term guides. Needs at least 100 wine impressions in the window to read. (b) Nostalgia: "90s nostalgia gifts" at 20 or better, or any nostalgia query in the top 10, is a pass; otherwise leave the guides alone. (c) Kill criterion: if neither group moves, on-page changes alone are not the lever, so stop rewriting guides and put the effort into links and Pinterest instead. Baselines are the numbers above.
 - Request Indexing for the four updated URLs: done 2026-11-20 after merge (PR #61). dad guide re-check still planned for mid-January (Phase 64); no Pinterest pin was made for the new wine title.
+
+### Phase 73: Self-hosted fonts — branch `feature/self-host-fonts` (2026-11-27)
+- Why: Vercel builds failed intermittently loading Source Serif 4 from Google ("Can't resolve '@vercel/turbopack-next/internal/font/google/font'"): 11/11, 11/24, 11/25, 11/26.
+- The 17 woff2 files `next/font/google` produced were copied from a local build into `public/fonts/`, with their unicode ranges and fallback metrics in `app/fonts.css`. Source Serif is now one 400 to 700 variable face per subset instead of four identical ones.
+- `app/layout.tsx` preloads only the Source Serif latin file (Geist and Geist Mono were preloaded before but nothing renders in them). `next.config.ts` caches `/fonts/*.woff2` for a year, so rename a file if it is replaced.
+- Verified on localhost, home and wine guide at 1200px: same font families, element sizes and page heights before and after; only `/fonts/` requested; no console errors. Build passes with no Google font URLs in the CSS.
 
 ### Phase 72: Error tracking — branch `feature/posthog-error-tracking` (2026-11-26)
 - Why: the site recorded no errors, which leaves the phone crash from texted `/wizard` links unexplained.

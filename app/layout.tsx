@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
+import { preload } from "react-dom";
 import "./globals.css";
+import "./fonts.css";
 import { cookies } from "next/headers";
 import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
@@ -13,22 +14,6 @@ import { hasClerkSessionCookie } from "@/lib/has-clerk-session";
 import { JsonLd } from "@/components/json-ld";
 import { organizationSchema } from "@/lib/schema";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const serif = Source_Serif_4({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 const TITLE_DEFAULT = `${SITE_NAME}: Find the perfect gift`;
 
@@ -90,11 +75,16 @@ export default async function RootLayout({
   const cookieHeader = (await cookies()).toString();
   const initialWantsClerk = hasClerkSessionCookie(cookieHeader);
 
+  // Headings use this face on every page. Geist (fonts.css) is not preloaded
+  // because nothing renders in it today.
+  preload("/fonts/source-serif-4-latin.woff2", {
+    as: "font",
+    type: "font/woff2",
+    crossOrigin: "anonymous",
+  });
+
   const body = (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${serif.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />

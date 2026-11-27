@@ -1,0 +1,7 @@
+The fonts in this folder are licensed under the SIL Open Font License, Version 1.1
+(https://openfontlicense.org). Each file also carries its own copyright and
+license details in its metadata.
+
+Source Serif 4: Copyright Adobe, https://github.com/adobe-fonts/source-serif
+Geist and Geist Mono: Copyright 2024 The Geist Project Authors,
+https://github.com/vercel/geist-font
