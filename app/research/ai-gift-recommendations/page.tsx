@@ -5,6 +5,7 @@ import { FOUNDER_ID, FOUNDER_NAME, ORGANIZATION_ID } from "@/lib/schema";
 import { JsonLd } from "@/components/json-ld";
 import { Card } from "@/components/ui/card";
 import { BarList } from "@/components/research/bar-list";
+import { FinderCta } from "@/components/research/finder-cta";
 import { StatTile } from "@/components/research/stat-tile";
 import data from "@/lib/research/gift-study-data.json";
 
@@ -97,6 +98,8 @@ export default function AiGiftStudyPage() {
           </Link>{" "}
           &middot; November 11, 2026 &middot; Method and data at the bottom
         </p>
+
+        <FinderCta />
 
         <div className="mt-8 space-y-4 text-base leading-relaxed text-stone-600">
           <p>
